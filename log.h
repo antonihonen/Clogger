@@ -1,3 +1,12 @@
+/*
+ * File: log.h
+ * Project: logger
+ * Created: 2019-04-15
+ * Author: Anton Ihonen, anton.ihonen@gmail.com
+ *
+ * This file defines a flexible and efficient logging interface.
+ */
+
 #ifndef LOG_H
 #define LOG_H
 

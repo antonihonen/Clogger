@@ -1,3 +1,12 @@
+/*
+ * File: log_macros.h
+ * Project: logger
+ * Created: 2019-04-15
+ * Author: Anton Ihonen, anton.ihonen@gmail.com
+ *
+ * This file contains macros used in the project.
+ */
+
 #ifndef LOG_MACROS_H
 #define LOG_MACROS_H
 
