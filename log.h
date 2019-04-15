@@ -24,21 +24,22 @@ typedef struct
 	bool is_buf_memory_owner_;
 
 	LOG_FILE_POLICY file_policy_;
-	char file_dir_[MAX_DIR_SIZE];
-	char file_name_[MAX_FILENAME_SIZE];
-	char file_ext_[MAX_FILE_EXT_SIZE];
+	char file_dir_[LOG_MAX_DIR_SIZE];
+	char file_name_[LOG_MAX_FILENAME_SIZE];
+	char file_ext_[LOG_MAX_FILE_EXT_SIZE];
 	size_t max_file_size_;
 	bool is_file_creator_;
 	bool has_file_changed_;
 
-	char entry_format_[MAX_FORMAT_SIZE];
+	char entry_format_[LOG_MAX_FORMAT_SIZE];
 	LOG_LEVEL entry_threshold_;
 	bool do_allow_entries_;
 } log_t;
 
 LOG_ERROR
 log_init(log_t* log,
-	LOG_LEVEL threshold,
+	LOG_LEVEL entry_threshold,
+	char* entry_format,
 	LOG_BUFFERING_POLICY buffering_policy,
 	size_t buffer_size,
 	void* buffer,
