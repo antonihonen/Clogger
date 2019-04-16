@@ -10,8 +10,8 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "log_macros.h"
-#include "log_types.h"
+#include "macros.h"
+#include "types.h"
 #include <stddef.h>
 #include <stdbool.h>
 
