@@ -20,3 +20,15 @@ static bool is_valid_log_lvl(LOG_LEVEL level)
 	}
 	return false;
 }
+
+static bool is_valid_file_policy(LOG_FILE_POLICY policy)
+{
+	for (size_t i = 0; i < LOG_VALID_FILEPOL_COUNT; ++i)
+	{
+		if (policy == GOOD_FILE_POLICIES[i])
+		{
+			return true;
+		}
+	}
+	return false;
+}
