@@ -15,24 +15,71 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/* Defines the properties of a log object. */
 typedef struct
 {
+	// Determines whether output is buffered. If it is,
+	// all log entries are first written into a buffer,
+	// the contents of which will be written into the log
+	// file at once when the buffer is about to get full
+	// if a file policy other than NO_FILE_POLICY
+	// has been selected. 
 	LOG_BUFFERING_POLICY buffering_policy_;
+	
+	// The base address of the output buffer.
 	void* buffer_;
+
+	// The capacity of the buffer in bytes.
 	size_t buffer_capacity_;
+
+	// The offset of the next byte in the buffer to be written in
+	// in relation to the buffer base address.
 	size_t buffer_head_;
+	
+	// Indicates whether the log object has allocated
+	// the buffer memory by itself or if it was given
+	// by the user.
 	bool is_buf_memory_owner_;
 
+	// Determines what action is taken when the log file
+	// reaches its maximum size.
 	LOG_FILE_POLICY file_policy_;
+
+	// Full path of the directory the log file resides in.
 	char file_dir_[LOG_MAX_DIR_SIZE];
+
+	// The file name format to be used for the log file.
+	// Macros can be used for example to make the name include
+	// the current date.
 	char file_name_[LOG_MAX_FILENAME_SIZE];
+
+	// The log file extension of the output file.
 	char file_ext_[LOG_MAX_FILE_EXT_SIZE];
+	
+	// The maximum size of a single log file.
+	// When the maximum file size is reached, the
+	// chosen file policy dictates what action is taken.
 	size_t max_file_size_;
+
+	// Indicates whether the log object created the file
+	// it is writing to.
 	bool is_file_creator_;
+
+	// Indicates whether the log file has been changed by
+	// the log object.
 	bool has_file_changed_;
 
+	// The format after which log entries are formatted.
+	// Macros such as date can be used to determine the format.
 	char entry_format_[LOG_MAX_FORMAT_SIZE];
+
+	// The active threshold level. Any entry with a lower level
+	// than the threshold level will be ignored.
 	LOG_LEVEL entry_threshold_;
+
+	// Indicates whether the log object accepts any entries -
+	// if not, all entries are ignored as if their level
+	// was lower than the entry threshold.
 	bool do_allow_entries_;
 } log_t;
 
