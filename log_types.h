@@ -12,7 +12,6 @@
 #define LOG_ENUMS_H
 
 typedef enum {
-	NOT_SET,
 	TRACE,
 	DEBUG,
 	INFO,
