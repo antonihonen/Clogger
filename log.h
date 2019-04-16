@@ -27,7 +27,7 @@ typedef struct
 	LOG_BUFFERING_POLICY buffering_policy_;
 	
 	/* The base address of the output buffer. */
-	void* buffer_;
+	char* buffer_;
 
 	/* The capacity of the buffer in bytes. */
 	size_t buffer_capacity_;
@@ -89,11 +89,11 @@ immediately after initialization.
 @entry_threshold:
 @entry_format:
 @buffering_policy:
-@buffer_size:
-@buffer:
+@output_buffer_size:
+@output_buffer:
 @file_policy:
 @dir:
-@filename:
+@filename_format:
 @file_ext:
 @max_file_size:
 @return:
@@ -103,11 +103,11 @@ log_init(log_t* log,
 	LOG_LEVEL entry_threshold,
 	char* entry_format,
 	LOG_BUFFERING_POLICY buffering_policy,
-	size_t buffer_size,
-	void* buffer,
+	size_t output_buffer_size,
+	char* output_buffer,
 	LOG_FILE_POLICY file_policy,
 	char* dir,
-	char* filename,
+	char* filename_format,
 	char* file_ext,
 	size_t max_file_size);
 
@@ -137,15 +137,16 @@ upon the call to log_init).
 LOG_ERROR
 log_close(log_t* log);
 
-/* Sets a LOG_LEVEL threshold which log entries will have
+/* Sets a log level threshold which log entries will have
 to exceed in order to be accepted to be written into the log
-file.
+file. Accepted values are: TRACE < DEBUG < INFO < WARNING
+< ERROR < CRITICAL.
 @log: A pointer to the log object.
-@new_threshold:
+@threshold:
 @return:
 */
 LOG_ERROR
-log_set_threshold(log_t* log, LOG_LEVEL new_threshold);
+log_set_threshold(log_t* log, LOG_LEVEL threshold);
 
 /* Gets the active log entry threshold.
 @log: A pointer to the log object.
@@ -160,11 +161,11 @@ enabled, entries will first be written in a buffer rather
 than the log file. When the buffer gets full, all data in
 the buffer are written into the file at once.
 @log: A pointer to the log object.
-@new_policy:
+@policy:
 @return:
 */
 LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY new_policy);
+log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy);
 
 /* Gets the active buffering policy.
 @log: A pointer to the log object.
@@ -180,12 +181,12 @@ the old buffer was allocated by the log object upon the call to
 log_init, the buffer memory will be released. Otherwise the user
 is responsible for releasing the buffer memory.
 @log: A pointer to the log object.
-@new_buffer:
-@new_buf_size:
+@output_buffer:
+@buffer_size:
 @return:
 */
 LOG_ERROR
-log_set_buffer(log_t* log, void* new_buffer, size_t new_buf_size);
+log_set_output_buffer(log_t* log, char* output_buffer, size_t buffer_size);
 
 /* Gets a pointer to the output buffer's base address.
 @log: A pointer to the log object.
@@ -193,7 +194,7 @@ log_set_buffer(log_t* log, void* new_buffer, size_t new_buf_size);
 @return:
 */
 LOG_ERROR
-log_buffer(log_t* log, void** buffer);
+log_buffer(log_t* log, char* buffer);
 
 /* Gets a pointer to the address in which the
 next write to the output buffer will happen.
@@ -202,7 +203,7 @@ next write to the output buffer will happen.
 @return:
 */
 LOG_ERROR
-log_buffer_head(log_t* log, void** head);
+log_buffer_head(log_t* log, char* head);
 
 /* Flushes the output buffer, writing any data in the
 buffer into the log file and emptying the buffer.
@@ -250,11 +251,11 @@ log_buffer_space_left(log_t* log, size_t* free_space);
 determines what action is taken when the log file reaches
 its maximum size.
 @log: A pointer to the log object.
-@new_policy:
+@policy:
 @return:
 */
 LOG_ERROR
-log_set_file_policy(log_t* log, LOG_FILE_POLICY new_policy);
+log_set_file_policy(log_t* log, LOG_FILE_POLICY policy);
 
 /* Gets the active file policy.
 @log: A pointer to the log object.
@@ -267,11 +268,11 @@ log_file_policy(log_t* log, LOG_FILE_POLICY* policy);
 /* Sets the directory in which the log file will be found.
 Full path to the directory is expected.
 @log: A pointer to the log object.
-@new_dir:
+@dir:
 @return:
 */
 LOG_ERROR
-log_set_dir(log_t* log, char* new_dir);
+log_set_dir(log_t* log, char* dir);
 
 /* Gets the full path of the log file directory.
 @log: A pointer to the log object.
@@ -279,15 +280,15 @@ log_set_dir(log_t* log, char* new_dir);
 @return:
 */
 LOG_ERROR
-log_dir(log_t* log, char** dir);
+log_dir(log_t* log, char* dir);
 
 /* Sets the file name format for the log.
 @log: A pointer to the log object.
-@filename:
+@filename_format:
 @return:
 */
 LOG_ERROR
-log_set_filename(log_t* log, char* filename);
+log_set_filename_format(log_t* log, char* filename_format);
 
 /* Gets the exact name of the current log file
 including the file format but excluding the
@@ -297,7 +298,7 @@ directory path.
 @return:
 */
 LOG_ERROR
-log_filename(log_t* log, char** filename);
+log_current_file_name(log_t* log, char* filename);
 
 /* Returns the full path of the current log file.
 @log: A pointer to the log object.
@@ -305,7 +306,7 @@ log_filename(log_t* log, char** filename);
 @return:
 */
 LOG_ERROR
-log_filepath(log_t* log, char** path);
+log_filepath(log_t* log, char* path);
 
 /* Sets the log file extension.
 @log: A pointer to the log object.
@@ -321,15 +322,15 @@ log_set_file_ext(log_t* log, char* new_file_ext);
 @return:
 */
 LOG_ERROR
-log_file_ext(log_t* log, char** file_ext);
+log_file_ext(log_t* log, char* file_ext);
 
 /* Sets the maximum size of a single log file in bytes.
 @log: A pointer to the log object.
-@new_file_size:
+@file_size:
 @return:
 */
 LOG_ERROR
-log_set_max_file_size(log_t* log, size_t new_file_size);
+log_set_max_file_size(log_t* log, size_t file_size);
 
 /* Gets the maximum size of a single log file in bytes.
 @log: A pointer to the log object.
@@ -350,11 +351,11 @@ log_current_file_size(log_t* log, size_t* file_size);
 /* Sets the entry format that all new entries will be formatted
 after.
 @log: A pointer to the log object.
-@format:
+@entry_format:
 @return:
 */
 LOG_ERROR
-log_set_entry_format(log_t* log, char* format);
+log_set_entry_format(log_t* log, char* entry_format);
 
 /* Formats a log message according to the active entry
 format and writes it to the buffer if buffering is enabled
