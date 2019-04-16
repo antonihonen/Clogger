@@ -368,6 +368,14 @@ doesn't exceed the active entry threshold of the log object.
 LOG_ERROR
 log_write(log_t* log, LOG_LEVEL level, char* message);
 
+/* The same as log_write but with logging level set to TRACE.
+@log: A pointer to the log object.
+@message:
+@return:
+*/
+LOG_ERROR
+log_trace(log_t* log, char* message);
+
 /* The same as log_write but with logging level set to DEBUG.
 @log: A pointer to the log object.
 @message:
