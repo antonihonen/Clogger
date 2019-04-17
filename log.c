@@ -8,9 +8,9 @@
  */
 
 #include "log.h"
-#include "string.h"
 #include "validate.h"
-#include "malloc.h"
+#include <malloc.h>
+#include <string.h>
 
 LOG_ERROR
 log_init(log_t* log,
