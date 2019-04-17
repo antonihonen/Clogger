@@ -24,7 +24,6 @@ log_init(log_t* log,
 
 	strcpy(log->file_dir_, dir);
 	stcpy(log->filename_format_, filename_format);
-	strcpy(log->file_ext_, LOG_DEF_FILE_EXT);
 	log->max_file_size_ = max_file_size;
 	log->file_policy_ = file_policy;
 	log->file_ = NULL;

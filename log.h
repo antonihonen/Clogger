@@ -37,13 +37,11 @@ typedef struct
 	/* Full path of the directory the log file resides in. */
 	char file_dir_[LOG_MAX_DIR_SIZE];
 
-	/* The file name format to be used for the log file.
+	/* The file name format to be used for the log file. Includes
+	file extension.
 	Macros can be used, for example to make the name include
 	the current date. */
 	char filename_format_[LOG_MAX_FILENAME_SIZE];
-
-	/* The log file extension of the output file. */
-	char file_ext_[LOG_MAX_FILE_EXT_SIZE];
 	
 	/* The maximum size of a single log file.
 	When the maximum file size is reached, the
