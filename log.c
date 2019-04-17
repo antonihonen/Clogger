@@ -57,3 +57,165 @@ log_disable(log_t* log)
 	log->do_allow_entries_ = false;
 	return NO_ERROR;
 }
+
+LOG_ERROR
+log_close(log_t* log)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_threshold(log_t* log, LOG_LEVEL threshold)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_threshold(log_t* log, LOG_LEVEL* threshold)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_buffer(log_t* log, size_t buffer_size)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_flush_buffer(log_t* log)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_file_policy(log_t* log, LOG_FILE_POLICY policy)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_file_policy(log_t* log, LOG_FILE_POLICY* policy)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_dir(log_t* log, char* dir)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_dir(log_t* log, char* dir)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_filename_format(log_t* log, char* filename_format)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_current_file_name(log_t* log, char* filename)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_filepath(log_t* log, char* path)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_file_ext(log_t* log, char* new_file_ext)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_file_ext(log_t* log, char* file_ext)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_max_file_size(log_t* log, size_t file_size)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_max_file_size(log_t* log, size_t* file_size)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_current_file_size(log_t* log, size_t* file_size)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_set_entry_format(log_t* log, char* entry_format)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_write(log_t* log, LOG_LEVEL level, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_trace(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_debug(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_info(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_warning(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_error(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_critical(log_t* log, char* message)
+{
+	return NO_ERROR;
+}
