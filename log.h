@@ -234,22 +234,6 @@ log_current_file_name(log_t* log, char* filename);
 LOG_ERROR
 log_filepath(log_t* log, char* path);
 
-/* Sets the log file extension.
-@log: A pointer to the log object.
-@new_file_ext:
-@return:
-*/
-LOG_ERROR
-log_set_file_ext(log_t* log, char* new_file_ext);
-
-/* Gets the log file extension.
-@log: A pointer to the log object.
-@file_ext:
-@return:
-*/
-LOG_ERROR
-log_file_ext(log_t* log, char* file_ext);
-
 /* Sets the maximum size of a single log file in bytes.
 @log: A pointer to the log object.
 @file_size:

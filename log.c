@@ -89,10 +89,7 @@ log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy)
 }
 
 LOG_ERROR
-log_set_buffer(log_t* log, size_t buffer_size)
-{
-	return NO_ERROR;
-}
+log_set_buffer(log_t* log, size_t buffer_size);
 
 LOG_ERROR
 log_flush_buffer(log_t* log)
@@ -138,18 +135,6 @@ log_current_file_name(log_t* log, char* filename)
 
 LOG_ERROR
 log_filepath(log_t* log, char* path)
-{
-	return NO_ERROR;
-}
-
-LOG_ERROR
-log_set_file_ext(log_t* log, char* new_file_ext)
-{
-	return NO_ERROR;
-}
-
-LOG_ERROR
-log_file_ext(log_t* log, char* file_ext)
 {
 	return NO_ERROR;
 }
