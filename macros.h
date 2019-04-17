@@ -98,8 +98,8 @@
 #define LOG_SUN_S "Sun"
 #define LOG_SUN_S_C "SUN"
 
-#define LOG_DOW_L_FIELD_SIZE sizeof(LOG_WED_L)
-#define LOG_DOW_S_FIELD_SIZE sizeof(LOG_WED_S)
+#define LOG_DOW_L_FIELD_SIZE (sizeof(LOG_WED_L) - 1)
+#define LOG_DOW_S_FIELD_SIZE (sizeof(LOG_WED_S) - 1)
 
 #define LOG_DEBUG_STR "Debug"
 #define LOG_DEBUG_STR_C "DEBUG"
@@ -111,7 +111,7 @@
 #define LOG_ERROR_STR_C "ERROR"
 #define LOG_CRITICAL_STR "Critical"
 #define LOG_CRITICAL_STR_C "CRITICAL"
-#define LOG_LVL_FIELD_SIZE sizeof(LOG_CRITICAL_STR);
+#define LOG_LVL_FIELD_SIZE (sizeof(LOG_CRITICAL_STR) - 1);
 
 #define LOG_NEWLINE_CHAR "\n"
 
