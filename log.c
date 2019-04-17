@@ -36,4 +36,24 @@ log_init(log_t* log,
 	strcpy(log->entry_format_, LOG_DEF_ENTRY_FORMAT);
 	log->entry_threshold_ = LOG_DEF_THRESHOLD;
 	log->do_allow_entries_ = true;
+
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_enable(log_t* log)
+{
+	// TODO: Check legality of parameters.
+
+	log->do_allow_entries_ = true;
+	return NO_ERROR;
+}
+
+LOG_ERROR
+log_disable(log_t* log)
+{
+	// TODO: Check legality of parameters.
+
+	log->do_allow_entries_ = false;
+	return NO_ERROR;
 }
