@@ -12,8 +12,9 @@
 
 #include "macros.h"
 #include "types.h"
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
 
 /* Defines the properties of a log object. */
 typedef struct
@@ -25,21 +26,9 @@ typedef struct
 	if a file policy other than NO_FILE_POLICY
 	has been selected. */
 	LOG_BUFFERING_POLICY buffering_policy_;
-	
-	/* The base address of the output buffer. */
-	char* buffer_;
 
 	/* The capacity of the buffer in bytes. */
 	size_t buffer_capacity_;
-
-	/* The offset of the next byte in the buffer to be written in
-	in relation to the buffer base address. */
-	size_t buffer_head_;
-	
-	/* Indicates whether the log object has allocated
-	the buffer memory by itself or if it was given
-	by the user. */
-	bool is_buf_memory_owner_;
 
 	/* Determines what action is taken when the log file
 	reaches its maximum size. */
@@ -51,7 +40,7 @@ typedef struct
 	/* The file name format to be used for the log file.
 	Macros can be used, for example to make the name include
 	the current date. */
-	char file_name_[LOG_MAX_FILENAME_SIZE];
+	char filename_format_[LOG_MAX_FILENAME_SIZE];
 
 	/* The log file extension of the output file. */
 	char file_ext_[LOG_MAX_FILE_EXT_SIZE];
@@ -60,6 +49,9 @@ typedef struct
 	When the maximum file size is reached, the
 	chosen file policy dictates what action is taken. */
 	size_t max_file_size_;
+
+	/* A handle to the currently active file stream. */
+	FILE* file_;
 
 	/* Indicates whether the log object created the file
 	it is writing to. */
@@ -86,30 +78,22 @@ typedef struct
 /* Initializes a log object. The object can be used
 immediately after initialization.
 @log: A pointer to the log object.
-@entry_threshold:
-@entry_format:
-@buffering_policy:
-@output_buffer_size:
-@output_buffer:
-@file_policy:
 @dir:
 @filename_format:
-@file_ext:
 @max_file_size:
+@file_policy:
+@output_buffer_size:
+@output_buffer:
+@buffering_policy:
 @return:
 */
 LOG_ERROR
 log_init(log_t* log,
-	LOG_LEVEL entry_threshold,
-	char* entry_format,
-	LOG_BUFFERING_POLICY buffering_policy,
-	size_t output_buffer_size,
-	char* output_buffer,
-	LOG_FILE_POLICY file_policy,
 	char* dir,
 	char* filename_format,
-	char* file_ext,
-	size_t max_file_size);
+	size_t max_file_size,
+	LOG_FILE_POLICY file_policy,
+	LOG_BUFFERING_POLICY buffering_policy);
 
 /* Enables writing to the log. When writing is enabled,
 entries that exceed the active entry threshold will be
@@ -128,9 +112,7 @@ all entries will be ignored.
 LOG_ERROR
 log_disable(log_t* log);
 
-/* Flushes the output buffer and releases buffer memory if
-owned by the log object (memory was allocated by the object
-upon the call to log_init).
+/* Flushes the output buffer and releases memory.
 @log: A pointer to the log object.
 @return:
 */
@@ -175,35 +157,15 @@ log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy);
 LOG_ERROR
 log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy);
 
-/* Sets a new buffer for the log object. This will replace the
-old buffer - only a single buffer can be active at a time. If
-the old buffer was allocated by the log object upon the call to
-log_init, the buffer memory will be released. Otherwise the user
-is responsible for releasing the buffer memory.
+/* Sets a new size for the output buffer. The old buffer is
+discarded - the user must flush the old buffer first if
+data must not be lost.
 @log: A pointer to the log object.
-@output_buffer:
 @buffer_size:
 @return:
 */
 LOG_ERROR
-log_set_output_buffer(log_t* log, char* output_buffer, size_t buffer_size);
-
-/* Gets a pointer to the output buffer's base address.
-@log: A pointer to the log object.
-@buffer:
-@return:
-*/
-LOG_ERROR
-log_buffer(log_t* log, char* buffer);
-
-/* Gets a pointer to the address in which the
-next write to the output buffer will happen.
-@log: A pointer to the log object.
-@head:
-@return:
-*/
-LOG_ERROR
-log_buffer_head(log_t* log, char* head);
+log_set_buffer(log_t* log, size_t buffer_size);
 
 /* Flushes the output buffer, writing any data in the
 buffer into the log file and emptying the buffer.
@@ -212,40 +174,6 @@ buffer into the log file and emptying the buffer.
 */
 LOG_ERROR
 log_flush_buffer(log_t* log);
-
-/* Discards all data in the output buffer. Not to be
-confused with log_flush_buffer.
-@log: A pointer to the log object.
-@return:
-*/
-LOG_ERROR
-log_clear_buffer(log_t* log);
-
-/* Gets the capacity of the output buffer in bytes.
-@log: A pointer to the log object.
-@capacity:
-@return:
-*/
-LOG_ERROR
-log_buffer_capacity(log_t* log, size_t* capacity);
-
-/* Gets the number of bytes currently in the output
-buffer.
-@log: A pointer to the log object.
-@size:
-@return:
-*/
-LOG_ERROR
-log_buffer_size(log_t* log, size_t* size);
-
-/* Gets the current amount of free space in the
-output buffer in bytes.
-@log: A pointer to the log object.
-@free_space:
-@return:
-*/
-LOG_ERROR
-log_buffer_space_left(log_t* log, size_t* free_space);
 
 /* Sets the file policy for the log. The file policy
 determines what action is taken when the log file reaches

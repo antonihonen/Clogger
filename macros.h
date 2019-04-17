@@ -113,6 +113,9 @@
 #define LOG_CRITICAL_STR_C "CRITICAL"
 #define LOG_LVL_FIELD_SIZE sizeof(LOG_CRITICAL_STR);
 
-#define NEWLINE_CHAR "\n"
+#define LOG_NEWLINE_CHAR "\n"
+
+#define LOG_DEF_LVL TRACE
+#define LOG_DEF_FORMAT "%(_MSG_)"
 
 #endif // LOG_MACROS_H
