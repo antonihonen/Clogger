@@ -11,9 +11,9 @@
 #define LOG_MACROS_H
 
 /* Default values for log_t struct members. */
-#define LOG_DEF_BUFFER_POLICY DONT_BUFFER
+#define LOG_DEF_BUFFER_POLICY FULL_BUFFERING
 #define LOG_DEF_BUFFER_SIZE 0
-#define LOG_DEF_FILE_POLICY ITERATIVE
+#define LOG_DEF_FILE_POLICY ROTATE
 #define LOG_DEF_THRESHOLD TRACE
 #define LOG_MAX_DIR_SIZE 512
 #define LOG_DEF_DIR "logs"
