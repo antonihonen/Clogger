@@ -67,12 +67,18 @@ log_close(log_t* log)
 LOG_ERROR
 log_set_threshold(log_t* log, LOG_LEVEL threshold)
 {
+	// TODO: Check legality of parameters.
+
+	log->entry_threshold_ = threshold;
 	return NO_ERROR;
 }
 
 LOG_ERROR
 log_threshold(log_t* log, LOG_LEVEL* threshold)
 {
+	// TODO: Check legality of parameters.
+
+	*threshold = log->entry_threshold_;
 	return NO_ERROR;
 }
 
