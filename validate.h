@@ -4,43 +4,20 @@
  * Created: 2019-04-16
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file contains functions that validate user input.
+ * This file defines functions that validate user input.
  */
 
 #include "types.h"
+#include "stdbool.h"
 
-static bool is_valid_log_lvl(LOG_LEVEL level)
-{
-	for (size_t i = 0; i < LOG_VALID_LVL_COUNT; ++i)
-	{
-		if (level == VALID_LOG_LEVELS[i])
-		{
-			return true;
-		}
-	}
-	return false;
-}
+bool is_valid_dir(char* dir);
 
-static bool is_valid_file_policy(LOG_FILE_POLICY policy)
-{
-	for (size_t i = 0; i < LOG_VALID_FILEPOL_COUNT; ++i)
-	{
-		if (policy == VALID_FILE_POLICIES[i])
-		{
-			return true;
-		}
-	}
-	return false;
-}
+bool is_valid_filename_format(char* filename_format);
 
-static bool is_valid_buf_policy(LOG_BUFFERING_POLICY policy)
-{
-	for (size_t i = 0; i < LOG_VALID_BUFPOL_COUNT; ++i)
-	{
-		if (policy == VALID_BUF_POLICIES[i])
-		{
-			return true;
-		}
-	}
-	return false;
-}
+bool is_valid_path(char* path);
+
+bool is_valid_log_lvl(LOG_LEVEL level);
+
+bool is_valid_file_policy(LOG_FILE_POLICY policy);
+
+bool is_valid_buf_policy(LOG_BUFFERING_POLICY policy);
