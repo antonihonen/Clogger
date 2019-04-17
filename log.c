@@ -23,7 +23,7 @@ log_init(log_t* log,
 	// TODO: Check legality of parameters.
 
 	strcpy(log->file_dir_, dir);
-	stcpy(log->filename_format_, filename_format);
+	strcpy(log->filename_format_, filename_format);
 	log->max_file_size_ = max_file_size;
 	log->file_policy_ = file_policy;
 	log->file_ = NULL;
@@ -95,7 +95,10 @@ log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy)
 }
 
 LOG_ERROR
-log_set_buffer_size(log_t* log, size_t buffer_size);
+log_set_buffer_size(log_t* log, size_t buffer_size)
+{
+	return NO_ERROR;
+}
 
 LOG_ERROR
 log_flush_buffer(log_t* log)
