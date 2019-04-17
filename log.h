@@ -163,7 +163,7 @@ data must not be lost.
 @return:
 */
 LOG_ERROR
-log_set_buffer(log_t* log, size_t buffer_size);
+log_set_buffer_size(log_t* log, size_t buffer_size);
 
 /* Flushes the output buffer, writing any data in the
 buffer into the log file and emptying the buffer.

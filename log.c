@@ -89,7 +89,7 @@ log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy)
 }
 
 LOG_ERROR
-log_set_buffer(log_t* log, size_t buffer_size);
+log_set_buffer_size(log_t* log, size_t buffer_size);
 
 LOG_ERROR
 log_flush_buffer(log_t* log)
