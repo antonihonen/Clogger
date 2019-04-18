@@ -19,7 +19,7 @@
 #define LOG_MACRO_BEGIN '%'
 #define LOG_MACRO_BEGIN_ESC "%%"
 
-static LOG_ERROR expand_macro(char** format_head, char* peek_buf)
+static LOG_ERROR expand_macro(char** dest_head, char** format_head, char* format_id)
 {
 	return NO_ERROR;
 }
@@ -55,10 +55,6 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 	// Pointer to the first byte in the format string that hasn't yet
 	// been handled.
 	char* format_head = formatter->fn_format_;
-	// Buffer where peek-ahead results will be stored.
-	char peek_buf[LOG_MAX_FORMAT_MACRO_LEN];
-	// Pointer to the first uncopied byte in the peek buffer.
-	char* peek_head = peek_buf;
 	
 	while (*format_head != LOG_NULL_TERMINATOR)
 	{
@@ -71,9 +67,7 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 			++format_head;
 		}
 		// Expand the macro.
-		LOG_CLEAR_STRING(peek_buf);
-		peek_head = peek_buf;
-		expand_macro(&format_head, peek_buf);
+		expand_macro(&filename_head, &format_head, "fn");
 	}
 	// Add the null terminator which was excluded in the
 	// while loop.
