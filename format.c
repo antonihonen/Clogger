@@ -8,18 +8,17 @@
  * format.h.
  */
 
- /* File name formatter functions. */
-
 #include "format.h"
+#include "time_util.h"
+#include <stdbool.h>
 #include <string.h>
 
-#define LOG_MAX_FORMAT_MACRO_LEN 8
+ /* File name formatter functions. */
+
 #define LOG_CLEAR_STRING(string) (string[0] = '\0')
 #define LOG_NULL_TERMINATOR '\0'
-#define LOG_MACRO_BEGIN '%'
-#define LOG_MACRO_BEGIN_ESC "%%"
 
-static LOG_ERROR expand_macro(char** dest_head, char** format_head, char* format_id)
+static LOG_ERROR expand_macro(char** dest_head, char** format_head, LOG_LEVEL lvl)
 {
 	return NO_ERROR;
 }
@@ -67,7 +66,7 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 			++format_head;
 		}
 		// Expand the macro.
-		expand_macro(&filename_head, &format_head, "fn");
+		expand_macro(&filename_head, &format_head, -1);
 	}
 	// Add the null terminator which was excluded in the
 	// while loop.
