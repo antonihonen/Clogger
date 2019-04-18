@@ -31,38 +31,6 @@
 #define LOG_NO_DIR ""
 #define LOG_NO_FILE_EXT ""
 
-/* Macros the user can use to format log entries. */
-// Expands to the current year, represented in four digits.
-#define LOG_YEAR_MACRO "%(_YYYY_)"
-// Expands to the current month, represented in two digits.
-#define LOG_MONTH_MACRO "%(_MM_)"
-// Expands to the current day of the month, represented in two digits.
-#define LOG_DAY_MACRO "%(_DD_)"
-// Expands to the current hour of the day, represented in two digits.
-#define LOG_HOUR_MACRO "%(_hh_)"
-// Expands to the current minute of the hour, represented in two digits.
-#define LOG_MINUTE_MACRO "%(_mm_)"
-// Expands to the current second of the minute, represented in two digits.
-#define LOG_SEC_MACRO "%(_ss_)"
-// Expands to the current day of the week, occupying nine characters
-// (Wednesday) - spare characters will be .
-#define LOG_DOW_L_MACRO "%(_DOW_L_)"
-// Expands to the current day of the week, represented in three characters.
-#define LOG_DOW_S_MACRO "%(_DOW_S_)"
-// Expands to the current logging level of the log object in capital letters,
-// occupying eight characters (CRITICAL).
-#define LOG_LEVEL_MACRO "%(_LVL_)"
-// Expands to the current logging level of the log object in capital letters,
-// occupying eight characters (Critical).
-#define LOG_LEVEL_FC_MACRO "%(_Lvl_)"
-// Expands to the current logging level of the log object in non-capital
-// letters, occupying eight characters (critical).
-#define LOG_LEVEL_NC_MACRO "%(_lvl_)"
-// Expands to the log message as inputted by the user in a write call.
-#define LOG_MSG_MACRO  "%(_MSG_)"
-
-#define LOG_FILE_ITER_MACRO "%(_FILE_I_)"
-
 #define LOG_MON_L "Monday"
 #define LOG_MON_L_C "MONDAY"
 #define LOG_MON_S "Mon"
