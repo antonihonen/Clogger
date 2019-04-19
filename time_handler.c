@@ -73,7 +73,7 @@ thandler_init(thandler_t* thandler)
 {
 	assert(thandler);
 
-	thandler->last_fetch_ = NULL;
+	thandler->_last_fetch = NULL;
 	return E_NO_ERROR;
 }
 
@@ -92,7 +92,7 @@ thandler_fetch_ltime(thandler_t* thandler)
 
 	time_t raw_time;
 	time(&raw_time);
-	thandler->last_fetch_ = localtime(&raw_time);
+	thandler->_last_fetch = localtime(&raw_time);
 	return E_NO_ERROR;
 }
 
@@ -101,10 +101,10 @@ thandler_get_year(thandler_t* thandler, char* year)
 {
 	assert(thandler);
 	assert(year);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
-	// The year contained by last_fetch_ is counted from 1900.
-	sprintf(year, "%i", 1900L + thandler->last_fetch_->tm_year);
+	// The year contained by _last_fetch is counted from 1900.
+	sprintf(year, "%i", 1900L + thandler->_last_fetch->tm_year);
 	return E_NO_ERROR;
 }
 
@@ -113,10 +113,10 @@ thandler_get_month(thandler_t* thandler, char* month)
 {
 	assert(thandler);
 	assert(month);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
 	// The month contained by local time is counted from 0.
-	two_digit_int_to_str(thandler->last_fetch_->tm_mon + 1, month);
+	two_digit_int_to_str(thandler->_last_fetch->tm_mon + 1, month);
 	return E_NO_ERROR;
 }
 
@@ -125,9 +125,9 @@ thandler_get_mday(thandler_t* thandler, char* mday)
 {
 	assert(thandler);
 	assert(mday);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->last_fetch_->tm_mday, mday);
+	two_digit_int_to_str(thandler->_last_fetch->tm_mday, mday);
 	return E_NO_ERROR;
 }
 
@@ -136,9 +136,9 @@ thandler_get_hours(thandler_t* thandler, char* hours)
 {
 	assert(thandler);
 	assert(hours);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->last_fetch_->tm_hour, hours);
+	two_digit_int_to_str(thandler->_last_fetch->tm_hour, hours);
 	return E_NO_ERROR;
 }
 
@@ -147,9 +147,9 @@ thandler_get_mins(thandler_t* thandler, char* mins)
 {
 	assert(thandler);
 	assert(mins);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->last_fetch_->tm_min, mins);
+	two_digit_int_to_str(thandler->_last_fetch->tm_min, mins);
 	return E_NO_ERROR;
 }
 
@@ -158,9 +158,9 @@ thandler_get_secs(thandler_t* thandler, char* secs)
 {
 	assert(thandler);
 	assert(secs);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->last_fetch_->tm_sec, secs);
+	two_digit_int_to_str(thandler->_last_fetch->tm_sec, secs);
 	return E_NO_ERROR;
 }
 
@@ -168,14 +168,14 @@ LOG_ERROR
 thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 {
 	assert(thandler);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 	assert(mname);
 	assert(format >= __MN_SHORT_SMALL);
 	assert(format <= __MN_LONG_ALL_CAPS);
 
 	// Allocate enough space to accommodate the longest month name.
 	char full_name_in_caps[10];
-	strcpy(full_name_in_caps, MONTHS[thandler->last_fetch_->tm_mon]);
+	strcpy(full_name_in_caps, MONTHS[thandler->_last_fetch->tm_mon]);
 
 	if (format >= __MN_SHORT_SMALL && format <= __MN_SHORT_ALL_CAPS)
 	{
@@ -203,14 +203,14 @@ LOG_ERROR
 thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format)
 {
 	assert(thandler);
-	assert(thandler->last_fetch_);
+	assert(thandler->_last_fetch);
 	assert(wday);
 	assert(format >= __WD_SHORT_SMALL);
 	assert(format <= __WD_LONG_ALL_CAPS);
 
 	// Allocate enough space to accommodate the longest weekday name.
 	char full_name_in_caps[10];
-	strcpy(full_name_in_caps, WEEKDAYS[thandler->last_fetch_->tm_wday]);
+	strcpy(full_name_in_caps, WEEKDAYS[thandler->_last_fetch->tm_wday]);
 
 	if (format >= __WD_SHORT_SMALL && format <= __WD_SHORT_ALL_CAPS)
 	{

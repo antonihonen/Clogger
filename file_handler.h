@@ -15,19 +15,19 @@
 
 /* Defines the properties of a file handler object. */
 typedef struct {
-	FILE* fstream_;
+	FILE* _fstream;
 
-	LOG_BUFFERING_POLICY buffering_policy_;
-	size_t buffer_capacity_;
+	LOG_BUFFERING_POLICY _buffering_policy;
+	size_t _buffer_capacity;
 
-	LOG_FILE_POLICY file_policy_;
-	char file_dir_[LOG_MAX_DIR_SIZE];
-	char filename_format_[LOG_MAX_FILENAME_SIZE];
-	char current_filename_[LOG_MAX_FILENAME_SIZE];
-	size_t max_file_size_;
-	bool is_file_creator_;
-	bool has_file_changed_;
-	size_t file_iteration_;
+	LOG_FILE_POLICY _file_policy;
+	char _file_dir[__MAX_DIR_SIZE];
+	char _filename_format[__MAX_FILENAME_SIZE];
+	char _current_filename[__MAX_FILENAME_SIZE];
+	size_t _max_file_size;
+	bool _is_file_creator;
+	bool _has_file_changed;
+	size_t _file_iteration;
 } fhandler_t;
 
 LOG_ERROR

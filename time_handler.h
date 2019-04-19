@@ -26,7 +26,7 @@ typedef struct
 {
 	// Contains the result of the last call to localtime()
 	// received upon the last call to thandler_fetch_ltime().
-	struct tm* last_fetch_;
+	struct tm* _last_fetch;
 } thandler_t;
 
 LOG_ERROR

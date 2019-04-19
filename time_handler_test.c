@@ -22,7 +22,7 @@ static thandler_t* t = NULL;
 void test_get_year_single_pass(int tm_year, char* correct_result)
 {
 	char result[__YEAR_MAX_CHARS + 1];
-	t->last_fetch_->tm_year = tm_year;
+	t->_last_fetch->tm_year = tm_year;
 	thandler_get_year(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -38,7 +38,7 @@ void test_get_year(void)
 void test_get_month_single_pass(int tm_mon, char* correct_result)
 {
 	char result[3];
-	t->last_fetch_->tm_mon = tm_mon;
+	t->_last_fetch->tm_mon = tm_mon;
 	thandler_get_month(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -56,7 +56,7 @@ void test_get_month(void)
 void test_get_mday_single_pass(int tm_mday, char* correct_result)
 {
 	char result[3];
-	t->last_fetch_->tm_mday = tm_mday;
+	t->_last_fetch->tm_mday = tm_mday;
 	thandler_get_mday(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -74,7 +74,7 @@ void test_get_mday(void)
 void test_get_hours_single_pass(int tm_hour, char* correct_result)
 {
 	char result[3];
-	t->last_fetch_->tm_hour = tm_hour;
+	t->_last_fetch->tm_hour = tm_hour;
 	thandler_get_hours(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -93,7 +93,7 @@ void test_get_hours(void)
 void test_get_minutes_single_pass(int tm_min, char* correct_result)
 {
 	char result[3];
-	t->last_fetch_->tm_min = tm_min;
+	t->_last_fetch->tm_min = tm_min;
 	thandler_get_mins(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -116,7 +116,7 @@ void test_get_minutes(void)
 void test_get_seconds_single_pass(int tm_sec, char* correct_result)
 {
 	char result[3];
-	t->last_fetch_->tm_sec = tm_sec;
+	t->_last_fetch->tm_sec = tm_sec;
 	thandler_get_secs(t, result);
 	assert(strcmp(result, correct_result) == 0);
 }
@@ -139,7 +139,7 @@ void test_get_seconds(void)
 void test_get_mname_single_pass(int tm_mon, __MNAME_FORMAT format,
 	char* correct_result)
 {
-	t->last_fetch_->tm_mon = tm_mon;
+	t->_last_fetch->tm_mon = tm_mon;
 	char result[__MNAME_MAX_CHARS];
 	thandler_get_mname(t, result, format);
 	assert(strcmp(result, correct_result) == 0);
@@ -176,7 +176,7 @@ void test_get_mname(void)
 void test_get_wday_single_pass(int tm_wday, __WDAY_FORMAT format,
 	char* correct_result)
 {
-	t->last_fetch_->tm_wday = tm_wday;
+	t->_last_fetch->tm_wday = tm_wday;
 	char result[__WDAY_MAX_CHARS];
 	thandler_get_wday(t, result, format);
 	assert(strcmp(result, correct_result) == 0);

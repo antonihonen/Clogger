@@ -18,7 +18,8 @@
 #define LOG_CLEAR_STRING(string) (string[0] = '\0')
 #define LOG_NULL_TERMINATOR '\0'
 
-static LOG_ERROR expand_macro(char** dest_head, char** format_head, LOG_LEVEL lvl)
+static LOG_ERROR
+expand_macro(char** dest_head, char** format_head, LOG_LEVEL lvl)
 {
 	return E_NO_ERROR;
 }
@@ -37,9 +38,9 @@ fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 {
 	// TODO: Check validity of parameters.
 
-	strcpy(formatter->fn_format_, format);
+	strcpy(formatter->_fn_format, format);
 	// Clear the expanded filename string.
-	formatter->expanded_fn_[0] = '\0';
+	formatter->_expanded_fn[0] = '\0';
 	return E_NO_ERROR;
 }
 
@@ -53,13 +54,13 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 	char* filename_head = formatted_filename;
 	// Pointer to the first byte in the format string that hasn't yet
 	// been handled.
-	char* format_head = formatter->fn_format_;
+	char* format_head = formatter->_fn_format;
 	
 	while (*format_head != LOG_NULL_TERMINATOR)
 	{
 		// Copy characters one at a time until
 		// the beginning of a macro is found.
-		while (*format_head != LOG_MACRO_BEGIN)
+		while (*format_head != __MACRO_BEGIN)
 		{
 			*filename_head = *format_head;
 			++filename_head;

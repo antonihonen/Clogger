@@ -19,7 +19,7 @@ typedef enum {
 	L_ERROR,
 	L_CRITICAL
 } LOG_LEVEL;
-#define LOG_VALID_LVL_COUNT 6
+#define __VALID_LVL_COUNT 6
 static const LOG_LEVEL VALID_LOG_LEVELS[6] =
 	{ L_TRACE, L_DEBUG, L_INFO, L_WARNING, L_ERROR, L_CRITICAL };
 
@@ -28,8 +28,8 @@ typedef enum {
 	ROTATE,
 	IGNORE_EXCESS
 } LOG_FILE_POLICY;
-#define LOG_VALID_FILEPOL_COUNT 3
-static const LOG_FILE_POLICY VALID_FILE_POLICIES[LOG_VALID_FILEPOL_COUNT] =
+#define __VALID_FILEPOL_COUNT 3
+static const LOG_FILE_POLICY VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT] =
 	{ REWRITE, ROTATE, IGNORE_EXCESS };
 
 typedef enum {
@@ -37,8 +37,8 @@ typedef enum {
 	LINE_BUFFERING,
 	FULL_BUFFERING
 } LOG_BUFFERING_POLICY;
-#define LOG_VALID_BUFPOL_COUNT 3
-static const LOG_BUFFERING_POLICY VALID_BUF_POLICIES[LOG_VALID_BUFPOL_COUNT] =
+#define __VALID_BUFPOL_COUNT 3
+static const LOG_BUFFERING_POLICY VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT] =
 	{ NO_BUFFERING, LINE_BUFFERING, FULL_BUFFERING };
 
 typedef enum {
@@ -60,30 +60,30 @@ typedef enum {
 
 typedef enum
 {
-	YEAR_M,
-	MONTH_M,
-	DAY_M,
-	HOUR_M,
-	MIN_M,
-	SEC_M,
-	DOW_3_M,
-	DOW_FULL_M,
-	LVL_M,
-	MSG_M,
-	ESC_M,
-} LOG_FORMAT_MACRO;
-#define LOG_YEAR_MACRO "%(YYYY)"
-#define LOG_MONTH_MACRO "%(MM)"
-#define LOG_DAY_MACRO "%(DD)"
-#define LOG_HOUR_MACRO "%(hh)"
-#define LOG_MINUTE_MACRO "%(mm)"
-#define LOG_SEC_MACRO "%(ss)"
-#define LOG_DOW_3_MACRO "%(DOW_3)"
-#define LOG_DOW_FULL_MACRO "%(DOW_FULL)"
-#define LOG_LEVEL_MACRO "%(LVL)"
-#define LOG_MSG_MACRO  "%(MSG)"
-#define LOG_MACRO_BEGIN_ESC "%%"
-#define LOG_MACRO_BEGIN '%'
-#define LOG_MAX_FORMAT_MACRO_LEN 16
+	__YEAR_M,
+	__MONTH_M,
+	__DAY_M,
+	__HOUR_M,
+	__MIN_M,
+	__SEC_M,
+	__DOW_3_M,
+	__DOW_FULL_M,
+	__LVL_M,
+	__MSG_M,
+	__ESC_M,
+} __FORMAT_MACRO;
+#define __MACRO_BEGIN '%'
+#define __MACRO_BEGIN_ESC "%%"
+#define __YEAR_MACRO "%(YYYY)"
+#define __MONTH_MACRO "%(MM)"
+#define __DAY_MACRO "%(DD)"
+#define __HOUR_MACRO "%(hh)"
+#define __MINUTE_MACRO "%(mm)"
+#define __SEC_MACRO "%(ss)"
+#define __DOW_3_MACRO "%(DOW_3)"
+#define __DOW_FULL_MACRO "%(DOW_FULL)"
+#define __LEVEL_MACRO "%(LVL)"
+#define __MSG_MACRO  "%(MSG)"
+#define __MAX_FORMAT_MACRO_LEN 16
 
 #endif // LOG_ENUMS_H

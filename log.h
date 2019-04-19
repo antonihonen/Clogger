@@ -25,52 +25,52 @@ typedef struct
 	file at once when the buffer is about to get full
 	if a file policy other than NO_FILE_POLICY
 	has been selected. */
-	LOG_BUFFERING_POLICY buffering_policy_;
+	LOG_BUFFERING_POLICY _buffering_policy;
 
 	/* The capacity of the buffer in bytes. */
-	size_t buffer_capacity_;
+	size_t _buffer_capacity_;
 
 	/* Determines what action is taken when the log file
 	reaches its maximum size. */
-	LOG_FILE_POLICY file_policy_;
+	LOG_FILE_POLICY _file_policy;
 
 	/* Full path of the directory the log file resides in. */
-	char file_dir_[LOG_MAX_DIR_SIZE];
+	char _file_dir[__MAX_DIR_SIZE];
 
 	/* The file name format to be used for the log file. Includes
 	file extension.
 	Macros can be used, for example to make the name include
 	the current date. */
-	char filename_format_[LOG_MAX_FILENAME_SIZE];
+	char _filename_format[__MAX_FILENAME_SIZE];
 	
 	/* The maximum size of a single log file.
 	When the maximum file size is reached, the
 	chosen file policy dictates what action is taken. */
-	size_t max_file_size_;
+	size_t _max_file_size;
 
 	/* A handle to the currently active file stream. */
-	FILE* file_;
+	FILE* _file;
 
 	/* Indicates whether the log object created the file
 	it is writing to. */
-	bool is_file_creator_;
+	bool _is_file_creator;
 
 	/* Indicates whether the log file has been changed by
 	the log object. */
-	bool has_file_changed_;
+	bool _has_file_changed;
 
 	/* The format after which log entries are formatted.
 	Macros such as date can be used to determine the format. */
-	char entry_format_[LOG_MAX_FORMAT_SIZE];
+	char _entry_format[__MAX_FORMAT_SIZE];
 
 	/* The active threshold level. Any entry with a lower level
 	than the threshold level will be ignored. */
-	LOG_LEVEL entry_threshold_;
+	LOG_LEVEL _entry_threshold;
 
 	/* Indicates whether the log object accepts any entries -
 	if not, all entries are ignored as if their level
 	was lower than the entry threshold. */
-	bool do_allow_entries_;
+	bool _do_allow_entries;
 } log_t;
 
 /* Initializes a log object. The object can be used

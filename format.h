@@ -16,14 +16,14 @@
 
 /* Defines the properties of a filename formatter object. */
 typedef struct {
-	char fn_format_[LOG_MAX_FILENAME_SIZE];
-	char expanded_fn_[LOG_MAX_FILENAME_SIZE];
+	char _fn_format[__MAX_FILENAME_SIZE];
+	char _expanded_fn[__MAX_FILENAME_SIZE];
 } fn_formatter_t;
 
 /* Defines the properties of an entry formatter object. */
 typedef struct {
-	char e_format_[LOG_MAX_MSG_SIZE];
-	char e_expanded_format_[LOG_MAX_MSG_SIZE];
+	char _e_format[__MAX_MSG_SIZE];
+	char _e_expanded_format[__MAX_MSG_SIZE];
 } e_formatter_t;
 
 /* File name formatter functions. */
