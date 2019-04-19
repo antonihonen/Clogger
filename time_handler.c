@@ -25,8 +25,8 @@
 
 // Used for easy implementation of thandler_get_mname().
 static const char* MONTHS[12] =
-	{"JANUARY", "FEBRUARY", "MARC", "APRIL", "MAY", "JUNE",
-	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
+	{ "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
 
 // Used for easy implementation of thandler_get_wday().
 // Starts from Sunday because in the tm struct returned by localtime()
