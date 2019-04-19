@@ -18,11 +18,9 @@
 #define __UPP_Z_ASCII_VAL 90 // uppercase Z
 #define __LOW_A_ASCII_VAL 97 // lowercase a
 #define __LOW_Z_ASCII_VAL 122 // lowercase z
+// Converts an alphabetical ASCII character to lowercase.
 #define __ASCII_CHAR_TO_LOWER(c) \
 	if (*c >= __UPP_A_ASCII_VAL && *c <= __UPP_Z_ASCII_VAL) { *c += 32; } \
-	else {}
-#define __ASCII_CHAR_TO_UPPER(c) \
-	if (*c >= __LOW_A_ASCII_VAL && *c <= __LOW_Z_ASCII_VAL) { *c -= 32; } \
 	else {}
 
 // Used for easy implementation of thandler_get_mname().
@@ -37,9 +35,10 @@ static const char* WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
 	"THURSDAY", "FRIDAY", "SATURDAY" };
 
-// Writes the value of i to str with two digits.
-// Zero is used as prefix for i < 10.
-static void two_digit_int_to_str(int i, char* str)
+/* Writes the value of i to str with two digits.
+Zero is used as prefix for i < 10. */
+static void
+two_digit_int_to_str(int i, char* str)
 {
 	assert(i >= 0);
 	assert(str);
@@ -56,26 +55,15 @@ static void two_digit_int_to_str(int i, char* str)
 	sprintf(str, format, i);
 }
 
-// Converts alphabetic characters in str to lowercase.
-static void ascii_str_to_lower(char* str)
+/* Converts alphabetical characters in str to lowercase. */
+static void
+ascii_str_to_lower(char* str)
 {
 	assert(str);
 
 	while (*str != '\0')
 	{
 		__ASCII_CHAR_TO_LOWER(str);
-		++str;
-	}
-}
-
-// Converts alphabetic characters in str to uppercase.
-static void ascii_str_to_upper(char* str)
-{
-	assert(str);
-
-	while (*str != '\0')
-	{
-		__ASCII_CHAR_TO_UPPER(str);
 		++str;
 	}
 }
@@ -120,7 +108,8 @@ thandler_get_year(thandler_t* thandler, char* year)
 	return E_NO_ERROR;
 }
 
-LOG_ERROR thandler_get_month(thandler_t* thandler, char* month)
+LOG_ERROR
+thandler_get_month(thandler_t* thandler, char* month)
 {
 	assert(thandler);
 	assert(month);
@@ -131,7 +120,8 @@ LOG_ERROR thandler_get_month(thandler_t* thandler, char* month)
 	return E_NO_ERROR;
 }
 
-LOG_ERROR thandler_get_mday(thandler_t* thandler, char* mday)
+LOG_ERROR
+thandler_get_mday(thandler_t* thandler, char* mday)
 {
 	assert(thandler);
 	assert(mday);
@@ -141,7 +131,8 @@ LOG_ERROR thandler_get_mday(thandler_t* thandler, char* mday)
 	return E_NO_ERROR;
 }
 
-LOG_ERROR thandler_get_hours(thandler_t* thandler, char* hours)
+LOG_ERROR
+thandler_get_hours(thandler_t* thandler, char* hours)
 {
 	assert(thandler);
 	assert(hours);
@@ -151,7 +142,8 @@ LOG_ERROR thandler_get_hours(thandler_t* thandler, char* hours)
 	return E_NO_ERROR;
 }
 
-LOG_ERROR thandler_get_mins(thandler_t* thandler, char* mins)
+LOG_ERROR
+thandler_get_mins(thandler_t* thandler, char* mins)
 {
 	assert(thandler);
 	assert(mins);
@@ -161,7 +153,8 @@ LOG_ERROR thandler_get_mins(thandler_t* thandler, char* mins)
 	return E_NO_ERROR;
 }
 
-LOG_ERROR thandler_get_secs(thandler_t* thandler, char* secs)
+LOG_ERROR
+thandler_get_secs(thandler_t* thandler, char* secs)
 {
 	assert(thandler);
 	assert(secs);
