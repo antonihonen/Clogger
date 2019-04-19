@@ -26,8 +26,8 @@
 	else {}
 
 static const char* MONTHS[12] =
-	{"January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December"};
+	{"JANUARY", "FEBRUARY", "MARC", "APRIL", "MAY", "JUNE",
+	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
 
 static const char* WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
@@ -35,7 +35,7 @@ static const char* WEEKDAYS[7] =
 
 static void two_digit_int_to_str(int i, char* str)
 {
-	assert(i > 0);
+	assert(i >= 0);
 	assert(str);
 
 	char format[4];
@@ -165,8 +165,9 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 	assert(format >= __MN_SHORT_SMALL);
 	assert(format <= __MN_LONG_ALL_CAPS);
 
-	char full_name_in_caps[10] = MONTHS[thandler->last_fetch_->tm_mon];
-	
+	char full_name_in_caps[10];
+	strcpy(full_name_in_caps, MONTHS[thandler->last_fetch_->tm_mon]);
+
 	if (format >= __MN_SHORT_SMALL && format <= __MN_SHORT_ALL_CAPS)
 	{
 		full_name_in_caps[3] = '\0';
@@ -194,7 +195,8 @@ thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format)
 	assert(format >= __WD_SHORT_SMALL);
 	assert(format <= __WD_LONG_ALL_CAPS);
 
-	char full_name_in_caps[10] = WEEKDAYS[thandler->last_fetch_->tm_wday];
+	char full_name_in_caps[10];
+	strcpy(full_name_in_caps, WEEKDAYS[thandler->last_fetch_->tm_wday]);
 
 	if (format >= __WD_SHORT_SMALL && format <= __WD_SHORT_ALL_CAPS)
 	{

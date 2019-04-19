@@ -4,13 +4,18 @@
  * Created: 2019-04-15
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file contains tests used to test the logging interface
- * defined in log.h as well as the driver program for the tests.
+ * This file contains the main function that automatically
+ * runs tests.
  */
 
-#include "log.h"
+#include "time_handler.h"
+#include <stdio.h>
 
-int main(void)
+int main()
 {
+	run_thandler_tests("TIME HANDLER TESTS\n");
+	printf("\nTests passed, press Enter to finish.\n");
+	char str[2];
+	fgets(str, 2, stdin);
 	return 0;
 }
