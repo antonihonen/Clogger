@@ -9,7 +9,7 @@
  */
 
 #include "format.h"
-#include "time_util.h"
+#include "time_handler.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -20,7 +20,7 @@
 
 static LOG_ERROR expand_macro(char** dest_head, char** format_head, LOG_LEVEL lvl)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
@@ -29,7 +29,7 @@ fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
 	// TODO: Check validity of parameters.
 
 	fn_formatter_set_format(formatter, fn_format);
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
@@ -40,7 +40,7 @@ fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 	strcpy(formatter->fn_format_, format);
 	// Clear the expanded filename string.
 	formatter->expanded_fn_[0] = '\0';
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
@@ -72,19 +72,19 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 	// while loop.
 	*filename_head = *format_head;
 
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
 fn_formatter_fn_max_len(fn_formatter_t* formatter, size_t* size)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
 fn_formatter_close(fn_formatter_t* formatter)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 /* Entry formatter functions. */
@@ -92,23 +92,23 @@ fn_formatter_close(fn_formatter_t* formatter)
 LOG_ERROR
 e_formatter_init(e_formatter_t* formatter, char* format)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
 e_formatter_set_format(e_formatter_t* formatter, char* format)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
 e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entry)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
 
 LOG_ERROR
 e_formatter_close(e_formatter_t* formatter)
 {
-	return NO_ERROR;
+	return E_NO_ERROR;
 }
