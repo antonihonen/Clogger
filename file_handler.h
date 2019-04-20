@@ -7,6 +7,9 @@
  * This file defines a file handling interface.
  */
 
+#ifndef FILE_HANDLER_H
+#define FILE_HANDLER_H
+
 #include "macros.h"
 #include "types.h"
 #include <stdbool.h>
@@ -83,3 +86,5 @@ fhandler_write(fhandler_t* handler, char* message);
 
 LOG_ERROR
 fhandler_flush_buffer(fhandler_t* handler, char* message);
+
+#endif

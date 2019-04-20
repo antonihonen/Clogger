@@ -11,12 +11,15 @@
 #ifndef FORMATTER_TYPES_H
 #define FORMATTER_TYPES_H
 
+#include "user_macro_handlers.h"
+#include "types.h"
+
 /* User macro-related types. */
 
 typedef enum
 {
-	__UM_NO_MACRO,
-	__UM_YEAR,
+	__UM_NO_MACRO = -1,
+	__UM_YEAR = 1,
 	__UM_MONTH,
 	__UM_DAY,
 	__UM_HOUR,
@@ -67,15 +70,11 @@ typedef enum
 #define __UM_LVL_A_S "LVL"
 #define __UM_MSG_S "MSG"
 
-#define __MAX_UM_LENGTH 16 // Superfluous
+#define __MAX_UM_S_LEN 16 // superfluous
 
-static const char* __USER_MACROS[__UM_COUNT] =
-{ __UM_YEAR_S, __UM_MONTH_S, __UM_MDAY_S,
-__UM_HOUR_S, __UM_MIN_S, __UM_SEC_S,
-__UM_MNAME_S_N_S, __UM_MNAME_S_F_S, __UM_MNAME_S_A_S,
-__UM_MNAME_L_N_S, __UM_MNAME_L_F_S, __UM_MNAME_L_A_S,
-__UM_WDAY_S_N_S, __UM_WDAY_S_F_S, __UM_WDAY_S_A_S,
-__UM_WDAY_L_N_S, __UM_WDAY_L_F_S, __UM_WDAY_L_A_S,
-__UM_LVL_N_S, __UM_LVL_N_S, __UM_LVL_A_S, __UM_MSG_S };
+const char* __USER_MACROS[__UM_COUNT];
+
+
+void(*__UM_HANDLERS[50])(thandler_t*, char*, LOG_LEVEL, char*);
 
 #endif // FORMATTER_TYPES_H

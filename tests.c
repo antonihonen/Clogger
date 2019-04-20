@@ -8,13 +8,13 @@
  * runs tests.
  */
 
-#include "time_handler.h"
-#include "formatter.h"
+#include "time_handler_test.h"
+#include "formatter_test.h"
 #include <stdio.h>
 
 int main()
 {
-	run_thandler_tests("TIME HANDLER TESTS\n");
+	run_time_handler_tests("TIME HANDLER TESTS\n");
 	run_formatter_tests("FORMATTER TESTS\n");
 	printf("\nTests passed, press Enter to finish.\n");
 	char str[2];

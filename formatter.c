@@ -11,6 +11,7 @@
 #include "formatter.h"
 #include "time_handler.h"
 #include <assert.h>
+#include <malloc.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -44,7 +45,7 @@ __user_macro_as_str(const char* format_sequence, char* macro_str, size_t* const 
 		switch (*format_sequence)
 		{
 		case __UM_LEFT_DELIM:
-			if (has_macro_begun || skip_over != 1)
+			if (has_macro_begun || *skip_over != 1)
 			{
 				// Only one __UM_LEFT_DELIM can be contained
 				// by a valid macro sequence and it must
@@ -139,14 +140,18 @@ __identify_user_macro(const char* const macro_seq, __UM_ID* const macro_id, size
 	*macro_id = __UM_NO_MACRO;
 }
 
+/* Expands the user macro in format_head and writes the expanded
+macro to dest_head. */
 void
-__expand_macro(char** dest_head, char** format_head, char* message,
-	LOG_LEVEL lvl)
+__expand_macro(thandler_t* thandler, char* dest_head,
+	char* format_head, char* message, LOG_LEVEL lvl, size_t* skip_over)
 {
-	char macro[20];
-	char* macro_end = format_head;
-
-	return E_NO_ERROR;
+	__UM_ID macro_id = __UM_NO_MACRO;
+	__identify_user_macro(format_head, &macro_id, skip_over);
+	if (macro_id != __UM_NO_MACRO)
+	{
+//		__UM_HANDLERS[macro_id](thandler, dest_head, lvl, message);
+	}
 }
 
  /* File name formatter functions. */
@@ -157,6 +162,8 @@ fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
 	// TODO: Check validity of parameters.
 
 	fn_formatter_set_format(formatter, fn_format);
+	formatter->thandler = malloc(sizeof(thandler_t));
+	thandler_init(formatter->thandler);
 	return E_NO_ERROR;
 }
 
@@ -183,6 +190,7 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 	// been handled.
 	char* format_head = formatter->_fn_format;
 	
+	thandler_fetch_ltime(formatter->thandler);
 	while (*format_head != '\0')
 	{
 		// Copy characters one at a time until
@@ -194,7 +202,10 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 			++format_head;
 		}
 		// Expand the macro.
-		__expand_macro(&filename_head, &format_head, NULL, __NULL_LOG_LEVEL);
+		size_t skip_over = 0;
+		__expand_macro(formatter->thandler, filename_head,
+			format_head, NULL, __NULL_LOG_LEVEL, &skip_over);
+		format_head += skip_over;
 	}
 	// Add the null terminator which was excluded in the
 	// while loop.
@@ -238,5 +249,6 @@ e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entr
 LOG_ERROR
 e_formatter_close(e_formatter_t* formatter)
 {
+	free(formatter->thandler);
 	return E_NO_ERROR;
 }

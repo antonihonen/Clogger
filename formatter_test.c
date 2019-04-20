@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <malloc.h>
 #include <stdio.h>
-
+#include <string.h>
 
 void test_user_macro_as_str_single_pass(char* macro_seq, char* correct_result, size_t correct_size)
 {
@@ -31,7 +31,7 @@ void test_user_macro_as_str()
 	for (size_t i = 0; i < __UM_COUNT; ++i)
 	{
 		char* macro_sequence = malloc(strlen(__USER_MACROS[i]) + 4);
-		char* correct_result = __USER_MACROS[i];
+		const char* correct_result = __USER_MACROS[i];
 		size_t correct_size = strlen(correct_result) + 3;
 		macro_sequence[0] = __UM_BEGIN_INDIC;
 		macro_sequence[1] = __UM_LEFT_DELIM;
@@ -46,7 +46,7 @@ void test_user_macro_as_str()
 #define test_cases 3
 	char* test_seqs[test_cases] = { "%(NOT_A_MACRO(", "%   not a macro ", "%)" };
 	char* correct_results[test_cases] = { "%", "%", "%" };
-	char* correct_sizes[test_cases] = { 1, 1, 1 };
+	size_t correct_sizes[test_cases] = { 1, 1, 1 };
 	for (size_t i = 0; i < test_cases; ++i)
 	{
 		test_user_macro_as_str_single_pass(test_seqs[i],

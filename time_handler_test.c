@@ -10,6 +10,7 @@
 #include "time_handler_test.h"
 #include <assert.h>
 #include <malloc.h>
+#include <stdio.h>
 #include <string.h>
 
 #define __YEAR_MAX_CHARS 4
@@ -210,7 +211,7 @@ void test_get_wday(void)
 	printf("  test_get_wday passed\n");
 }
 
-void run_thandler_tests(char* test_set_title)
+void run_time_handler_tests(char* test_set_title)
 {
 	printf(test_set_title);
 	t = malloc(sizeof(thandler_t));

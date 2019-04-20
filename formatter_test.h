@@ -8,10 +8,10 @@
  */
 
 #ifndef FORMAT_TEST_H
-#define FORMAT_TEST_H
+#define FORMATTER_TEST_H
 
 #include "formatter.h"
 
-void run_formatter_tests(void);
+void run_formatter_tests(char* test_set_title);
 
-#endif // FORMAT_TEST_H
+#endif // FORMATTER_TEST_H

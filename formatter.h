@@ -12,20 +12,26 @@
  * macros need to be expanded - these classes handle that.
  */
 
+#ifndef FORMATTER_H
+#define FORMATTER_H
+
 #include "formatter_types.h"
 #include "macros.h"
+#include "time_handler.h"
 #include "types.h"
 
 /* Defines the properties of a filename formatter object. */
 typedef struct {
 	char _fn_format[__MAX_FILENAME_SIZE];
 	char _expanded_fn[__MAX_FILENAME_SIZE];
+	thandler_t* thandler;
 } fn_formatter_t;
 
 /* Defines the properties of an entry formatter object. */
 typedef struct {
 	char _e_format[__MAX_MSG_SIZE];
 	char _e_expanded_format[__MAX_MSG_SIZE];
+	thandler_t* thandler;
 } e_formatter_t;
 
 /* File name formatter functions. */
@@ -58,3 +64,5 @@ e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entr
 
 LOG_ERROR
 e_formatter_close(e_formatter_t* formatter);
+
+#endif // FORMATTER_H

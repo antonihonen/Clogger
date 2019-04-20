@@ -8,6 +8,9 @@
  * for fetching information about the current time.
  */
 
+#ifndef TIME_HANDLER_H
+#define TIME_HANDLER_H
+
 #include "types.h"
 #include <time.h>
 
@@ -61,3 +64,5 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format);
 
 LOG_ERROR
 thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format);
+
+#endif // TIME_HANDLER_H
