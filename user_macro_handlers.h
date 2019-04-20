@@ -16,7 +16,6 @@
 #include <assert.h>
 #include <string.h>
 
-
 void __um_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
 
 void __um_month_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);

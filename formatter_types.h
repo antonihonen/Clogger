@@ -74,7 +74,6 @@ typedef enum
 
 const char* __USER_MACROS[__UM_COUNT];
 
-
-void(*__UM_HANDLERS[50])(thandler_t*, char*, LOG_LEVEL, char*);
+void (*__UM_HANDLERS[__UM_COUNT])(thandler_t*, char*, LOG_LEVEL, char*);
 
 #endif // FORMATTER_TYPES_H

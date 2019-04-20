@@ -12,6 +12,7 @@
 #define TIME_HANDLER_H
 
 #include "types.h"
+#include <stdbool.h>
 #include <time.h>
 
 /* Determines whether thandler_get_wday gets the weekday as
@@ -30,6 +31,8 @@ typedef struct
 	// Contains the result of the last call to localtime()
 	// received upon the last call to thandler_fetch_ltime().
 	struct tm* _last_fetch;
+	// For testing purposes:
+	bool _is_testing;
 } thandler_t;
 
 LOG_ERROR

@@ -19,6 +19,7 @@
 #define __CLEAR_STRING(string) (string[0] = '\0')
 #define __IS_EMPTY_STRING(string) (string[0] == '\0')
 #define __NULL_LOG_LEVEL -1
+#define __UM_HANDLER(macro_id) __UM_HANDLERS[macro_id]
 
 /* Private helper functions. */
 
@@ -74,6 +75,10 @@ __user_macro_as_str(const char* format_sequence, char* macro_str, size_t* const 
 			break;
 		case '\0':
 			if (!has_macro_begun)
+			{
+				has_macro_valid_format = false;
+			}
+			if (!has_macro_ended)
 			{
 				has_macro_valid_format = false;
 			}
@@ -150,7 +155,8 @@ __expand_macro(thandler_t* thandler, char* dest_head,
 	__identify_user_macro(format_head, &macro_id, skip_over);
 	if (macro_id != __UM_NO_MACRO)
 	{
-//		__UM_HANDLERS[macro_id](thandler, dest_head, lvl, message);
+		thandler_fetch_ltime(thandler);
+		__UM_HANDLER(macro_id)(thandler, dest_head, lvl, message);
 	}
 }
 

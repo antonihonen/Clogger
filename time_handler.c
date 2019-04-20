@@ -75,6 +75,7 @@ thandler_init(thandler_t* thandler)
 	assert(thandler);
 
 	thandler->_last_fetch = NULL;
+	thandler->_is_testing = false;
 	return E_NO_ERROR;
 }
 
@@ -91,6 +92,8 @@ thandler_fetch_ltime(thandler_t* thandler)
 {
 	assert(thandler);
 
+	if (thandler->_is_testing) { return; }
+	
 	time_t raw_time;
 	time(&raw_time);
 	thandler->_last_fetch = localtime(&raw_time);

@@ -215,6 +215,7 @@ void run_time_handler_tests(char* test_set_title)
 {
 	printf(test_set_title);
 	t = malloc(sizeof(thandler_t));
+	thandler_init(t);
 	thandler_fetch_ltime(t);
 	test_get_year();
 	test_get_month();
