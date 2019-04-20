@@ -7,10 +7,12 @@
  * This file defines two formatter classes that are responsible
  * for formatting file names and log entries respectively.
  * These formatters are needed because both file names and
- * log entries can be formatted using macros and those
+ * log entries can be formatted by the user using macros
+ * (referred to as user macros) and those
  * macros need to be expanded - these classes handle that.
  */
 
+#include "formatter_types.h"
 #include "macros.h"
 #include "types.h"
 

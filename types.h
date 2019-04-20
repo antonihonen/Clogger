@@ -58,32 +58,4 @@ typedef enum {
 	E_BAD_PATH
 } LOG_ERROR;
 
-typedef enum
-{
-	__YEAR_M,
-	__MONTH_M,
-	__DAY_M,
-	__HOUR_M,
-	__MIN_M,
-	__SEC_M,
-	__DOW_3_M,
-	__DOW_FULL_M,
-	__LVL_M,
-	__MSG_M,
-	__ESC_M,
-} __FORMAT_MACRO;
-#define __MACRO_BEGIN '%'
-#define __MACRO_BEGIN_ESC "%%"
-#define __YEAR_MACRO "%(YYYY)"
-#define __MONTH_MACRO "%(MM)"
-#define __DAY_MACRO "%(DD)"
-#define __HOUR_MACRO "%(hh)"
-#define __MINUTE_MACRO "%(mm)"
-#define __SEC_MACRO "%(ss)"
-#define __DOW_3_MACRO "%(DOW_3)"
-#define __DOW_FULL_MACRO "%(DOW_FULL)"
-#define __LEVEL_MACRO "%(LVL)"
-#define __MSG_MACRO  "%(MSG)"
-#define __MAX_FORMAT_MACRO_LEN 16
-
 #endif // LOG_ENUMS_H
