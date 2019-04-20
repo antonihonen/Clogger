@@ -12,6 +12,7 @@
 #include "types.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 #define __UPP_A_ASCII_VAL 65 // uppercase A
@@ -24,14 +25,14 @@
 	else {}
 
 // Used for easy implementation of thandler_get_mname().
-static const char* MONTHS[12] =
+static const char* const MONTHS[12] =
 	{ "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
 	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
 
 // Used for easy implementation of thandler_get_wday().
 // Starts from Sunday because in the tm struct returned by localtime()
 // tm_day value of 0 equals Sunday.
-static const char* WEEKDAYS[7] =
+static const char* const WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
 	"THURSDAY", "FRIDAY", "SATURDAY" };
 

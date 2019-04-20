@@ -21,6 +21,7 @@ typedef enum {
 } LOG_LEVEL;
 #define __VALID_LVL_COUNT 6
 const LOG_LEVEL VALID_LOG_LEVELS[__VALID_LVL_COUNT];
+const char* const LOG_LEVEL_STRS[__VALID_LVL_COUNT];
 
 typedef enum {
 	REWRITE,
