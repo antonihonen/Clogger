@@ -11,8 +11,8 @@
 #ifndef FORMAT_MACRO_HANDLERS_H
 #define FORMAT_MACRO_HANDLERS_H
 
+#include "log_level.h"
 #include "time_handler.h"
-#include "types.h"
 #include <assert.h>
 #include <string.h>
 

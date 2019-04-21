@@ -5,7 +5,6 @@
  */
 
 #include "time_handler.h"
-#include "types.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -88,7 +87,7 @@ thandler_fetch_ltime(thandler_t* thandler)
 {
 	assert(thandler);
 
-	if (thandler->_is_testing) { return; }
+	if (thandler->_is_testing) { return E_NO_ERROR; }
 	
 	time_t raw_time;
 	time(&raw_time);

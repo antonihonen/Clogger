@@ -4,14 +4,16 @@
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This module contains the main class of the library,
- * log_t.
+ * the logger type log_t.
  */
 
 #ifndef LOG_H
 #define LOG_H
 
+#include "error.h"
+#include "log_level.h"
 #include "macros.h"
-#include "types.h"
+#include "policy.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

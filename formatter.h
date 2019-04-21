@@ -16,7 +16,6 @@
 #include "format_macro.h"
 #include "macros.h"
 #include "time_handler.h"
-#include "types.h"
 
 /* Defines the properties of a filename formatter object. */
 typedef struct {

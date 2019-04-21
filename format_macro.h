@@ -12,7 +12,6 @@
 #define FORMAT_MACRO_H
 
 #include "format_macro_handlers.h"
-#include "types.h"
 
 typedef enum
 {

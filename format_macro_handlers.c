@@ -5,7 +5,6 @@
  */
 
 #include "format_macro_handlers.h"
-#include "types.h"
 
 void __fm_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 {
@@ -178,9 +177,9 @@ void __fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 
 void __fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 {
-	// TODO: Implement.
-
 	assert(dest);
+
+	// TODO: Implement.
 }
 
 void __fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
