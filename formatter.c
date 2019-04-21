@@ -161,7 +161,7 @@ entered by the user, if any. Lvl contains the
 log level of the message, if any. Macro_length
 will contain the number of characters the macro
 sequence consisted of. If the macro format is invalid,
-only __UM_BEGIN_INDIC is written to dest (macro_length
+only __FM_BEGIN_INDIC is written to dest (macro_length
 will be 1). */
 void
 __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
