@@ -13,7 +13,7 @@
  */
 
 typedef enum {
-	L_NO_LEVEL = -1,
+	__L_NO_LEVEL = -1,
 	L_TRACE = 0,
 	L_DEBUG,
 	L_INFO,
@@ -21,7 +21,7 @@ typedef enum {
 	L_ERROR,
 	L_CRITICAL
 } LOG_LEVEL;
-#define __VALID_LVL_COUNT L_CRITICAL + 1
+#define __VALID_LVL_COUNT (L_CRITICAL + 1)
 
 const LOG_LEVEL __VALID_LOG_LEVELS[__VALID_LVL_COUNT];
 const char* const __LOG_LEVEL_STRS[__VALID_LVL_COUNT];

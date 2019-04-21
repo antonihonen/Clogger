@@ -7,15 +7,13 @@
  */
 
 #include "formatter.h"
+#include "string_util.h"
 #include "time_handler.h"
 #include <assert.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <string.h>
 
-#define __CLEAR_STRING(string) (string[0] = '\0')
-#define __IS_EMPTY_STRING(string) (string[0] == '\0')
-#define __NULL_LOG_LEVEL -1
 #define __FM_HANDLER(macro_id) __FM_HANDLERS[macro_id]
 
 /* Private helper functions. */
@@ -223,7 +221,6 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 	// refer to the same point in time.
 
 	thandler_fetch_ltime(formatter->thandler);
-
 	while (*format_head != '\0')
 	{
 		// Copy characters one at a time until
@@ -235,8 +232,12 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 			++format_head;
 		}
 		// Macro begin was discovered.
+		// Expand the macro.
 		size_t macro_length = 0;
-		__expand_fm(format_head, filename_head, formatter->thandler, NULL, __NULL_LOG_LEVEL, &macro_length);
+		__expand_fm(format_head, filename_head, formatter->thandler,
+			NULL, __L_NO_LEVEL, &macro_length);
+		// The macro was handled so skip the rest of the characters
+		// in the macro.
 		format_head += macro_length;
 	}
 	// Add the null terminator which was excluded in the

@@ -9,6 +9,9 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#define __CLEAR_STRING(string) (string[0] = '\0')
+#define __IS_EMPTY_STRING(string) (string[0] == '\0')
+
 /* Writes the value of i to str with two digits.
 Zero is used as prefix for i < 10, so 1
 will turn into "01" and so on. */

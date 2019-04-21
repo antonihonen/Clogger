@@ -28,8 +28,8 @@ typedef enum {
 	NO_BUFFERING,
 	LINE_BUFFERING,
 	FULL_BUFFERING
-	// As per described in the documentation of the setbuf() function
-	// from <stdio.h>
+	// ...as described in the documentation of the setbuf() function
+	// from <stdio.h>.
 } LOG_BUFFERING_POLICY;
 #define __VALID_BUFPOL_COUNT 3
 const LOG_BUFFERING_POLICY __VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT];
