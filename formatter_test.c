@@ -4,7 +4,6 @@
  * Created: 2019-04-19
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file implements tests for the format.h module.
  */
 
 #include "formatter_test.h"
@@ -13,67 +12,78 @@
 #include <stdio.h>
 #include <string.h>
 
-void test_user_macro_as_str_single_pass(char* macro_seq, char* correct_result, size_t correct_size)
+/* Single application of the test. */
+static void
+apply_um_as_str(char* macro_seq, char* correct_result, size_t correct_size)
 {
 	assert(macro_seq); assert(correct_result); assert(correct_size);
 
 	char result[128];
 	size_t size;
-	__user_macro_as_str(macro_seq, result, &size);
+	__um_as_str(macro_seq, result, &size);
 	assert(strcmp(result, correct_result) == 0);
 	assert(size == correct_size);
 }
 
-
-void test_user_macro_as_str()
+/* Runs tests for the __um_as_str() function. */
+static void
+test_um_as_str()
 {
 	printf("  test_user_macro_as_str\n");
-	for (size_t i = 0; i < __UM_COUNT; ++i)
+	
+	// Test all the valid macros first.
+	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
-		char* macro_sequence = malloc(strlen(__USER_MACROS[i]) + 4);
-		const char* correct_result = __USER_MACROS[i];
+		// Allocate memory. +4 because strlen doesn't count null
+		// terminator and __FM_BEGIN_INDIC, __FM_LEFT_DELIM and
+		// __FM_RIGHT_DELIM will be added.
+		char* macro_sequence = malloc(strlen(__FORMAT_MACROS[i]) + 4);
+		const char* correct_result = __FORMAT_MACROS[i];
 		size_t correct_size = strlen(correct_result) + 3;
-		macro_sequence[0] = __UM_BEGIN_INDIC;
-		macro_sequence[1] = __UM_LEFT_DELIM;
-		strcpy(macro_sequence + 2, __USER_MACROS[i]);
-		macro_sequence[correct_size - 1] = __UM_RIGHT_DELIM;
+		macro_sequence[0] = __FM_BEGIN_INDIC;
+		macro_sequence[1] = __FM_LEFT_DELIM;
+		strcpy(macro_sequence + 2, __FORMAT_MACROS[i]);
+		macro_sequence[correct_size - 1] = __FM_RIGHT_DELIM;
 		macro_sequence[correct_size] = '\0';
 		correct_size = strlen(macro_sequence);
-		test_user_macro_as_str_single_pass(macro_sequence, correct_result, correct_size);
+		apply_um_as_str(macro_sequence, correct_result, correct_size);
 		free(macro_sequence);
 	}
 
-#define test_cases 5
-	char* test_seqs[test_cases] =
+	// Test invalid macros.
+#define um_as_str_inv_test_cases 5
+	char* test_seqs[um_as_str_inv_test_cases] =
 		{ "%(NOT_A_MACRO(", "%   not a macro ", "%)",
 		"%(year", "%year" };
-	char* correct_results[test_cases] = { "%", "%", "%", "%", "%" };
-	size_t correct_sizes[test_cases] = { 1, 1, 1, 1, 1 };
-	for (size_t i = 0; i < test_cases; ++i)
+	char* correct_results[um_as_str_inv_test_cases] = { "%", "%", "%", "%", "%" };
+	size_t correct_sizes[um_as_str_inv_test_cases] = { 1, 1, 1, 1, 1 };
+	for (size_t i = 0; i < um_as_str_inv_test_cases; ++i)
 	{
-		test_user_macro_as_str_single_pass(test_seqs[i],
+		apply_um_as_str(test_seqs[i],
 			correct_results[i], correct_sizes[i]);
 	}
 
 	printf("  passed\n");
 }
 
-void test_identify_user_macro_single_pass(char* macro, __UM_ID correct_result)
+static void
+test_identify_user_macro_single_pass(char* macro, __FM_ID correct_result)
 {
 	assert(macro);
 	size_t macro_length = 0;
-	__UM_ID result = -1;
-	__identify_user_macro(macro, &result, &macro_length);
+	__FM_ID result = -1;
+	__identify_um(macro, &result, &macro_length);
 	assert(result == correct_result);
 }
 
-void test_identify_user_macro(void)
+static void
+test_identify_user_macro(void)
 {
 	printf("  test_identify_user_macro\n");
-	for (size_t i = 0; i < __UM_COUNT; ++i)
+	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
 		char macro_seq[256] = "%(";
-		strcat(macro_seq, __USER_MACROS[i]);
+		strcat(macro_seq, __FORMAT_MACROS[i]);
 		strcat(macro_seq, ")");
 		test_identify_user_macro_single_pass(macro_seq, i);
 		strcat(macro_seq, " ");
@@ -82,35 +92,36 @@ void test_identify_user_macro(void)
 		test_identify_user_macro_single_pass(macro_seq, i);
 	}
 
-	test_identify_user_macro_single_pass("%(year", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     year", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_(year)", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_year)", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_year", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_(__)", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_____", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%      ", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     )", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     ()", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%()", __UM_NO_MACRO);
-	test_identify_user_macro_single_pass("%%", __UM_NO_MACRO);
+	test_identify_user_macro_single_pass("%(year", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%     year", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%_(year)", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%_year)", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%_year", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%_(__)", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%_____", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%      ", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%     )", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%     ()", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%()", __FM_NO_MACRO);
+	test_identify_user_macro_single_pass("%%", __FM_NO_MACRO);
 
 	printf("  passed\n");
 }
 
-void test_expand_macro_single_pass(thandler_t* thandler, char* macro,
-	char* message, LOG_LEVEL lvl, char* correct_result, size_t correct_skip_over)
+static void
+test_expand_macro_single_pass(thandler_t* thandler, char* macro,
+	char* message, LOG_LEVEL lvl, char* correct_result,
+	size_t correct_skip_over)
 {
 	char* result[__MAX_MSG_SIZE];
 	size_t skip_over_result = 0;
-	__expand_macro(thandler, result, macro, message, lvl, &skip_over_result);
-	printf("result = '%s'\n", result);
-	printf("correct = '%s'\n", correct_result);
+	__expand_um(macro, result, thandler, message, lvl, &skip_over_result);
 	assert(strcmp(result, correct_result) == 0);
 	assert(skip_over_result == correct_skip_over);
 }
 
-void test_expand_macro()
+static void
+test_expand_macro()
 {
 	printf("  test_expand_macro\n");
 
@@ -177,10 +188,11 @@ void test_expand_macro()
 	printf("  passed\n");
 }
 
-void run_formatter_tests(char* test_set_title)
+void
+run_formatter_tests(char* test_set_title)
 {
 	printf(test_set_title);
-	test_user_macro_as_str();
+	test_um_as_str();
 	test_identify_user_macro();
 	test_expand_macro();
 }

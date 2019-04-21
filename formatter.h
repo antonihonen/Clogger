@@ -15,7 +15,7 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
-#include "formatter_types.h"
+#include "format_macro.h"
 #include "macros.h"
 #include "time_handler.h"
 #include "types.h"
