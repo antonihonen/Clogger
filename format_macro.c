@@ -8,6 +8,7 @@
 
 #include "format_macro.h"
 #include "format_macro_handlers.h"
+#include "format_macro_handlers.h"
 
 const char* __FORMAT_MACROS[__FM_COUNT] =
 	{ __FM_YEAR_S, __FM_MONTH_S, __FM_MDAY_S,

@@ -14,7 +14,7 @@
 
 /* Single application of the test. */
 static void
-apply_um_as_str(char* macro_seq, char* correct_result, size_t correct_size)
+apply_fm_as_str(char* macro_seq, char* correct_result, size_t correct_size)
 {
 	assert(macro_seq); assert(correct_result); assert(correct_size);
 
@@ -25,9 +25,9 @@ apply_um_as_str(char* macro_seq, char* correct_result, size_t correct_size)
 	assert(size == correct_size);
 }
 
-/* Runs tests for the __um_as_str() function. */
+/* Runs tests for the __fm_as_str() function. */
 static void
-test_um_as_str()
+test_fm_as_str()
 {
 	printf("  test_user_macro_as_str\n");
 	
@@ -46,20 +46,20 @@ test_um_as_str()
 		macro_sequence[correct_size - 1] = __FM_RIGHT_DELIM;
 		macro_sequence[correct_size] = '\0';
 		correct_size = strlen(macro_sequence);
-		apply_um_as_str(macro_sequence, correct_result, correct_size);
+		apply_fm_as_str(macro_sequence, correct_result, correct_size);
 		free(macro_sequence);
 	}
 
 	// Test invalid macros.
-#define um_as_str_inv_test_cases 5
-	char* test_seqs[um_as_str_inv_test_cases] =
+#define fm_as_str_inv_test_cases 5
+	char* test_seqs[fm_as_str_inv_test_cases] =
 		{ "%(NOT_A_MACRO(", "%   not a macro ", "%)",
 		"%(year", "%year" };
-	char* correct_results[um_as_str_inv_test_cases] = { "%", "%", "%", "%", "%" };
-	size_t correct_sizes[um_as_str_inv_test_cases] = { 1, 1, 1, 1, 1 };
-	for (size_t i = 0; i < um_as_str_inv_test_cases; ++i)
+	char* correct_results[fm_as_str_inv_test_cases] = { "%", "%", "%", "%", "%" };
+	size_t correct_sizes[fm_as_str_inv_test_cases] = { 1, 1, 1, 1, 1 };
+	for (size_t i = 0; i < fm_as_str_inv_test_cases; ++i)
 	{
-		apply_um_as_str(test_seqs[i],
+		apply_fm_as_str(test_seqs[i],
 			correct_results[i], correct_sizes[i]);
 	}
 
@@ -192,7 +192,7 @@ void
 run_formatter_tests(char* test_set_title)
 {
 	printf(test_set_title);
-	test_um_as_str();
+	test_fm_as_str();
 	test_identify_user_macro();
 	test_expand_macro();
 }
