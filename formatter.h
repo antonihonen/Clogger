@@ -8,6 +8,8 @@
  * These formatters are needed because both file names and
  * log entries can be formatted by the user using format macros that
  * need to be expanded - these classes do that.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef FORMATTER_H

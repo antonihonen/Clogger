@@ -5,6 +5,8 @@
  *
  * This module contains the main class of the library,
  * the logger type log_t.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef LOG_H

@@ -6,6 +6,8 @@
  * This module contains items related to format
  * macro handling. Format macros (for example "%(year)")
  * can be used to format file names or log entries.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef FORMAT_MACRO_H

@@ -6,6 +6,8 @@
  * This module contains a time handler class
  * that can be used to fetch information about
  * the current time.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef TIME_HANDLER_H
@@ -43,6 +45,9 @@ thandler_close(thandler_t* thandler);
 
 LOG_ERROR
 thandler_fetch_ltime(thandler_t* thandler);
+
+LOG_ERROR
+thandler_is_legal_state(thandler_t* thandler, bool* was_fetched);
 
 LOG_ERROR
 thandler_get_year(thandler_t* thandler, char* year);

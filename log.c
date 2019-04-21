@@ -2,6 +2,8 @@
  * File: log.c
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #include "log.h"

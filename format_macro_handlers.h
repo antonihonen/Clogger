@@ -6,6 +6,8 @@
  * This module contains the format macro handlers.
  * Each handler is responsible for expanding a
  * certain macro.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef FORMAT_MACRO_HANDLERS_H

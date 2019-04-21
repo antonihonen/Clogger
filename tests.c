@@ -5,6 +5,8 @@
  *
  * This file contains the main function that automatically
  * runs tests for the project.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #include "time_handler_test.h"

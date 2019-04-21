@@ -6,13 +6,15 @@
  * This module contains a file handler class
  * that can be used to manipulate files.
  *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef FILE_HANDLER_H
 #define FILE_HANDLER_H
 
+#include "error.h"
 #include "macros.h"
-#include "types.h"
+#include "policy.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

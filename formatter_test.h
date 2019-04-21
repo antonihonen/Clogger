@@ -4,6 +4,8 @@
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This module contains tests for the formatter module.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef FORMAT_TEST_H

@@ -2,22 +2,16 @@
  * File: time_handler.c
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #include "time_handler.h"
+#include "string_util.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-
-#define __UPP_A_ASCII_VAL 65 // uppercase A
-#define __UPP_Z_ASCII_VAL 90 // uppercase Z
-#define __LOW_A_ASCII_VAL 97 // lowercase a
-#define __LOW_Z_ASCII_VAL 122 // lowercase z
-// Converts an alphabetical ASCII character to lowercase.
-#define __ASCII_CHAR_TO_LOWER(c) \
-	if (*c >= __UPP_A_ASCII_VAL && *c <= __UPP_Z_ASCII_VAL) { *c += 32; } \
-	else {}
 
 // Used for easy implementation of thandler_get_mname().
 static const char* const MONTHS[12] =
@@ -31,38 +25,7 @@ static const char* const WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
 	"THURSDAY", "FRIDAY", "SATURDAY" };
 
-/* Writes the value of i to str with two digits.
-Zero is used as prefix for i < 10. */
-static void
-two_digit_int_to_str(int i, char* str)
-{
-	assert(i >= 0);
-	assert(str);
 
-	char format[4];
-	if (i < 10)
-	{
-		strcpy(format, "0%i");
-	}
-	else
-	{
-		strcpy(format, "%i");
-	}
-	sprintf(str, format, i);
-}
-
-/* Converts alphabetical characters in str to lowercase. */
-static void
-ascii_str_to_lower(char* str)
-{
-	assert(str);
-
-	while (*str != '\0')
-	{
-		__ASCII_CHAR_TO_LOWER(str);
-		++str;
-	}
-}
 
 LOG_ERROR
 thandler_init(thandler_t* thandler)
@@ -96,6 +59,15 @@ thandler_fetch_ltime(thandler_t* thandler)
 }
 
 LOG_ERROR
+thandler_is_legal_state(thandler_t* thandler, bool* was_fetched)
+{
+	assert(thandler); assert(was_fetched);
+
+	*was_fetched = thandler->_last_fetch != NULL ? true : false;
+	return E_NO_ERROR;
+}
+
+LOG_ERROR
 thandler_get_year(thandler_t* thandler, char* year)
 {
 	assert(thandler);
@@ -115,7 +87,7 @@ thandler_get_month(thandler_t* thandler, char* month)
 	assert(thandler->_last_fetch);
 
 	// The month contained by local time is counted from 0.
-	two_digit_int_to_str(thandler->_last_fetch->tm_mon + 1, month);
+	__two_digit_int_to_str(thandler->_last_fetch->tm_mon + 1, month);
 	return E_NO_ERROR;
 }
 
@@ -126,7 +98,7 @@ thandler_get_mday(thandler_t* thandler, char* mday)
 	assert(mday);
 	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->_last_fetch->tm_mday, mday);
+	__two_digit_int_to_str(thandler->_last_fetch->tm_mday, mday);
 	return E_NO_ERROR;
 }
 
@@ -137,7 +109,7 @@ thandler_get_hours(thandler_t* thandler, char* hours)
 	assert(hours);
 	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->_last_fetch->tm_hour, hours);
+	__two_digit_int_to_str(thandler->_last_fetch->tm_hour, hours);
 	return E_NO_ERROR;
 }
 
@@ -148,7 +120,7 @@ thandler_get_mins(thandler_t* thandler, char* mins)
 	assert(mins);
 	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->_last_fetch->tm_min, mins);
+	__two_digit_int_to_str(thandler->_last_fetch->tm_min, mins);
 	return E_NO_ERROR;
 }
 
@@ -159,7 +131,7 @@ thandler_get_secs(thandler_t* thandler, char* secs)
 	assert(secs);
 	assert(thandler->_last_fetch);
 
-	two_digit_int_to_str(thandler->_last_fetch->tm_sec, secs);
+	__two_digit_int_to_str(thandler->_last_fetch->tm_sec, secs);
 	return E_NO_ERROR;
 }
 
@@ -184,11 +156,11 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 
 	if (format == __MN_SHORT_SMALL || format == __MN_LONG_SMALL)
 	{
-		ascii_str_to_lower(full_name_in_caps);
+		__ascii_str_to_lower(full_name_in_caps);
 	}
 	else if (format == __MN_SHORT_FIRST_CAP || format == __MN_LONG_FIRST_CAP)
 	{
-		ascii_str_to_lower(full_name_in_caps + 1);
+		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
 
 	// At this point full_name_in_caps may no longer be the full name
@@ -219,11 +191,11 @@ thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format)
 
 	if (format == __WD_SHORT_SMALL || format == __WD_LONG_SMALL)
 	{
-		ascii_str_to_lower(full_name_in_caps);
+		__ascii_str_to_lower(full_name_in_caps);
 	}
 	else if (format == __WD_SHORT_FIRST_CAP || format == __WD_LONG_FIRST_CAP)
 	{
-		ascii_str_to_lower(full_name_in_caps + 1);
+		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
 	strcpy(wday, full_name_in_caps);
 

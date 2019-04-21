@@ -4,6 +4,8 @@
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This module contains tests for the time handler module.
+ *
+ * Copyright (C) 2019. Anton Ihonen
  */
 
 #ifndef TIME_HANDLER_TEST_H
