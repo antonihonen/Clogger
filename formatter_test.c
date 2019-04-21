@@ -1,9 +1,7 @@
 /*
  * File: formatter_test.c
  * Project: logger
- * Created: 2019-04-19
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
  */
 
 #include "formatter_test.h"
@@ -20,7 +18,7 @@ apply_um_as_str(char* macro_seq, char* correct_result, size_t correct_size)
 
 	char result[128];
 	size_t size;
-	__um_as_str(macro_seq, result, &size);
+	__fm_as_str(macro_seq, result, &size);
 	assert(strcmp(result, correct_result) == 0);
 	assert(size == correct_size);
 }
@@ -72,7 +70,7 @@ test_identify_user_macro_single_pass(char* macro, __FM_ID correct_result)
 	assert(macro);
 	size_t macro_length = 0;
 	__FM_ID result = -1;
-	__identify_um(macro, &result, &macro_length);
+	__identify_fm(macro, &result, &macro_length);
 	assert(result == correct_result);
 }
 
@@ -115,7 +113,7 @@ test_expand_macro_single_pass(thandler_t* thandler, char* macro,
 {
 	char* result[__MAX_MSG_SIZE];
 	size_t skip_over_result = 0;
-	__expand_um(macro, result, thandler, message, lvl, &skip_over_result);
+	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result);
 	assert(strcmp(result, correct_result) == 0);
 	assert(skip_over_result == correct_skip_over);
 }

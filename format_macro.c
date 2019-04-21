@@ -1,44 +1,11 @@
 /*
  * File: format_macro.c
  * Project: logger
- * Created: 2019-04-20
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
  */
 
 #include "format_macro.h"
-
-void __fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_mname_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_wday_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __);
-
-void __fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __);
-
-void __fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __);
-
-void __fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __);
-
-void __fm_msg_handler(thandler_t* _, char* dest, LOG_LEVEL __, char* message);
+#include "format_macro_handlers.h"
 
 const char* __FORMAT_MACROS[__FM_COUNT] =
 	{ __FM_YEAR_S, __FM_MONTH_S, __FM_MDAY_S,

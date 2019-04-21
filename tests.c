@@ -1,11 +1,10 @@
 /*
  * File: tests.c
  * Project: logger
- * Created: 2019-04-15
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This file contains the main function that automatically
- * runs tests.
+ * runs tests for the project.
  */
 
 #include "time_handler_test.h"

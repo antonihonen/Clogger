@@ -1,10 +1,10 @@
 /*
  * File: log.h
  * Project: logger
- * Created: 2019-04-15
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines a flexible and efficient logging interface.
+ * This module contains the main class of the library,
+ * log_t.
  */
 
 #ifndef LOG_H

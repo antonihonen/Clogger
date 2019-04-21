@@ -1,9 +1,7 @@
 /*
  * File: formatter.c
  * Project: logger
- * Created: 2019-04-17
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
  */
 
 #include "formatter.h"
@@ -16,7 +14,7 @@
 #define __CLEAR_STRING(string) (string[0] = '\0')
 #define __IS_EMPTY_STRING(string) (string[0] == '\0')
 #define __NULL_LOG_LEVEL -1
-#define __UM_HANDLER(macro_id) __FM_HANDLERS[macro_id]
+#define __FM_HANDLER(macro_id) __FM_HANDLERS[macro_id]
 
 /* Private helper functions. */
 
@@ -33,7 +31,7 @@ stated above, only __FM_BEGIN_INDIC will be written into
 macro_as_str (and macro_length will be 1).
 */
 void
-__um_as_str(const char* macro_start, char* macro_as_str,
+__fm_as_str(const char* macro_start, char* macro_as_str,
 	size_t* const macro_length)
 {
 	assert(macro_start); assert(macro_as_str); assert(macro_length);
@@ -127,15 +125,15 @@ i.e. how many characters the macro occupies in the
 format string, not including null terminator.
 */
 void
-__identify_um(const char* const macro_start, __FM_ID* const macro_id, size_t* const macro_length)
+__identify_fm(const char* const macro_start, __FM_ID* const macro_id, size_t* const macro_length)
 {
 	assert(macro_start); assert(macro_id); assert(macro_length);
 	assert(*macro_start == __FM_BEGIN_INDIC);
 
 	// Get the macro as a string as well as the number of
 	// characters the macro sequence consists of.
-	char macro_as_str[__MAX_UM_S_LEN];
-	__um_as_str(macro_start, macro_as_str, macro_length);
+	char macro_as_str[__MAX_FM_S_LEN];
+	__fm_as_str(macro_start, macro_as_str, macro_length);
 
 	// Iterate through __FORMAT_MACROS and see if one of them
 	// matches. The indexes of the macro strings in __FORMAT_MACROS
@@ -164,7 +162,7 @@ sequence consisted of. If the macro format is invalid,
 only __UM_BEGIN_INDIC is written to dest (macro_length
 will be 1). */
 void
-__expand_um(char* macro_start, char* dest, thandler_t* thandler,
+__expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	char* msg, LOG_LEVEL lvl, size_t* macro_length)
 {
 	assert(dest && macro_start);
@@ -176,10 +174,10 @@ __expand_um(char* macro_start, char* dest, thandler_t* thandler,
 	assert(thandler->_last_fetch);
 
 	__FM_ID macro_id = __FM_NO_MACRO;
-	__identify_um(macro_start, &macro_id, macro_length);
+	__identify_fm(macro_start, &macro_id, macro_length);
 	if (macro_id != __FM_NO_MACRO)
 	{
-		__UM_HANDLER(macro_id)(thandler, dest, lvl, msg);
+		__FM_HANDLER(macro_id)(thandler, dest, lvl, msg);
 	}
 }
 
@@ -236,7 +234,7 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 		}
 		// Macro begin was discovered.
 		size_t macro_length = 0;
-		__expand_um(format_head, filename_head, formatter->thandler, NULL, __NULL_LOG_LEVEL, &macro_length);
+		__expand_fm(format_head, filename_head, formatter->thandler, NULL, __NULL_LOG_LEVEL, &macro_length);
 		format_head += macro_length;
 	}
 	// Add the null terminator which was excluded in the

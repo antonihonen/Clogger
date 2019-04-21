@@ -1,11 +1,7 @@
 /*
  * File: time_handler.c
  * Project: logger
- * Created: 2019-04-18
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
- * This file implements the time handler class defined
- * in time_handler.h.
  */
 
 #include "time_handler.h"

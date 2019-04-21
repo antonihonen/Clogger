@@ -1,10 +1,11 @@
 /*
  * File: file_handler.h
  * Project: logger
- * Created: 2019-04-17
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines a file handling interface.
+ * This module contains a file handler class
+ * that can be used to manipulate files.
+ *
  */
 
 #ifndef FILE_HANDLER_H

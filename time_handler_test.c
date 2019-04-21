@@ -1,10 +1,7 @@
 /*
  * File: time_handler_test.c
  * Project: logger
- * Created: 2019-04-18
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
- * This file implements tests for the time_handler.h module.
  */
 
 #include "time_handler_test.h"

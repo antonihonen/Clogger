@@ -1,10 +1,9 @@
 /*
  * File: time_handler_test.h
  * Project: logger
- * Created: 2019-04-18
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines tests for the time_util.h module.
+ * This module contains tests for the time handler module.
  */
 
 #ifndef TIME_HANDLER_TEST_H

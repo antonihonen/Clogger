@@ -1,11 +1,10 @@
 /*
- * File: log_types.h
+ * File: types.h
  * Project: logger
- * Created: 2019-04-15
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines various supporting data types and
- * related values used in the project.
+ * This module contains various supporting data types
+ * and related values used in the project.
  */
 
 #ifndef LOG_ENUMS_H

@@ -1,9 +1,7 @@
 /*
  * File: format_macro_handlers.c
  * Project: logger
- * Created: 2019-04-20
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
  */
 
 #include "format_macro_handlers.h"

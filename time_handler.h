@@ -1,11 +1,11 @@
 /*
  * File: time_handler.h
  * Project: logger
- * Created: 2019-04-18
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines a time handler that is responsible
- * for fetching information about the current time.
+ * This module contains a time handler class
+ * that can be used to fetch information about
+ * the current time.
  */
 
 #ifndef TIME_HANDLER_H

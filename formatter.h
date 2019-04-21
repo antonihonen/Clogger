@@ -1,15 +1,13 @@
 /*
  * File: formatter.h
  * Project: logger
- * Created: 2019-04-17
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This file defines two formatter classes that are responsible
  * for formatting file names and log entries respectively.
  * These formatters are needed because both file names and
- * log entries can be formatted by the user using macros
- * (referred to as user macros) and those
- * macros need to be expanded - these classes handle that.
+ * log entries can be formatted by the user using format macros that
+ * need to be expanded - these classes do that.
  */
 
 #ifndef FORMATTER_H

@@ -1,12 +1,11 @@
 /*
  * File: format_macro_handlers.h
  * Project: logger
- * Created: 2019-04-20
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This file defines functions that are each responsible
- * for expanding a certain format macro.
- *
+ * This module contains the format macro handlers.
+ * Each handler is responsible for expanding a
+ * certain macro.
  */
 
 #ifndef FORMAT_MACRO_HANDLERS_H

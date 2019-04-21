@@ -1,9 +1,7 @@
 /*
  * File: types.c
  * Project: logger
- * Created: 2019-04-20
  * Author: Anton Ihonen, anton.ihonen@gmail.com
- *
  */
 
 #include "types.h"
