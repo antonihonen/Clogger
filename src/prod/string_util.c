@@ -1,5 +1,5 @@
 /*
- * File: string_util.h
+ * File: string_util.c
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
@@ -12,6 +12,8 @@
 #include "string_util.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 #define __CHAR_TO_LOWER(c) \
 	*c += 32

@@ -11,7 +11,7 @@
 #ifndef TIME_HANDLER_TEST_H
 #define TIME_HANDLER_TEST_H
 
-#include "time_handler.h"
+#include "..\prod\time_handler.h"
 
 void run_time_handler_tests(char* test_set_title);
 

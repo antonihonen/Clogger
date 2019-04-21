@@ -12,6 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 
+extern void __fm_as_str(char*, char*, size_t*);
+extern void __identify_fm(char*, __FM_ID*, size_t*);
+extern void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*);
+
 /* Single application of the test. */
 static void
 apply_fm_as_str(char* macro_seq, char* correct_result, size_t correct_size)
@@ -113,7 +117,7 @@ test_expand_macro_single_pass(thandler_t* thandler, char* macro,
 	char* message, LOG_LEVEL lvl, char* correct_result,
 	size_t correct_skip_over)
 {
-	char* result[__MAX_MSG_SIZE];
+	char result[__MAX_MSG_SIZE];
 	size_t skip_over_result = 0;
 	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result);
 	assert(strcmp(result, correct_result) == 0);

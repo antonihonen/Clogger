@@ -11,7 +11,7 @@
 #ifndef FORMAT_TEST_H
 #define FORMATTER_TEST_H
 
-#include "formatter.h"
+#include "..\prod\formatter.h"
 
 void run_formatter_tests(char* test_set_title);
 
