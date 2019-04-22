@@ -86,7 +86,7 @@ void __fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char*
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char mname_str[__FM_MNAME_S_EXP_SIZE];
+	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_SMALL);
 	strcpy(dest, mname_str);
 }
@@ -96,7 +96,7 @@ void __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char*
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char mname_str[__FM_MNAME_S_EXP_SIZE];
+	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_FIRST_CAP);
 	strcpy(dest, mname_str);
 }
@@ -106,7 +106,7 @@ void __fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char*
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char mname_str[__FM_MNAME_S_EXP_SIZE];
+	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_ALL_CAPS);
 	strcpy(dest, mname_str);
 }
@@ -146,7 +146,7 @@ void __fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* 
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char wday_str[__FM_WDAY_S_EXP_SIZE];
+	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_SMALL);
 	strcpy(dest, wday_str);
 }
@@ -156,7 +156,7 @@ void __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* 
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char wday_str[__FM_WDAY_S_EXP_SIZE];
+	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_FIRST_CAP);
 	strcpy(dest, wday_str);
 }
@@ -166,7 +166,7 @@ void __fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* 
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
 
-	char wday_str[__FM_WDAY_S_EXP_SIZE];
+	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_ALL_CAPS);
 	strcpy(dest, wday_str);
 }
