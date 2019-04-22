@@ -13,19 +13,17 @@
 #include <string.h>
 #include <time.h>
 
-// Used for easy implementation of thandler_get_mname().
+/* Used for easy implementation of thandler_get_mname(). */
 static const char* const MONTHS[12] =
 	{ "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
 	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
 
-// Used for easy implementation of thandler_get_wday().
-// Starts from Sunday because in the tm struct returned by localtime()
-// tm_day value of 0 equals Sunday.
+/* Used for easy implementation of thandler_get_wday().
+Starts from Sunday because in the tm struct returned by localtime()
+tm_day value of 0 equals Sunday. */
 static const char* const WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
 	"THURSDAY", "FRIDAY", "SATURDAY" };
-
-
 
 LOG_ERROR
 thandler_init(thandler_t* thandler)
@@ -74,7 +72,7 @@ thandler_get_year(thandler_t* thandler, char* year)
 	assert(year);
 	assert(thandler->_last_fetch);
 
-	// The year contained by _last_fetch is counted from 1900.
+	/* The year contained by _last_fetch is counted from 1900. */
 	sprintf(year, "%i", 1900L + thandler->_last_fetch->tm_year);
 	return E_NO_ERROR;
 }
@@ -86,7 +84,7 @@ thandler_get_month(thandler_t* thandler, char* month)
 	assert(month);
 	assert(thandler->_last_fetch);
 
-	// The month contained by local time is counted from 0.
+	/* The month contained by local time is counted from 0. */
 	__two_digit_int_to_str(thandler->_last_fetch->tm_mon + 1, month);
 	return E_NO_ERROR;
 }
@@ -144,13 +142,13 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 	assert(format >= __MN_SHORT_SMALL);
 	assert(format <= __MN_LONG_ALL_CAPS);
 
-	// Allocate enough space to accommodate the longest month name.
+	/* Allocate enough space to accommodate the longest month name. */
 	char full_name_in_caps[10];
 	strcpy(full_name_in_caps, MONTHS[thandler->_last_fetch->tm_mon]);
 
 	if (format >= __MN_SHORT_SMALL && format <= __MN_SHORT_ALL_CAPS)
 	{
-		// The format is short so cut the full name after 3 chars.
+		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 
@@ -163,8 +161,8 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
 
-	// At this point full_name_in_caps may no longer be the full name
-	// or in caps.
+	/* At this point full_name_in_caps may no longer be the full name
+	or in caps. */
 	strcpy(mname, full_name_in_caps);
 	
 	return E_NO_ERROR;
@@ -179,13 +177,13 @@ thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format)
 	assert(format >= __WD_SHORT_SMALL);
 	assert(format <= __WD_LONG_ALL_CAPS);
 
-	// Allocate enough space to accommodate the longest weekday name.
+	/* Allocate enough space to accommodate the longest weekday name. */
 	char full_name_in_caps[10];
 	strcpy(full_name_in_caps, WEEKDAYS[thandler->_last_fetch->tm_wday]);
 
 	if (format >= __WD_SHORT_SMALL && format <= __WD_SHORT_ALL_CAPS)
 	{
-		// The format is short so cut the full name after 3 chars.
+		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 

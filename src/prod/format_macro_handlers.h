@@ -119,4 +119,4 @@ __fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __);
 void
 __fm_msg_handler(thandler_t* _, char* dest, LOG_LEVEL __, char* msg);
 
-#endif // FORMAT_MACRO_HANDLERS_H
+#endif /* FORMAT_MACRO_HANDLERS_H */

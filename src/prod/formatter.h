@@ -64,4 +64,4 @@ e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entr
 LOG_ERROR
 e_formatter_close(e_formatter_t* formatter);
 
-#endif // FORMATTER_H
+#endif /* FORMATTER_H */

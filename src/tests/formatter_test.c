@@ -35,12 +35,12 @@ test_fm_as_str()
 {
 	printf("  test_user_macro_as_str\n");
 	
-	// Test all the valid macros first.
+	/* Test all the valid macros first. */
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
-		// Allocate memory. +4 because strlen doesn't count null
-		// terminator and __FM_BEGIN_INDIC, __FM_LEFT_DELIM and
-		// __FM_RIGHT_DELIM will be added.
+		/* Allocate memory. +4 because strlen doesn't count null
+		terminator and __FM_BEGIN_INDIC, __FM_LEFT_DELIM and
+		__FM_RIGHT_DELIM will be added. */
 		char* macro_sequence = malloc(strlen(__FORMAT_MACROS[i]) + 4);
 		const char* correct_result = __FORMAT_MACROS[i];
 		size_t correct_size = strlen(correct_result) + 3;
@@ -54,7 +54,7 @@ test_fm_as_str()
 		free(macro_sequence);
 	}
 
-	// Test invalid macros.
+	/* Test invalid macros. */
 #define fm_as_str_inv_test_cases 5
 	char* test_seqs[fm_as_str_inv_test_cases] =
 		{ "%(NOT_A_MACRO(", "%   not a macro ", "%)",
@@ -177,11 +177,11 @@ test_expand_macro()
 		L_TRACE, "Sunday", sizeof("%(Wday_l)") - 1);
 	test_expand_macro_single_pass(thandler, "%(WDAY_L)", message,
 		L_TRACE, "SUNDAY", sizeof("%(WDAY_L)") - 1);
-	// Not implemented yet.
-//	test_expand_macro_single_pass(thandler, "%(lvl)", message,
-//		L_TRACE, "trace", sizeof("%(LVL)") - 1);
-//	test_expand_macro_single_pass(thandler, "%(Lvl)", message,
-//		L_TRACE, "Trace", sizeof("%(LVL)") - 1);
+	/* Not implemented yet.
+	test_expand_macro_single_pass(thandler, "%(lvl)", message,
+		L_TRACE, "trace", sizeof("%(LVL)") - 1);
+	test_expand_macro_single_pass(thandler, "%(Lvl)", message,
+		L_TRACE, "Trace", sizeof("%(LVL)") - 1); */
 	test_expand_macro_single_pass(thandler, "%(LVL)", message,
 		L_TRACE, "TRACE", sizeof("%(LVL)") - 1);
 	test_expand_macro_single_pass(thandler, "%(MSG)", message,

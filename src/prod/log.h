@@ -331,4 +331,4 @@ log_error(log_t* log, char* message);
 LOG_ERROR
 log_critical(log_t* log, char* message);
 
-#endif // LOG_H
+#endif /* LOG_H */

@@ -12,13 +12,13 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-// Maximum lengths of user-inputted strings.
+/* Maximum lengths of user-inputted strings. */
 #define __MAX_DIR_SIZE 512
 #define __MAX_FILENAME_SIZE 256
 #define __MAX_MSG_SIZE 256
 #define __MAX_FORMAT_SIZE 128
 
-// The sizes of expanded format macros.
+/* The sizes of expanded format macros. */
 #define __FM_YEAR_EXP_SIZE 5
 #define __FM_MONTH_EXP_SIZE 3
 #define __FM_MDAY_EXP_SIZE 3
@@ -30,4 +30,4 @@
 #define __FM_WDAY_S_EXP_SIZE 3
 #define __MAX_FM_WDAY_L_EXP_SIZE 10 // "wednesday\0"
 
-#endif // MACROS_H
+#endif /* MACROS_H */

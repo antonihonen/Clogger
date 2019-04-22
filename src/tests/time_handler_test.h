@@ -15,4 +15,4 @@
 
 void run_time_handler_tests(char* test_set_title);
 
-#endif // TIME_HANDLER_TEST_H
+#endif /* TIME_HANDLER_TEST_H */

@@ -90,4 +90,4 @@ fhandler_write(fhandler_t* handler, char* message);
 LOG_ERROR
 fhandler_flush_buffer(fhandler_t* handler, char* message);
 
-#endif
+#endif /* FILE_HANDLER_H */

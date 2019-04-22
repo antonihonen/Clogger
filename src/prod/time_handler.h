@@ -30,10 +30,10 @@ typedef enum { __MN_SHORT_SMALL, __MN_SHORT_FIRST_CAP, __MN_SHORT_ALL_CAPS,
 /* Defines the properties of a time handler object. */
 typedef struct
 {
-	// Contains the result of the last call to localtime()
-	// received upon the last call to thandler_fetch_ltime().
+	/* Contains the result of the last call to localtime()
+	received upon the last call to thandler_fetch_ltime(). */
 	struct tm* _last_fetch;
-	// For testing purposes:
+	/* For testing purposes: */
 	bool _is_testing;
 } thandler_t;
 
@@ -73,4 +73,4 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format);
 LOG_ERROR
 thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format);
 
-#endif // TIME_HANDLER_H
+#endif /* TIME_HANDLER_H */

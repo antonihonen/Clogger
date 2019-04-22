@@ -16,7 +16,7 @@
 #define __MNAME_MAX_CHARS 9
 #define __WDAY_MAX_CHARS 9
 
-// Global for convenience.
+/* Global for convenience. */
 static thandler_t* t = NULL;
 
 void test_get_year_single_pass(int tm_year, char* correct_result)

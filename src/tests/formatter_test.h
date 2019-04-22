@@ -15,4 +15,4 @@
 
 void run_formatter_tests(char* test_set_title);
 
-#endif // FORMATTER_TEST_H
+#endif /* FORMATTER_TEST_H */

@@ -12,6 +12,9 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#ifndef LOG_LEVEL_H
+#define LOG_LEVEL_H
+
 typedef enum {
 	__L_NO_LEVEL = -1,
 	L_TRACE = 0,
@@ -25,3 +28,5 @@ typedef enum {
 
 const LOG_LEVEL __VALID_LOG_LEVELS[__VALID_LVL_COUNT];
 const char* const __LOG_LEVEL_STRS[__VALID_LVL_COUNT];
+
+#endif /* LOG_LEVEL_H */

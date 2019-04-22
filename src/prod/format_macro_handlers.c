@@ -226,7 +226,7 @@ __fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 {
 	assert(dest);
 	
-	// TODO: Implement.
+	/* TODO: Implement. */
 }
 
 void
@@ -234,7 +234,7 @@ __fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 {
 	assert(dest);
 
-	// TODO: Implement.
+	/* TODO: Implement. */
 }
 
 void
