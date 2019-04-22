@@ -165,7 +165,7 @@ void
 __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	char* msg, LOG_LEVEL lvl, size_t* macro_length)
 {
-	assert(dest && macro_start);
+	assert(macro_start); assert(dest);
 	assert(*macro_start == __FM_BEGIN_INDIC);
 	assert(macro_length);
 	/* Local time must have been fetched. */
@@ -173,11 +173,21 @@ __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	for this. */
 	assert(thandler->_last_fetch);
 
+	/* Figure out which macro is in question. */
 	__FM_ID macro_id = __FM_NO_MACRO;
 	__identify_fm(macro_start, &macro_id, macro_length);
+
 	if (macro_id != __FM_NO_MACRO)
 	{
+		/* Valid macro detected. Call the handler, it will
+		expand the macro. */
 		__FM_HANDLER(macro_id)(thandler, dest, lvl, msg);
+	}
+	else
+	{
+		/* Invalid macro detected. Only write __FM_BEGIN_INDIC
+		to dest. Macro length is already set to 1. */
+		*dest = __FM_BEGIN_INDIC;
 	}
 }
 
@@ -200,7 +210,7 @@ fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 	/* TODO: Check validity of parameters. */
 
 	strcpy(formatter->_fn_format, format);
-	/* Clear the expanded filename string. */
+	/* Clear the expanded filename string since the format was changed. */
 	__CLEAR_STRING(formatter->_expanded_fn);
 	return E_NO_ERROR;
 }
@@ -210,7 +220,7 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 {
 	assert(formatter); assert(formatted_filename);
 
-	/* Pointer to the byte to be next written in the formatted_filename
+	/* Pointer to the next byte to be written in the formatted_filename
 	buffer. */
 	char* filename_head = formatted_filename;
 	/* Pointer to the first byte in the format string that hasn't yet
