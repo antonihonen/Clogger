@@ -16,6 +16,13 @@
 #ifndef POLICY_H
 #define POLICY_H
 
+/* REWRITE: Only use one log file and whenever it gets full,
+erase all data in the file and keep writing in the same file.
+ROTATE: When the log file gets full, append a sequential
+number to the file name.
+IGNORE_EXCESS: When the file gets full, no longer accept
+log writes until the file has been emptied by an external
+process. */
 typedef enum {
 	REWRITE,
 	ROTATE,
@@ -24,12 +31,12 @@ typedef enum {
 #define __VALID_FILEPOL_COUNT 3
 const LOG_FILE_POLICY __VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT];
 
+/* These three buffering modes correspond 1:1 with the buffering modes
+explained in the documentation of the setbuf function from stdio.h.*/
 typedef enum {
 	NO_BUFFERING,
 	LINE_BUFFERING,
 	FULL_BUFFERING
-	/* ...as described in the documentation of the setbuf() function
-	from <stdio.h>. */
 } LOG_BUFFERING_POLICY;
 #define __VALID_BUFPOL_COUNT 3
 const LOG_BUFFERING_POLICY __VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT];

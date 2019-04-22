@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-/* Determines whether thandler_get_wday gets the weekday as
+/* Determines whether thandler_get_wday gets the day of the week as
 mon, Mon, MON, monday, Monday or MONDAY. */
 typedef enum { __WD_SHORT_SMALL, __WD_SHORT_FIRST_CAP, __WD_SHORT_ALL_CAPS,
 	__WD_LONG_SMALL, __WD_LONG_FIRST_CAP, __WD_LONG_ALL_CAPS } __WDAY_FORMAT;

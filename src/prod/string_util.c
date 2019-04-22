@@ -15,8 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define __ASCII_CAP_AND_SMALL_DIFF 32
 #define __CHAR_TO_LOWER(c) \
-	*c += 32
+	*c += __ASCII_CAP_AND_SMALL_DIFF
 	
 #define __IS_UPPERCASE_CHAR(c) *c >= 'A' && *c <= 'Z' ? true : false
 

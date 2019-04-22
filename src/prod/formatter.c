@@ -37,45 +37,56 @@ __fm_as_str(const char* macro_start, char* macro_as_str,
 	assert(macro_start); assert(macro_as_str); assert(macro_length);
 	assert(*macro_start == __FM_BEGIN_INDIC);
 
-	char* macro_as_str_original = macro_as_str;
-	bool has_macro_ended = false;
+	/* Save the initial state of macro_as_str. */
+	char* macro_as_str_initial = macro_as_str;
+	
+	/* Indicates if __FM_RIGHT_DELIM has been encountered in the macro
+	string. */
+	bool has_macro_ended = false; 
+	/* Indicates if __FM_LEFT_DELIM was encountered as the second char. */
 	bool has_macro_begun = false;
+	/* Indicates whether the macro conforms to the format described in
+	format_macro.h, except that in terms of this function the macro
+	body doesn't need to be a valid one. */
 	bool has_macro_valid_format = true;
 	*macro_length = 0;
 
+	/* Read the macro string one character at a time until the macro
+	either ends or is found to be invalid. */
 	while (!has_macro_ended)
 	{	
 		switch (*macro_start)
 		{
 		case __FM_LEFT_DELIM:
+			/* Only one __FM_LEFT_DELIM can be contained
+			by a valid macro sequence and it must
+			be the second character. */
 			if (has_macro_begun || *macro_length != 1)
 			{
-				/* Only one __FM_LEFT_DELIM can be contained
-				by a valid macro sequence and it must
-				be the second character. */
 				has_macro_valid_format = false;
 				has_macro_ended = true;
 			}
 			has_macro_begun = true;
 			break;
 		case __FM_RIGHT_DELIM:
+			/* __FM_LEFT_DELIM must come before __FM_RIGHT_DELIM */
 			if (!has_macro_begun)
 			{
-				/* __FM_LEFT_DELIM must come before __FM_RIGHT_DELIM */
 				has_macro_valid_format = false;
 			}
 			has_macro_ended = true;
 			break;
 		case __FM_BEGIN_INDIC:
+			/* A valid macro cannot contain __FM_BEGIN_INDIC
+			unless it's the first char. */
 			if (*macro_length > 0)
 			{
-				/* A macro cannot contain __FM_BEGIN_INDIC
-				unless it's the first char. */
 				has_macro_valid_format = false;
 				has_macro_ended = true;
 			}
 			break;
 		case '\0':
+			/* End of macro string. */
 			if (!has_macro_begun)
 			{
 				has_macro_valid_format = false;
@@ -87,9 +98,10 @@ __fm_as_str(const char* macro_start, char* macro_as_str,
 			has_macro_ended = true;
 			break;
 		default:
+			/* Only the characters forming the body of the macro
+			is written into the macro_as_str buffer. */
 			*macro_as_str = *macro_start;
 			++macro_as_str;
-
 			break;
 		}
 
@@ -97,15 +109,15 @@ __fm_as_str(const char* macro_start, char* macro_as_str,
 		{
 			/* Invalid format so write __FM_BEGIN_INDIC in the first
 			char of the macro string. */
-			*macro_as_str_original = __FM_BEGIN_INDIC;
-			macro_as_str = macro_as_str_original + 1;
-			/* Only one valid char in macro_str now. */
-			*macro_length = 1;
+			*macro_as_str_initial = __FM_BEGIN_INDIC;
+			macro_as_str = macro_as_str_initial + 1;
+			/* Set length to 0 as if the last character,
+			which caused the macro to be found invalid,
+			was the first one. */
+			*macro_length = 0;
 		}
-		else
-		{
-			++*macro_length;
-		}
+		
+		++*macro_length;
 		
 		if (has_macro_ended)
 		{

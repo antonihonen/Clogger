@@ -186,6 +186,9 @@ test_expand_macro()
 		L_TRACE, "TRACE", sizeof("%(LVL)") - 1);
 	test_expand_macro_single_pass(thandler, "%(MSG)", message,
 		L_TRACE, message, sizeof("%(MSG)") - 1);
+
+	/* TODO: Add test cases for invalid macros. */
+
 	thandler_close(thandler);
 	free(thandler->_last_fetch);
 	free(thandler);

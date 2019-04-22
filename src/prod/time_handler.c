@@ -19,7 +19,7 @@ static const char* const MONTHS[12] =
 	"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
 
 /* Used for easy implementation of thandler_get_wday().
-Starts from Sunday because in the tm struct returned by localtime()
+Starts from Sunday because in the struct tm returned by localtime()
 tm_day value of 0 equals Sunday. */
 static const char* const WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
