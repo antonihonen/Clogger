@@ -1,5 +1,5 @@
 /*
- * File: tests.c
+ * File: run_tests.c
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
