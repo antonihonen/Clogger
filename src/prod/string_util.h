@@ -25,4 +25,4 @@ __two_digit_int_to_str(int i, char* str);
 void
 __ascii_str_to_lower(char* str);
 
-endif /* STRING_UTIL_H */
+#endif /* STRING_UTIL_H */
