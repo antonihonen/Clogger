@@ -4,8 +4,18 @@
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
  * This module contains items related to format
- * macro handling. Format macros (for example "%(year)")
- * can be used to format file names or log entries.
+ * macros. Format macros can be used
+ * to format file names and log entries. A valid
+ * format macro is a sequence of characters that
+ * conforms to the form "<1><2><3><4>",
+ * where
+ *
+ * 1 = __FM_BEGIN_INDIC (begin indicator)
+ * 2 = __FM_LEFT_DELIM (left delimiter)
+ * 3 = a valid macro body (one of the values in the __FORMAT_MACROS array)
+ * 4 = __FM_RIGHT_DELIM (right delimiter)
+ * 
+ * All of the values presented above have been defined in this module.
  *
  * Copyright (C) 2019. Anton Ihonen
  */
@@ -19,7 +29,7 @@ typedef enum
 {
 	// Suppose it is Sun 7 April 2019 and the time is
 	// 07:09:01 (hh:mm:ss) in the morning. A log message
-	// "this is a log message\n" has been requested to be
+	// "\nThis Is Some Weird Log_message\n\n" has been requested to be
 	// written into the log with the logging level "trace".
 	// Below is listed each macro type along with the
 	// value it would expand to.
@@ -30,10 +40,10 @@ typedef enum
 	__FM_HOUR, // "07"
 	__FM_MIN, // "08"
 	__FM_SEC, // "01"
-	__FM_MNAME_S_N, // "apr" (no capitals -> N)
+	__FM_MNAME_S_N, // "apr" (short form -> S, no capitals -> N)
 	__FM_MNAME_S_F, // "Apr" (first capitalized -> F)
 	__FM_MNAME_S_A, // "APR" (all capitalized -> A)
-	__FM_MNAME_L_N, // "april"
+	__FM_MNAME_L_N, // "april" (long form -> L)
 	__FM_MNAME_L_F, // "April"
 	__FM_MNAME_L_A, // APRIL
 	__FM_WDAY_S_N, // "sun"
@@ -45,28 +55,27 @@ typedef enum
 	__FM_LVL_N, // "trace"
 	__FM_LVL_F, // "Trace"
 	__FM_LVL_C, // "TRACE"
-	__FM_MSG // "this is a log message\n"
+	__FM_MSG // "\nThis Is Some Weird Log_message\n\n"
 } __FM_ID;
 // Because the valid macros values start from 1 (above)
 // the last macro in the list gives the number of
 // valid format macros.
 #define __FM_COUNT __FM_MSG
 
-
 // Every format macro must begin with this character.
 // This character CAN be used normally, however -
-// if it is not followed by a valid macro,
-// no macro expansion will be done.
+// it is only interpreted to be the macro beginning
+// when it is followed by a valid macro.
 #define __FM_BEGIN_INDIC '%'
 // In a valid macro, this has to come right after
 // __FM_BEGIN_INDIC.
 #define __FM_LEFT_DELIM '('
 // In a valid macro, this ends the macro sequence
-// and must be preceded by the string indicating
-// the macro (see below).
+// and must be preceded by the macro body
+// (see below).
 #define __FM_RIGHT_DELIM ')'
 
-// The correct spellings of each macro.
+// The body of each macro.
 #define __FM_YEAR_S "year"
 #define __FM_MONTH_S "month"
 #define __FM_MDAY_S "mday"
@@ -98,7 +107,7 @@ typedef enum
 // string form presented above.
 const char* __FORMAT_MACROS[__FM_COUNT];
 
-// A list of format macro handlers. Each valid macro
+// An array of format macro handlers. Each macro
 // is assigned a unique handler.
 void (*__FM_HANDLERS[__FM_COUNT])(thandler_t*, char*, LOG_LEVEL, char*);
 
