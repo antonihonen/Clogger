@@ -11,6 +11,9 @@
 #include <assert.h>
 #include <string.h>
 
+/* TODO: Make the handlers not to add the null terminator
+to the char buffers they write in.*/
+
 /* Returns true if the time handler is in a state that is legal,
 i.e. thandler_fetch_ltime() has been called for it.
 This must be checked because otherwise attempting to get

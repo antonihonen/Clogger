@@ -120,7 +120,11 @@ test_expand_macro_single_pass(thandler_t* thandler, char* macro,
 	char result[__MAX_MSG_SIZE];
 	size_t skip_over_result = 0;
 	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result);
-	assert(strcmp(result, correct_result) == 0);
+	/* Compare only as many characters as the result contains, since
+	no null terminator is added to the string in __expand_fm(). */
+	assert(strncmp(result, correct_result, strlen(correct_result) - 1) == 0);
+	/* TODO: Check that no null terminator was added. Not implemented yet. */
+/*  assert(result[strlen(result)] != '\0'); */
 	assert(skip_over_result == correct_skip_over);
 }
 
@@ -187,7 +191,15 @@ test_expand_macro()
 	test_expand_macro_single_pass(thandler, "%(MSG)", message,
 		L_TRACE, message, sizeof("%(MSG)") - 1);
 
-	/* TODO: Add test cases for invalid macros. */
+	/* Test cases for invalid macros. */
+	test_expand_macro_single_pass(thandler, "% (", message,
+		L_TRACE, "%", sizeof("%") - 1);
+	test_expand_macro_single_pass(thandler, "%__", message,
+		L_TRACE, "%", sizeof("%") - 1);
+	test_expand_macro_single_pass(thandler, "%     ", message,
+		L_TRACE, "%", sizeof("%") - 1);
+	test_expand_macro_single_pass(thandler, "%__", message,
+		L_TRACE, "%", sizeof("%") - 1);
 
 	thandler_close(thandler);
 	free(thandler->_last_fetch);
