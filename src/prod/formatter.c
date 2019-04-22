@@ -203,15 +203,66 @@ __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	}
 }
 
+/* Expands all macros in the format buffer, writing the expanded
+string to dest. Thandler will be used to expand time-related
+macros. Msg contains the log message entered by the user,
+if any. Lvl contains the log level of the message, if any.
+Msg and lvl may be omitted when this function is used to
+format a file name, since they are meaningless in that context. */
+void
+__format_str(char* format, char* dest, thandler_t* thandler,
+	char* msg, LOG_LEVEL lvl)
+{
+	assert(format); assert(dest); assert(thandler);
+	/* If message is given, logging level must also be given - if not,
+	logging level must not be given either. */
+	assert((msg && lvl != __L_NO_LEVEL) || !msg && lvl == __L_NO_LEVEL);
+
+	/* Pointer to the next byte to be written in the formatted_filename
+	buffer. */
+	char* dest_head = dest;
+	/* Pointer to the first byte in the format string that hasn't yet
+	been handled. */
+	char* format_head = format;
+
+	/* Fetch the local time for time-related macros so they all
+	refer to the same point in time. */
+
+	thandler_fetch_ltime(thandler);
+	while (*format_head != '\0')
+	{
+		/* Copy characters one at a time until
+		the beginning of a macro is found. */
+		while (*format_head != __FM_BEGIN_INDIC)
+		{
+			*dest_head = *format_head;
+			++dest_head;
+			++format_head;
+		}
+		/* Macro begin was discovered.
+		Expand the macro. */
+		size_t macro_length = 0;
+		__expand_fm(format_head, dest_head, thandler,
+			msg, lvl, &macro_length);
+		/* The macro was handled so skip the rest of the characters
+		in the macro. */
+		format_head += macro_length;
+	}
+	/* Add the null terminator which was excluded in the
+	while loop. */
+	*dest_head = *format_head;
+}
+
  /* File name formatter functions. */
 
 LOG_ERROR
 fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
 {
-	/* TODO: Check validity of parameters. */
+	assert(formatter); assert(fn_format);
 
 	fn_formatter_set_format(formatter, fn_format);
 	formatter->thandler = malloc(sizeof(thandler_t));
+	/* TODO: Check that malloc was successful. */
 	thandler_init(formatter->thandler);
 	return E_NO_ERROR;
 }
@@ -219,11 +270,14 @@ fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
 LOG_ERROR
 fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 {
-	/* TODO: Check validity of parameters. */
+	assert(formatter); assert(format);
+	/* TODO: Check format validity(? may not be needed). */
 
 	strcpy(formatter->_fn_format, format);
+
 	/* Clear the expanded filename string since the format was changed. */
 	__CLEAR_STRING(formatter->_expanded_fn);
+
 	return E_NO_ERROR;
 }
 
@@ -232,39 +286,8 @@ fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 {
 	assert(formatter); assert(formatted_filename);
 
-	/* Pointer to the next byte to be written in the formatted_filename
-	buffer. */
-	char* filename_head = formatted_filename;
-	/* Pointer to the first byte in the format string that hasn't yet
-	been handled. */
-	char* format_head = formatter->_fn_format;
-
-	/* Fetch the local time for time-related macros so they all
-	refer to the same point in time. */
-
-	thandler_fetch_ltime(formatter->thandler);
-	while (*format_head != '\0')
-	{
-		/* Copy characters one at a time until
-		the beginning of a macro is found. */
-		while (*format_head != __FM_BEGIN_INDIC)
-		{
-			*filename_head = *format_head;
-			++filename_head;
-			++format_head;
-		}
-		/* Macro begin was discovered.
-		Expand the macro. */
-		size_t macro_length = 0;
-		__expand_fm(format_head, filename_head, formatter->thandler,
-			NULL, __L_NO_LEVEL, &macro_length);
-		/* The macro was handled so skip the rest of the characters
-		in the macro. */
-		format_head += macro_length;
-	}
-	/* Add the null terminator which was excluded in the
-	while loop. */
-	*filename_head = *format_head;
+	__format_str(formatter->_fn_format, formatted_filename,
+		formatter->thandler, NULL, __L_NO_LEVEL);
 
 	return E_NO_ERROR;
 }
