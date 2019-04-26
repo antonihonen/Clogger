@@ -216,7 +216,7 @@ __format_str(char* format, char* dest, thandler_t* thandler,
 	assert(format); assert(dest); assert(thandler);
 	/* If message is given, logging level must also be given - if not,
 	logging level must not be given either. */
-	assert((msg && lvl != __L_NO_LEVEL) || !msg && lvl == __L_NO_LEVEL);
+	assert((msg && lvl != __L_NO_LEVEL) || (!msg && lvl == __L_NO_LEVEL));
 
 	/* Pointer to the next byte to be written in the formatted_filename
 	buffer. */
@@ -270,8 +270,8 @@ fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
 LOG_ERROR
 fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 {
-	assert(formatter); assert(format);
-	/* TODO: Check format validity(? may not be needed). */
+	assert(formatter);
+	assert(format);
 
 	strcpy(formatter->_fn_format, format);
 
@@ -284,10 +284,12 @@ fn_formatter_set_format(fn_formatter_t* formatter, char* format)
 LOG_ERROR
 fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
 {
-	assert(formatter); assert(formatted_filename);
+	assert(formatter);
+	assert(formatted_filename);
 
 	__format_str(formatter->_fn_format, formatted_filename,
 		formatter->thandler, NULL, __L_NO_LEVEL);
+	strcpy(formatter->_expanded_fn, formatted_filename);
 
 	return E_NO_ERROR;
 }
@@ -301,6 +303,7 @@ fn_formatter_fn_max_len(fn_formatter_t* formatter, size_t* size)
 LOG_ERROR
 fn_formatter_close(fn_formatter_t* formatter)
 {
+	free(formatter->thandler);
 	return E_NO_ERROR;
 }
 
