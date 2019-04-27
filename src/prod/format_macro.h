@@ -108,6 +108,6 @@ const char* __FORMAT_MACROS[__FM_COUNT];
 
 /* An array of format macro handlers. Each macro
 is assigned a unique handler. */
-const void (*const __FM_HANDLERS[__FM_COUNT])(thandler_t*, char*, LOG_LEVEL, char*, size_t*);
+const __FM_HANDLER const __FM_HANDLERS[__FM_COUNT];
 
 #endif /* FORMAT_MACRO_H */

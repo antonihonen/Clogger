@@ -13,8 +13,8 @@
 #include <string.h>
 
 /* Global for convenience. */
-fn_formatter_t* fnf;
-e_formatter_t* ef;
+fn_format_t* fnf;
+e_format_t* ef;
 thandler_t* th;
 
 static const int TEST_YEAR = 100;
@@ -208,27 +208,22 @@ test_expand_fm()
 	printf("  -> OK\n");
 }
 
-void test_fn_format_s(fn_formatter_t* fnf, char* format, char* correct_result)
+void test_fn_format_s(fn_format_t* fnf, char* format, char* correct_result)
 {
 	char result[512];
-	fn_formatter_set_format(fnf, format);
-	fn_formatter_format(fnf, result);
+	fnf_set_format(fnf, format);
+	fnf_format(fnf, result);
 	assert(strcmp(result, correct_result) == 0);
 }
 
 void test_fn_format(void)
 {
 	printf("  test_fn_format");
-	thandler_close(fnf->thandler);
-	free(fnf->thandler);
-	fnf->thandler = th;
 	char* format = "%(year)-%(month)-%(mday).log";
 	char result[512];
 	char result_f[512] = "%s-%s-%s.log";
 	sprintf(result, result_f, TEST_YEAR_S, TEST_MON_S, TEST_MDAY_S);
 	test_fn_format_s(fnf, format, result);
-	fn_formatter_close(fnf);
-	free(fnf);
 	printf(" -> OK\n");
 }
 
@@ -250,17 +245,19 @@ run_formatter_tests(char* test_set_title)
 	th->_last_fetch->tm_min = TEST_MIN;
 	th->_last_fetch->tm_sec = TEST_SEC;
 	th->_last_fetch->tm_wday = TEST_WDAY;
-	fnf = malloc(sizeof(fn_formatter_t));
-	fn_formatter_init(fnf, "");
+	fnf = fnf_init("");
 	/* Swap the thandler so that the tests can use the rigged one
 	we set up above. */
-	thandler_close(fnf->thandler);
-	free(fnf->thandler);
-	fnf->thandler = th;
+	thandler_close(fnf->_thandler);
+	free(fnf->_thandler);
+	fnf->_thandler = th;
 
 	/* Execute tests. */
 	test_fm_as_str();
 	test_identify_fm();
 	test_expand_fm();
 	test_fn_format();
+
+	fnf_close(fnf);
+	thandler_close(th);
 }

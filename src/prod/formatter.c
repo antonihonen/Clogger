@@ -14,7 +14,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define __FM_HANDLER(macro_id) __FM_HANDLERS[macro_id]
+/* Returns a pointer to the macro handler corresponding with id. */
+static inline const __FM_HANDLER const get_fm_handler(__FM_ID id)
+{
+	return __FM_HANDLERS[id];
+}
 
 /* Private helper functions. */
 
@@ -193,7 +197,7 @@ __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	{
 		/* Valid macro detected. Call the handler, it will
 		expand the macro. */
-		__FM_HANDLER(macro_id)(thandler, dest, lvl, msg, exp_macro_length);
+		get_fm_handler(macro_id)(thandler, dest, lvl, msg, exp_macro_length);
 	}
 	else
 	{
@@ -259,82 +263,89 @@ __format_str(char* format, char* dest, thandler_t* thandler,
 
  /* File name formatter functions. */
 
-LOG_ERROR
-fn_formatter_init(fn_formatter_t* formatter, char* fn_format)
+fn_format_t*
+fnf_init(char* fn_format)
 {
-	assert(formatter); assert(fn_format);
-
-	fn_formatter_set_format(formatter, fn_format);
-	formatter->thandler = malloc(sizeof(thandler_t));
-	/* TODO: Check that malloc was successful. */
-	thandler_init(formatter->thandler);
-	return E_NO_ERROR;
+	assert(fn_format);
+	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
+	if (!new_fnf) { return NULL; }
+	new_fnf->_thandler = malloc(sizeof(thandler_t));
+	if (!new_fnf->_thandler)
+	{
+		free(new_fnf);
+		return NULL;
+	}
+	thandler_init(new_fnf->_thandler);
+	fnf_set_format(new_fnf, fn_format);
+	
+	return new_fnf;
 }
 
 LOG_ERROR
-fn_formatter_set_format(fn_formatter_t* formatter, char* format)
+fnf_set_format(fn_format_t* formatter, char* format)
 {
 	assert(formatter);
 	assert(format);
 
-	strcpy(formatter->_fn_format, format);
+	strcpy(formatter->_form, format);
 
 	/* Clear the expanded filename string since the format was changed. */
-	__CLEAR_STRING(formatter->_expanded_fn);
+	__CLEAR_STRING(formatter->_exp_form);
 
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename)
+fnf_format(fn_format_t* formatter, char* formatted_filename)
 {
 	assert(formatter);
 	assert(formatted_filename);
 
-	__format_str(formatter->_fn_format, formatted_filename,
-		formatter->thandler, NULL, __L_NO_LEVEL);
-	strcpy(formatter->_expanded_fn, formatted_filename);
+	__format_str(formatter->_form, formatted_filename,
+		formatter->_thandler, NULL, __L_NO_LEVEL);
+	strcpy(formatter->_exp_form, formatted_filename);
 
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-fn_formatter_fn_max_len(fn_formatter_t* formatter, size_t* size)
+fnf_fn_max_len(fn_format_t* formatter, size_t* size)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-fn_formatter_close(fn_formatter_t* formatter)
+fnf_close(fn_format_t* formatter)
 {
-	thandler_close(formatter->thandler);
-	free(formatter->thandler);
+	thandler_close(formatter->_thandler);
+	free(formatter->_thandler);
 	return E_NO_ERROR;
 }
 
 /* Entry formatter functions. */
 
+e_format_t*
+ef_init(char* format)
+{
+	return NULL;
+}
+
 LOG_ERROR
-e_formatter_init(e_formatter_t* formatter, char* format)
+ef_set_format(e_format_t* formatter, char* format)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-e_formatter_set_format(e_formatter_t* formatter, char* format)
+ef_format(e_format_t* formatter, char* message, char* formatted_entry)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entry)
+ef_close(e_format_t* formatter)
 {
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-e_formatter_close(e_formatter_t* formatter)
-{
-	free(formatter->thandler);
+	thandler_close(formatter->_thandler);
+	free(formatter->_thandler);
 	return E_NO_ERROR;
 }

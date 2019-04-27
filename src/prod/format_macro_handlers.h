@@ -31,6 +31,8 @@
  (macros making use of it must only be used when formatting log entries)
 */
 
+typedef void(*__FM_HANDLER) (thandler_t*, char*, LOG_LEVEL, char*, size_t*);
+
  /* Handler for __FM_YEAR format macro. */
 void
 __fm_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);

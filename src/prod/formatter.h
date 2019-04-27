@@ -21,47 +21,47 @@
 
 /* Defines the properties of a filename formatter object. */
 typedef struct {
-	char _fn_format[__MAX_FILENAME_SIZE];
-	char _expanded_fn[__MAX_FILENAME_SIZE];
-	thandler_t* thandler;
-} fn_formatter_t;
+	char _form[__MAX_FILENAME_SIZE];
+	char _exp_form[__MAX_FILENAME_SIZE];
+	thandler_t* _thandler;
+} fn_format_t;
 
 /* Defines the properties of an entry formatter object. */
 typedef struct {
-	char _e_format[__MAX_MSG_SIZE];
-	char _e_expanded_format[__MAX_MSG_SIZE];
-	thandler_t* thandler;
-} e_formatter_t;
+	char _form[__MAX_MSG_SIZE];
+	char _exp_form[__MAX_MSG_SIZE];
+	thandler_t* _thandler;
+} e_format_t;
 
 /* File name formatter functions. */
 
-LOG_ERROR
-fn_formatter_init(fn_formatter_t* formatter, char* fn_format);
+fn_format_t*
+fnf_init(char* fn_format);
 
 LOG_ERROR
-fn_formatter_set_format(fn_formatter_t* formatter, char* format);
+fnf_set_format(fn_format_t* formatter, char* format);
 
 LOG_ERROR
-fn_formatter_format(fn_formatter_t* formatter, char* formatted_filename);
+fnf_format(fn_format_t* formatter, char* formatted_filename);
 
 LOG_ERROR
-fn_formatter_fn_max_len(fn_formatter_t* formatter, size_t* size);
+fnf_fn_max_len(fn_format_t* formatter, size_t* size);
 
 LOG_ERROR
-fn_formatter_close(fn_formatter_t* formatter);
+fnf_close(fn_format_t* formatter);
 
 /* Entry formatter functions. */
 
-LOG_ERROR
-e_formatter_init(e_formatter_t* formatter, char* format);
+e_format_t*
+ef_init(char* format);
 
 LOG_ERROR
-e_formatter_set_format(e_formatter_t* formatter, char* format);
+ef_set_format(e_format_t* formatter, char* format);
 
 LOG_ERROR
-e_formatter_format(e_formatter_t* formatter, char* message, char* formatted_entry);
+ef_format(e_format_t* formatter, char* message, char* formatted_entry);
 
 LOG_ERROR
-e_formatter_close(e_formatter_t* formatter);
+ef_close(e_format_t* formatter);
 
 #endif /* FORMATTER_H */
