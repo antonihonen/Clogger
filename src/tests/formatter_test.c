@@ -12,15 +12,11 @@
 #include <stdio.h>
 #include <string.h>
 
-extern void __fm_as_str(char*, char*, size_t*);
-extern void __identify_fm(char*, __FM_ID*, size_t*);
-extern void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*, size_t*);
-extern LOG_ERROR fn_formatter_init(fn_formatter_t*, char*);
-
 /* Global for convenience. */
 fn_formatter_t* fnf;
 e_formatter_t* ef;
 thandler_t* th;
+
 static const int TEST_YEAR = 100;
 static const char* const TEST_YEAR_S = "2000";
 static const int TEST_MON = 0;
@@ -34,14 +30,13 @@ static const char* const TEST_MIN_S = "07";
 static const int TEST_SEC = 8;
 static const char* const TEST_SEC_S = "08";
 static const int TEST_WDAY = 0;
-static const char* const TEST_WDAY_S = "MONDAY";
+static const char* const TEST_MNAME_S = "JANUARY";
+static const char* const TEST_WDAY_S = "SUNDAY";
 
 /* Single application of the test. */
 static void
 test_fm_as_str_s(char* macro_seq, char* correct_result, size_t correct_size)
 {
-	assert(macro_seq); assert(correct_result); assert(correct_size);
-
 	char result[128];
 	size_t size;
 	__fm_as_str(macro_seq, result, &size);
@@ -75,7 +70,7 @@ test_fm_as_str()
 	}
 
 	/* Test invalid macros. */
-#define fm_as_str_inv_test_cases 5
+	#define fm_as_str_inv_test_cases 5
 	char* test_seqs[fm_as_str_inv_test_cases] =
 		{ "%(NOT_A_MACRO(", "%   not a macro ", "%)",
 		"%(year", "%year" };
@@ -93,7 +88,6 @@ test_fm_as_str()
 static void
 test_identify_fm_s(char* macro, __FM_ID correct_result)
 {
-	assert(macro);
 	size_t macro_length = 0;
 	__FM_ID result = -1;
 	__identify_fm(macro, &result, &macro_length);
@@ -225,8 +219,6 @@ void test_fn_format_s(fn_formatter_t* fnf, char* format, char* correct_result)
 void test_fn_format(void)
 {
 	printf("  test_fn_format");
-	fn_formatter_t* fnf = malloc(sizeof(fn_formatter_t));
-	fn_formatter_init(fnf, "");
 	thandler_close(fnf->thandler);
 	free(fnf->thandler);
 	fnf->thandler = th;
@@ -245,10 +237,12 @@ run_formatter_tests(char* test_set_title)
 {
 	printf(test_set_title);
 
+	/* Set up the global objects. */
 	th = malloc(sizeof(thandler_t));
 	thandler_init(th);
+	/* Set thandler time to be constant. */
 	thandler_fetch_ltime(th);
-	th->_is_testing = true;
+	th->_is_testing = true; /* Time can't be fetched anymore. */
 	th->_last_fetch->tm_year = TEST_YEAR;
 	th->_last_fetch->tm_mon = TEST_MON;
 	th->_last_fetch->tm_mday = TEST_MDAY;
@@ -258,6 +252,13 @@ run_formatter_tests(char* test_set_title)
 	th->_last_fetch->tm_wday = TEST_WDAY;
 	fnf = malloc(sizeof(fn_formatter_t));
 	fn_formatter_init(fnf, "");
+	/* Swap the thandler so that the tests can use the rigged one
+	we set up above. */
+	thandler_close(fnf->thandler);
+	free(fnf->thandler);
+	fnf->thandler = th;
+
+	/* Execute tests. */
 	test_fm_as_str();
 	test_identify_fm();
 	test_expand_fm();
