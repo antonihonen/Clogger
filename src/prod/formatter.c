@@ -307,6 +307,7 @@ fn_formatter_fn_max_len(fn_formatter_t* formatter, size_t* size)
 LOG_ERROR
 fn_formatter_close(fn_formatter_t* formatter)
 {
+	thandler_close(formatter->thandler);
 	free(formatter->thandler);
 	return E_NO_ERROR;
 }

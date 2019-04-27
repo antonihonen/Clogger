@@ -20,7 +20,7 @@ const char* __FORMAT_MACROS[__FM_COUNT] =
 	__FM_LVL_N_S, __FM_LVL_F_S, __FM_LVL_A_S, __FM_MSG_S
 	};
 
-const void(*const __FM_HANDLERS[__FM_COUNT])(thandler_t*, char*, LOG_LEVEL, char*) =
+const void(*const __FM_HANDLERS[__FM_COUNT])(thandler_t*, char*, LOG_LEVEL, char*, size_t*) =
 	{ __fm_year_handler, __fm_month_handler, __fm_mday_handler,
 	__fm_hour_handler, __fm_min_handler, __fm_sec_handler,
 	__fm_mname_s_n_handler, __fm_mname_s_f_handler, __fm_mname_s_a_handler,

@@ -14,10 +14,12 @@
 
 extern void __fm_as_str(char*, char*, size_t*);
 extern void __identify_fm(char*, __FM_ID*, size_t*);
-extern void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*);
+extern void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*, size_t*);
 extern LOG_ERROR fn_formatter_init(fn_formatter_t*, char*);
 
 /* Global for convenience. */
+fn_formatter_t* fnf;
+e_formatter_t* ef;
 thandler_t* th;
 static const int TEST_YEAR = 100;
 static const char* const TEST_YEAR_S = "2000";
@@ -51,7 +53,7 @@ test_fm_as_str_s(char* macro_seq, char* correct_result, size_t correct_size)
 static void
 test_fm_as_str()
 {
-	printf("  test_user_macro_as_str\n");
+	printf("  test_fm_as_str");
 	
 	/* Test all the valid macros first. */
 	for (size_t i = 0; i < __FM_COUNT; ++i)
@@ -85,7 +87,7 @@ test_fm_as_str()
 			correct_results[i], correct_sizes[i]);
 	}
 
-	printf("  passed\n");
+	printf("  -> OK\n");
 }
 
 static void
@@ -101,7 +103,7 @@ test_identify_fm_s(char* macro, __FM_ID correct_result)
 static void
 test_identify_fm(void)
 {
-	printf("  test_identify_user_macro\n");
+	printf("  test_identify_fm");
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
 		char macro_seq[256] = "%(";
@@ -127,7 +129,7 @@ test_identify_fm(void)
 	test_identify_fm_s("%()", __FM_NO_MACRO);
 	test_identify_fm_s("%%", __FM_NO_MACRO);
 
-	printf("  passed\n");
+	printf("  -> OK\n");
 }
 
 static void
@@ -137,7 +139,8 @@ test_expand_fm_s(thandler_t* thandler, char* macro,
 {
 	char result[__MAX_MSG_SIZE];
 	size_t skip_over_result = 0;
-	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result);
+	size_t exp_macro_len = 0;
+	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result, &exp_macro_len);
 	/* Compare only as many characters as the result contains, since
 	no null terminator is added to the string in __expand_fm(). */
 	assert(strncmp(result, correct_result, strlen(correct_result) - 1) == 0);
@@ -149,7 +152,7 @@ test_expand_fm_s(thandler_t* thandler, char* macro,
 static void
 test_expand_fm()
 {
-	printf("  test_expand_macro\n");
+	printf("  test_expand_macro");
 
 	char* message = "this is a message";
 	test_expand_fm_s(th, "%(year)", message,
@@ -208,7 +211,7 @@ test_expand_fm()
 	test_expand_fm_s(th, "%__", message,
 		L_TRACE, "%", sizeof("%") - 1);
 
-	printf("  passed\n");
+	printf("  -> OK\n");
 }
 
 void test_fn_format_s(fn_formatter_t* fnf, char* format, char* correct_result)
@@ -216,14 +219,12 @@ void test_fn_format_s(fn_formatter_t* fnf, char* format, char* correct_result)
 	char result[512];
 	fn_formatter_set_format(fnf, format);
 	fn_formatter_format(fnf, result);
-	printf("format = %s\n", format);
-	printf("correct_result = %s\n", correct_result);
-	printf("result = %s\n", result);
 	assert(strcmp(result, correct_result) == 0);
 }
 
 void test_fn_format(void)
 {
+	printf("  test_fn_format");
 	fn_formatter_t* fnf = malloc(sizeof(fn_formatter_t));
 	fn_formatter_init(fnf, "");
 	thandler_close(fnf->thandler);
@@ -234,12 +235,16 @@ void test_fn_format(void)
 	char result_f[512] = "%s-%s-%s.log";
 	sprintf(result, result_f, TEST_YEAR_S, TEST_MON_S, TEST_MDAY_S);
 	test_fn_format_s(fnf, format, result);
+	fn_formatter_close(fnf);
 	free(fnf);
+	printf(" -> OK\n");
 }
 
 void
 run_formatter_tests(char* test_set_title)
 {
+	printf(test_set_title);
+
 	th = malloc(sizeof(thandler_t));
 	thandler_init(th);
 	thandler_fetch_ltime(th);
@@ -251,11 +256,10 @@ run_formatter_tests(char* test_set_title)
 	th->_last_fetch->tm_min = TEST_MIN;
 	th->_last_fetch->tm_sec = TEST_SEC;
 	th->_last_fetch->tm_wday = TEST_WDAY;
-	printf(test_set_title);
+	fnf = malloc(sizeof(fn_formatter_t));
+	fn_formatter_init(fnf, "");
 	test_fm_as_str();
 	test_identify_fm();
 	test_expand_fm();
 	test_fn_format();
-	thandler_close(th);
-	free(th);
 }
