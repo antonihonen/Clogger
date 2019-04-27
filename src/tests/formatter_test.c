@@ -15,10 +15,28 @@
 extern void __fm_as_str(char*, char*, size_t*);
 extern void __identify_fm(char*, __FM_ID*, size_t*);
 extern void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*);
+extern LOG_ERROR fn_formatter_init(fn_formatter_t*, char*);
+
+/* Global for convenience. */
+thandler_t* th;
+static const int TEST_YEAR = 100;
+static const char* const TEST_YEAR_S = "2000";
+static const int TEST_MON = 0;
+static const char* const TEST_MON_S = "01";
+static const int TEST_MDAY = 31;
+static const char* const TEST_MDAY_S = "31";
+static const int TEST_HOUR = 6;
+static const char* const TEST_HOUR_S = "06";
+static const int TEST_MIN = 7;
+static const char* const TEST_MIN_S = "07";
+static const int TEST_SEC = 8;
+static const char* const TEST_SEC_S = "08";
+static const int TEST_WDAY = 0;
+static const char* const TEST_WDAY_S = "MONDAY";
 
 /* Single application of the test. */
 static void
-apply_fm_as_str(char* macro_seq, char* correct_result, size_t correct_size)
+test_fm_as_str_s(char* macro_seq, char* correct_result, size_t correct_size)
 {
 	assert(macro_seq); assert(correct_result); assert(correct_size);
 
@@ -50,7 +68,7 @@ test_fm_as_str()
 		macro_sequence[correct_size - 1] = __FM_RIGHT_DELIM;
 		macro_sequence[correct_size] = '\0';
 		correct_size = strlen(macro_sequence);
-		apply_fm_as_str(macro_sequence, correct_result, correct_size);
+		test_fm_as_str_s(macro_sequence, correct_result, correct_size);
 		free(macro_sequence);
 	}
 
@@ -63,7 +81,7 @@ test_fm_as_str()
 	size_t correct_sizes[fm_as_str_inv_test_cases] = { 1, 1, 1, 1, 1 };
 	for (size_t i = 0; i < fm_as_str_inv_test_cases; ++i)
 	{
-		apply_fm_as_str(test_seqs[i],
+		test_fm_as_str_s(test_seqs[i],
 			correct_results[i], correct_sizes[i]);
 	}
 
@@ -71,7 +89,7 @@ test_fm_as_str()
 }
 
 static void
-test_identify_user_macro_single_pass(char* macro, __FM_ID correct_result)
+test_identify_fm_s(char* macro, __FM_ID correct_result)
 {
 	assert(macro);
 	size_t macro_length = 0;
@@ -81,7 +99,7 @@ test_identify_user_macro_single_pass(char* macro, __FM_ID correct_result)
 }
 
 static void
-test_identify_user_macro(void)
+test_identify_fm(void)
 {
 	printf("  test_identify_user_macro\n");
 	for (size_t i = 0; i < __FM_COUNT; ++i)
@@ -89,31 +107,31 @@ test_identify_user_macro(void)
 		char macro_seq[256] = "%(";
 		strcat(macro_seq, __FORMAT_MACROS[i]);
 		strcat(macro_seq, ")");
-		test_identify_user_macro_single_pass(macro_seq, i);
+		test_identify_fm_s(macro_seq, i);
 		strcat(macro_seq, " ");
-		test_identify_user_macro_single_pass(macro_seq, i);
+		test_identify_fm_s(macro_seq, i);
 		strcat(macro_seq, "_");
-		test_identify_user_macro_single_pass(macro_seq, i);
+		test_identify_fm_s(macro_seq, i);
 	}
 
-	test_identify_user_macro_single_pass("%(year", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     year", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_(year)", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_year)", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_year", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_(__)", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%_____", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%      ", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     )", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%     ()", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%()", __FM_NO_MACRO);
-	test_identify_user_macro_single_pass("%%", __FM_NO_MACRO);
+	test_identify_fm_s("%(year", __FM_NO_MACRO);
+	test_identify_fm_s("%     year", __FM_NO_MACRO);
+	test_identify_fm_s("%_(year)", __FM_NO_MACRO);
+	test_identify_fm_s("%_year)", __FM_NO_MACRO);
+	test_identify_fm_s("%_year", __FM_NO_MACRO);
+	test_identify_fm_s("%_(__)", __FM_NO_MACRO);
+	test_identify_fm_s("%_____", __FM_NO_MACRO);
+	test_identify_fm_s("%      ", __FM_NO_MACRO);
+	test_identify_fm_s("%     )", __FM_NO_MACRO);
+	test_identify_fm_s("%     ()", __FM_NO_MACRO);
+	test_identify_fm_s("%()", __FM_NO_MACRO);
+	test_identify_fm_s("%%", __FM_NO_MACRO);
 
 	printf("  passed\n");
 }
 
 static void
-test_expand_macro_single_pass(thandler_t* thandler, char* macro,
+test_expand_fm_s(thandler_t* thandler, char* macro,
 	char* message, LOG_LEVEL lvl, char* correct_result,
 	size_t correct_skip_over)
 {
@@ -129,89 +147,115 @@ test_expand_macro_single_pass(thandler_t* thandler, char* macro,
 }
 
 static void
-test_expand_macro()
+test_expand_fm()
 {
 	printf("  test_expand_macro\n");
 
-	thandler_t* thandler = malloc(sizeof(thandler_t));
-	thandler_init(thandler);
-	thandler->_last_fetch = malloc(sizeof(struct tm));
-	thandler->_last_fetch->tm_year = 100;
-	thandler->_last_fetch->tm_mon = 0;
-	thandler->_last_fetch->tm_mday = 31;
-	thandler->_last_fetch->tm_hour = 6;
-	thandler->_last_fetch->tm_min = 7;
-	thandler->_last_fetch->tm_sec = 8;
-	thandler->_last_fetch->tm_wday = 0;
-	thandler->_is_testing = true;
 	char* message = "this is a message";
-	test_expand_macro_single_pass(thandler, "%(year)", message,
+	test_expand_fm_s(th, "%(year)", message,
 		L_TRACE, "2000", sizeof("%(year)") - 1);
-	test_expand_macro_single_pass(thandler, "%(month)", message,
+	test_expand_fm_s(th, "%(month)", message,
 		L_TRACE, "01", sizeof("%(month)") - 1);
-	test_expand_macro_single_pass(thandler, "%(mday)", message,
+	test_expand_fm_s(th, "%(mday)", message,
 		L_TRACE, "31", sizeof("%(mday)") - 1);
-	test_expand_macro_single_pass(thandler, "%(hour)", message,
+	test_expand_fm_s(th, "%(hour)", message,
 		L_TRACE, "06", sizeof("%(hour)") - 1);
-	test_expand_macro_single_pass(thandler, "%(min)", message,
+	test_expand_fm_s(th, "%(min)", message,
 		L_TRACE, "07", sizeof("%(min)") - 1);
-	test_expand_macro_single_pass(thandler, "%(sec)", message,
+	test_expand_fm_s(th, "%(sec)", message,
 		L_TRACE, "08", sizeof("%(sec)") - 1);
-	test_expand_macro_single_pass(thandler, "%(mname_s)", message,
+	test_expand_fm_s(th, "%(mname_s)", message,
 		L_TRACE, "jan", sizeof("%(mname_s)") - 1);
-	test_expand_macro_single_pass(thandler, "%(Mname_s)", message,
+	test_expand_fm_s(th, "%(Mname_s)", message,
 		L_TRACE, "Jan", sizeof("%(mname_s)") - 1);
-	test_expand_macro_single_pass(thandler, "%(MNAME_S)", message,
+	test_expand_fm_s(th, "%(MNAME_S)", message,
 		L_TRACE, "JAN", sizeof("%(MNAME_S)") - 1);
-	test_expand_macro_single_pass(thandler, "%(mname_l)", message,
+	test_expand_fm_s(th, "%(mname_l)", message,
 		L_TRACE, "january", sizeof("%(mname_l)") - 1);
-	test_expand_macro_single_pass(thandler, "%(Mname_l)", message,
+	test_expand_fm_s(th, "%(Mname_l)", message,
 		L_TRACE, "January", sizeof("%(Mname_l)") - 1);
-	test_expand_macro_single_pass(thandler, "%(MNAME_L)", message,
+	test_expand_fm_s(th, "%(MNAME_L)", message,
 		L_TRACE, "JANUARY", sizeof("%(MNAME_L)") - 1);
-	test_expand_macro_single_pass(thandler, "%(wday_s)", message,
+	test_expand_fm_s(th, "%(wday_s)", message,
 		L_TRACE, "sun", sizeof("%(wday_s)") - 1);
-	test_expand_macro_single_pass(thandler, "%(Wday_s)", message,
+	test_expand_fm_s(th, "%(Wday_s)", message,
 		L_TRACE, "Sun", sizeof("%(Wday_s)") - 1);
-	test_expand_macro_single_pass(thandler, "%(WDAY_S)", message,
+	test_expand_fm_s(th, "%(WDAY_S)", message,
 		L_TRACE, "SUN", sizeof("%(WDAY_S)") - 1);
-	test_expand_macro_single_pass(thandler, "%(wday_l)", message,
+	test_expand_fm_s(th, "%(wday_l)", message,
 		L_TRACE, "sunday", sizeof("%(wday_l)") - 1);
-	test_expand_macro_single_pass(thandler, "%(Wday_l)", message,
+	test_expand_fm_s(th, "%(Wday_l)", message,
 		L_TRACE, "Sunday", sizeof("%(Wday_l)") - 1);
-	test_expand_macro_single_pass(thandler, "%(WDAY_L)", message,
+	test_expand_fm_s(th, "%(WDAY_L)", message,
 		L_TRACE, "SUNDAY", sizeof("%(WDAY_L)") - 1);
 	/* Not implemented yet.
 	test_expand_macro_single_pass(thandler, "%(lvl)", message,
 		L_TRACE, "trace", sizeof("%(LVL)") - 1);
 	test_expand_macro_single_pass(thandler, "%(Lvl)", message,
 		L_TRACE, "Trace", sizeof("%(LVL)") - 1); */
-	test_expand_macro_single_pass(thandler, "%(LVL)", message,
+	test_expand_fm_s(th, "%(LVL)", message,
 		L_TRACE, "TRACE", sizeof("%(LVL)") - 1);
-	test_expand_macro_single_pass(thandler, "%(MSG)", message,
+	test_expand_fm_s(th, "%(MSG)", message,
 		L_TRACE, message, sizeof("%(MSG)") - 1);
 
 	/* Test cases for invalid macros. */
-	test_expand_macro_single_pass(thandler, "% (", message,
+	test_expand_fm_s(th, "% (", message,
 		L_TRACE, "%", sizeof("%") - 1);
-	test_expand_macro_single_pass(thandler, "%__", message,
+	test_expand_fm_s(th, "%__", message,
 		L_TRACE, "%", sizeof("%") - 1);
-	test_expand_macro_single_pass(thandler, "%     ", message,
+	test_expand_fm_s(th, "%     ", message,
 		L_TRACE, "%", sizeof("%") - 1);
-	test_expand_macro_single_pass(thandler, "%__", message,
+	test_expand_fm_s(th, "%__", message,
 		L_TRACE, "%", sizeof("%") - 1);
 
-	thandler_close(thandler);
-	free(thandler->_last_fetch);
-	free(thandler);
 	printf("  passed\n");
+}
+
+void test_fn_format_s(fn_formatter_t* fnf, char* format, char* correct_result)
+{
+	char result[512];
+	fn_formatter_set_format(fnf, format);
+	fn_formatter_format(fnf, result);
+	printf("format = %s\n", format);
+	printf("correct_result = %s\n", correct_result);
+	printf("result = %s\n", result);
+	assert(strcmp(result, correct_result) == 0);
+}
+
+void test_fn_format(void)
+{
+	fn_formatter_t* fnf = malloc(sizeof(fn_formatter_t));
+	fn_formatter_init(fnf, "");
+	thandler_close(fnf->thandler);
+	free(fnf->thandler);
+	fnf->thandler = th;
+	char* format = "%(year)-%(month)-%(mday).log";
+	char result[512];
+	char result_f[512] = "%s-%s-%s.log";
+	sprintf(result, result_f, TEST_YEAR_S, TEST_MON_S, TEST_MDAY_S);
+	test_fn_format_s(fnf, format, result);
+	free(fnf);
 }
 
 void
 run_formatter_tests(char* test_set_title)
 {
+	th = malloc(sizeof(thandler_t));
+	thandler_init(th);
+	thandler_fetch_ltime(th);
+	th->_is_testing = true;
+	th->_last_fetch->tm_year = TEST_YEAR;
+	th->_last_fetch->tm_mon = TEST_MON;
+	th->_last_fetch->tm_mday = TEST_MDAY;
+	th->_last_fetch->tm_hour = TEST_HOUR;
+	th->_last_fetch->tm_min = TEST_MIN;
+	th->_last_fetch->tm_sec = TEST_SEC;
+	th->_last_fetch->tm_wday = TEST_WDAY;
 	printf(test_set_title);
 	test_fm_as_str();
-	test_identify_user_macro();
-	test_expand_macro();
+	test_identify_fm();
+	test_expand_fm();
+	test_fn_format();
+	thandler_close(th);
+	free(th);
 }

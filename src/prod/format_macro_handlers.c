@@ -27,7 +27,7 @@ __is_thandler_state_legal(thandler_t* thandler)
 }
 
 void
-__fm_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -35,10 +35,11 @@ __fm_year_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char year_str[__FM_YEAR_EXP_SIZE];
 	thandler_get_year(thandler, year_str);
 	strcpy(dest, year_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_month_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_month_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -46,10 +47,11 @@ __fm_month_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char month_str[__FM_MONTH_EXP_SIZE];
 	thandler_get_month(thandler, month_str);
 	strcpy(dest, month_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mday_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mday_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -57,10 +59,11 @@ __fm_mday_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mday_str[__FM_MDAY_EXP_SIZE];
 	thandler_get_mday(thandler, mday_str);
 	strcpy(dest, mday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_hour_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_hour_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -68,10 +71,11 @@ __fm_hour_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char hour_str[__FM_HOUR_EXP_SIZE];
 	thandler_get_hours(thandler, hour_str);
 	strcpy(dest, hour_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_min_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_min_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -79,10 +83,11 @@ __fm_min_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char min_str[__FM_MIN_EXP_SIZE];
 	thandler_get_mins(thandler, min_str);
 	strcpy(dest, min_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_sec_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_sec_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -90,10 +95,11 @@ __fm_sec_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char sec_str[__FM_SEC_EXP_SIZE];
 	thandler_get_secs(thandler, sec_str);
 	strcpy(dest, sec_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -101,10 +107,11 @@ __fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_SMALL);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -112,10 +119,11 @@ __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_FIRST_CAP);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -123,10 +131,11 @@ __fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_SHORT_ALL_CAPS);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -134,10 +143,11 @@ __fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_LONG_SMALL);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -145,10 +155,11 @@ __fm_mname_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_LONG_FIRST_CAP);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -156,10 +167,11 @@ __fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	thandler_get_mname(thandler, mname_str, __MN_LONG_ALL_CAPS);
 	strcpy(dest, mname_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -167,10 +179,11 @@ __fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_SMALL);
 	strcpy(dest, wday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -178,10 +191,11 @@ __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_FIRST_CAP);
 	strcpy(dest, wday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -189,10 +203,11 @@ __fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_SHORT_ALL_CAPS);
 	strcpy(dest, wday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -200,10 +215,11 @@ __fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_LONG_SMALL);
 	strcpy(dest, wday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -211,10 +227,11 @@ __fm_wday_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_LONG_FIRST_CAP);
 	strcpy(dest, wday_str);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_wday_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
+__fm_wday_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest);
 	assert(__is_thandler_state_legal(thandler));
@@ -222,10 +239,12 @@ __fm_wday_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __)
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	thandler_get_wday(thandler, wday_str, __WD_LONG_ALL_CAPS);
 	strcpy(dest, wday_str);
+
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
+__fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __, size_t* exp_macro_len)
 {
 	assert(dest);
 	
@@ -233,7 +252,7 @@ __fm_lvl_n_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 }
 
 void
-__fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
+__fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __, size_t* exp_macro_len)
 {
 	assert(dest);
 
@@ -241,17 +260,19 @@ __fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
 }
 
 void
-__fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __)
+__fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __, size_t* exp_macro_len)
 {
 	assert(dest);
 
 	strcpy(dest, __LOG_LEVEL_STRS[level]);
+	*exp_macro_len = strlen(dest);
 }
 
 void
-__fm_msg_handler(thandler_t* _, char* dest, LOG_LEVEL __, char* msg)
+__fm_msg_handler(thandler_t* _, char* dest, LOG_LEVEL __, char* msg, size_t* exp_macro_len)
 {
 	assert(dest); assert(msg);
 
 	strcpy(dest, msg);
+	*exp_macro_len = strlen(dest);
 }

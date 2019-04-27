@@ -175,7 +175,7 @@ only __FM_BEGIN_INDIC is written to dest (macro_length
 will be 1). */
 void
 __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
-	char* msg, LOG_LEVEL lvl, size_t* macro_length)
+	char* msg, LOG_LEVEL lvl, size_t* macro_length, size_t* exp_macro_length)
 {
 	assert(macro_start); assert(dest);
 	assert(*macro_start == __FM_BEGIN_INDIC);
@@ -193,7 +193,7 @@ __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	{
 		/* Valid macro detected. Call the handler, it will
 		expand the macro. */
-		__FM_HANDLER(macro_id)(thandler, dest, lvl, msg);
+		__FM_HANDLER(macro_id)(thandler, dest, lvl, msg, exp_macro_length);
 	}
 	else
 	{
@@ -233,20 +233,24 @@ __format_str(char* format, char* dest, thandler_t* thandler,
 	{
 		/* Copy characters one at a time until
 		the beginning of a macro is found. */
-		while (*format_head != __FM_BEGIN_INDIC)
+		if (*format_head != __FM_BEGIN_INDIC)
 		{
 			*dest_head = *format_head;
 			++dest_head;
 			++format_head;
 		}
-		/* Macro begin was discovered.
-		Expand the macro. */
-		size_t macro_length = 0;
-		__expand_fm(format_head, dest_head, thandler,
-			msg, lvl, &macro_length);
-		/* The macro was handled so skip the rest of the characters
-		in the macro. */
-		format_head += macro_length;
+		else {
+			/* Macro begin was discovered.
+			Expand the macro. */
+			size_t macro_length = 0;
+			size_t exp_macro_length = 0;
+			__expand_fm(format_head, dest_head, thandler,
+				msg, lvl, &macro_length, &exp_macro_length);
+			/* The macro was handled so skip the rest of the characters
+			in the macro. */
+			format_head += macro_length;
+			dest_head += exp_macro_length;
+		}
 	}
 	/* Add the null terminator which was excluded in the
 	while loop. */
