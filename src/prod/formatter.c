@@ -187,7 +187,7 @@ __expand_fm(char* macro_start, char* dest, thandler_t* thandler,
 	/* Local time must have been fetched. */
 	/* TODO: Add a function to the thandler interface
 	for this. */
-	assert(thandler->_last_fetch);
+	assert(th_has_legal_state(thandler));
 
 	/* Figure out which macro is in question. */
 	__FM_ID macro_id = __FM_NO_MACRO;
@@ -232,7 +232,7 @@ __format_str(char* format, char* dest, thandler_t* thandler,
 	/* Fetch the local time for time-related macros so they all
 	refer to the same point in time. */
 
-	thandler_fetch_ltime(thandler);
+	th_fetch_ltime(thandler);
 	while (*format_head != '\0')
 	{
 		/* Copy characters one at a time until
@@ -268,14 +268,13 @@ fnf_init(char* fn_format)
 {
 	assert(fn_format);
 	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
-	if (!new_fnf) { return NULL; }
-	new_fnf->_thandler = malloc(sizeof(thandler_t));
-	if (!new_fnf->_thandler)
+	thandler_t* new_th = th_init();
+	if (!new_fnf || !new_th)
 	{
-		free(new_fnf);
+		if (new_fnf) { free(new_fnf); }
 		return NULL;
 	}
-	thandler_init(new_fnf->_thandler);
+	new_fnf->_thandler = new_th;
 	fnf_set_format(new_fnf, fn_format);
 	
 	return new_fnf;
@@ -290,7 +289,7 @@ fnf_set_format(fn_format_t* formatter, char* format)
 	strcpy(formatter->_form, format);
 
 	/* Clear the expanded filename string since the format was changed. */
-	__CLEAR_STRING(formatter->_exp_form);
+	__clear_str(formatter->_exp_form);
 
 	return E_NO_ERROR;
 }
@@ -317,8 +316,9 @@ fnf_fn_max_len(fn_format_t* formatter, size_t* size)
 LOG_ERROR
 fnf_close(fn_format_t* formatter)
 {
-	thandler_close(formatter->_thandler);
-	free(formatter->_thandler);
+	assert(formatter);
+	th_close(formatter->_thandler);
+	free(formatter);
 	return E_NO_ERROR;
 }
 
@@ -345,7 +345,7 @@ ef_format(e_format_t* formatter, char* message, char* formatted_entry)
 LOG_ERROR
 ef_close(e_format_t* formatter)
 {
-	thandler_close(formatter->_thandler);
+	th_close(formatter->_thandler);
 	free(formatter->_thandler);
 	return E_NO_ERROR;
 }

@@ -11,7 +11,6 @@
 
 #include "string_util.h"
 #include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,6 +19,24 @@
 	*c += __ASCII_CAP_AND_SMALL_DIFF
 	
 #define __IS_UPPERCASE_CHAR(c) *c >= 'A' && *c <= 'Z' ? true : false
+
+void __terminate_str(char* str, size_t i)
+{
+	assert(str);
+	str[i] = '\0';
+}
+
+void __clear_str(char* str)
+{
+	assert(str);
+	__terminate_str(str, 0);
+}
+
+bool __is_empty_str(char* str)
+{
+	assert(str);
+	return *str == '\0';
+}
 
 void
 __two_digit_int_to_str(int i, char* str)

@@ -9,6 +9,7 @@
 #include "time_handler.h"
 #include "string_util.h"
 #include <assert.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -25,138 +26,138 @@ static const char* const WEEKDAYS[7] =
 	{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
 	"THURSDAY", "FRIDAY", "SATURDAY" };
 
-LOG_ERROR
-thandler_init(thandler_t* thandler)
+thandler_t*
+th_init()
 {
-	assert(thandler);
-
-	thandler->_last_fetch = NULL;
-	thandler->_is_testing = false;
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-thandler_close(thandler_t* thandler)
-{
-	assert(thandler);
-
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-thandler_fetch_ltime(thandler_t* thandler)
-{
-	assert(thandler);
-
-	if (thandler->_is_testing) { return E_NO_ERROR; }
+	thandler_t* new_th = malloc(sizeof(thandler_t));
+	struct tm* new_ltime = malloc(sizeof(struct tm));
+	if (!new_th || !new_ltime)
+	{
+		if (new_th) { free(new_th); }
+		return NULL;
+	}
+	new_th->_ltime = new_ltime;
+	new_th->_is_fetch_allowed = true;
 	
-	time_t raw_time;
-	time(&raw_time);
-	thandler->_last_fetch = localtime(&raw_time);
-	return E_NO_ERROR;
+	return new_th;
 }
 
-LOG_ERROR
-thandler_is_legal_state(thandler_t* thandler, bool* was_fetched)
+void
+th_close(thandler_t* th)
 {
-	assert(thandler); assert(was_fetched);
-
-	*was_fetched = thandler->_last_fetch != NULL ? true : false;
-	return E_NO_ERROR;
+	assert(th);
+	free(th->_ltime);
+	free(th);
 }
 
-LOG_ERROR
-thandler_get_year(thandler_t* thandler, char* year)
+bool
+th_has_legal_state(thandler_t* th)
 {
-	assert(thandler);
+	assert(th);
+
+	return th->_ltime != NULL ? true : false;
+}
+
+void
+th_fetch_ltime(thandler_t* th)
+{
+	assert(th);
+
+	if (th->_is_fetch_allowed)
+	{
+		time_t raw_time;
+		time(&raw_time);
+		/* Create a static copy of the struct returned by localtime(). */
+		memcpy(th->_ltime, localtime(&raw_time), sizeof(struct tm));
+	}
+}
+
+void
+th_get_year(thandler_t* th, char* year)
+{
+	assert(th);
+	assert(th_has_legal_state(th));
 	assert(year);
-	assert(thandler->_last_fetch);
 
-	/* The year contained by _last_fetch is counted from 1900. */
-	sprintf(year, "%i", 1900L + thandler->_last_fetch->tm_year);
-	return E_NO_ERROR;
+	/* The year contained by _ltime is counted from 1900. */
+	sprintf(year, "%i", 1900L + th->_ltime->tm_year);
 }
 
-LOG_ERROR
-thandler_get_month(thandler_t* thandler, char* month)
+void
+th_get_month(thandler_t* th, char* month)
 {
-	assert(thandler);
+	assert(th);
+	assert(th_has_legal_state(th));
 	assert(month);
-	assert(thandler->_last_fetch);
 
 	/* The month contained by local time is counted from 0. */
-	__two_digit_int_to_str(thandler->_last_fetch->tm_mon + 1, month);
-	return E_NO_ERROR;
+	__two_digit_int_to_str(th->_ltime->tm_mon + 1, month);
 }
 
-LOG_ERROR
-thandler_get_mday(thandler_t* thandler, char* mday)
+void
+th_get_mday(thandler_t* th, char* mday)
 {
-	assert(thandler);
+	assert(th);
+	assert(th_has_legal_state(th));
 	assert(mday);
-	assert(thandler->_last_fetch);
 
-	__two_digit_int_to_str(thandler->_last_fetch->tm_mday, mday);
-	return E_NO_ERROR;
+	__two_digit_int_to_str(th->_ltime->tm_mday, mday);
 }
 
-LOG_ERROR
-thandler_get_hours(thandler_t* thandler, char* hours)
+void
+th_get_hour(thandler_t* th, char* hour)
 {
-	assert(thandler);
-	assert(hours);
-	assert(thandler->_last_fetch);
+	assert(th);
+	assert(th_has_legal_state(th));
+	assert(hour);
 
-	__two_digit_int_to_str(thandler->_last_fetch->tm_hour, hours);
-	return E_NO_ERROR;
+	__two_digit_int_to_str(th->_ltime->tm_hour, hour);
 }
 
-LOG_ERROR
-thandler_get_mins(thandler_t* thandler, char* mins)
+void
+th_get_min(thandler_t* th, char* min)
 {
-	assert(thandler);
-	assert(mins);
-	assert(thandler->_last_fetch);
+	assert(th);
+	assert(th_has_legal_state(th));
+	assert(min);
 
-	__two_digit_int_to_str(thandler->_last_fetch->tm_min, mins);
-	return E_NO_ERROR;
+	__two_digit_int_to_str(th->_ltime->tm_min, min);
 }
 
-LOG_ERROR
-thandler_get_secs(thandler_t* thandler, char* secs)
+void
+th_get_sec(thandler_t* th, char* sec)
 {
-	assert(thandler);
-	assert(secs);
-	assert(thandler->_last_fetch);
+	assert(th);
+	assert(th_has_legal_state(th));
+	assert(sec);
 
-	__two_digit_int_to_str(thandler->_last_fetch->tm_sec, secs);
-	return E_NO_ERROR;
+	__two_digit_int_to_str(th->_ltime->tm_sec, sec);
 }
 
-LOG_ERROR
-thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
+void
+th_get_mname(thandler_t* th, char* mname, __MNAME_FORMAT form)
 {
-	assert(thandler);
-	assert(thandler->_last_fetch);
+	assert(th);
+	assert(th_has_legal_state(th));
 	assert(mname);
-	assert(format >= __MN_SHORT_SMALL);
-	assert(format <= __MN_LONG_ALL_CAPS);
+	assert(form >= __MN_SHORT_SMALL);
+	assert(form <= __MN_LONG_ALL_CAPS);
 
 	/* Allocate enough space to accommodate the longest month name. */
 	char full_name_in_caps[10];
-	strcpy(full_name_in_caps, MONTHS[thandler->_last_fetch->tm_mon]);
+	strcpy(full_name_in_caps, MONTHS[th->_ltime->tm_mon]);
 
-	if (format >= __MN_SHORT_SMALL && format <= __MN_SHORT_ALL_CAPS)
+	if (form >= __MN_SHORT_SMALL && form <= __MN_SHORT_ALL_CAPS)
 	{
 		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 
-	if (format == __MN_SHORT_SMALL || format == __MN_LONG_SMALL)
+	if (form == __MN_SHORT_SMALL || form == __MN_LONG_SMALL)
 	{
 		__ascii_str_to_lower(full_name_in_caps);
 	}
-	else if (format == __MN_SHORT_FIRST_CAP || format == __MN_LONG_FIRST_CAP)
+	else if (form == __MN_SHORT_FIRST_CAP || form == __MN_LONG_FIRST_CAP)
 	{
 		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
@@ -164,38 +165,34 @@ thandler_get_mname(thandler_t* thandler, char* mname, __MNAME_FORMAT format)
 	/* At this point full_name_in_caps may no longer be the full name
 	or in caps. */
 	strcpy(mname, full_name_in_caps);
-	
-	return E_NO_ERROR;
 }
 
-LOG_ERROR
-thandler_get_wday(thandler_t* thandler, char* wday, __WDAY_FORMAT format)
+void
+th_get_wday(thandler_t* th, char* wday, __WDAY_FORMAT form)
 {
-	assert(thandler);
-	assert(thandler->_last_fetch);
+	assert(th);
+	assert(th_has_legal_state(th));
 	assert(wday);
-	assert(format >= __WD_SHORT_SMALL);
-	assert(format <= __WD_LONG_ALL_CAPS);
+	assert(form >= __WD_SHORT_SMALL);
+	assert(form <= __WD_LONG_ALL_CAPS);
 
 	/* Allocate enough space to accommodate the longest weekday name. */
 	char full_name_in_caps[10];
-	strcpy(full_name_in_caps, WEEKDAYS[thandler->_last_fetch->tm_wday]);
+	strcpy(full_name_in_caps, WEEKDAYS[th->_ltime->tm_wday]);
 
-	if (format >= __WD_SHORT_SMALL && format <= __WD_SHORT_ALL_CAPS)
+	if (form >= __WD_SHORT_SMALL && form <= __WD_SHORT_ALL_CAPS)
 	{
 		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 
-	if (format == __WD_SHORT_SMALL || format == __WD_LONG_SMALL)
+	if (form == __WD_SHORT_SMALL || form == __WD_LONG_SMALL)
 	{
 		__ascii_str_to_lower(full_name_in_caps);
 	}
-	else if (format == __WD_SHORT_FIRST_CAP || format == __WD_LONG_FIRST_CAP)
+	else if (form == __WD_SHORT_FIRST_CAP || form == __WD_LONG_FIRST_CAP)
 	{
 		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
 	strcpy(wday, full_name_in_caps);
-
-	return E_NO_ERROR;
 }

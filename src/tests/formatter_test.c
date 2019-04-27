@@ -82,7 +82,7 @@ test_fm_as_str()
 			correct_results[i], correct_sizes[i]);
 	}
 
-	printf("  -> OK\n");
+	printf(" -> OK\n");
 }
 
 static void
@@ -123,7 +123,7 @@ test_identify_fm(void)
 	test_identify_fm_s("%()", __FM_NO_MACRO);
 	test_identify_fm_s("%%", __FM_NO_MACRO);
 
-	printf("  -> OK\n");
+	printf(" -> OK\n");
 }
 
 static void
@@ -205,7 +205,7 @@ test_expand_fm()
 	test_expand_fm_s(th, "%__", message,
 		L_TRACE, "%", sizeof("%") - 1);
 
-	printf("  -> OK\n");
+	printf(" -> OK\n");
 }
 
 void test_fn_format_s(fn_format_t* fnf, char* format, char* correct_result)
@@ -233,23 +233,22 @@ run_formatter_tests(char* test_set_title)
 	printf(test_set_title);
 
 	/* Set up the global objects. */
-	th = malloc(sizeof(thandler_t));
-	thandler_init(th);
+	th = th_init();
+	
 	/* Set thandler time to be constant. */
-	thandler_fetch_ltime(th);
-	th->_is_testing = true; /* Time can't be fetched anymore. */
-	th->_last_fetch->tm_year = TEST_YEAR;
-	th->_last_fetch->tm_mon = TEST_MON;
-	th->_last_fetch->tm_mday = TEST_MDAY;
-	th->_last_fetch->tm_hour = TEST_HOUR;
-	th->_last_fetch->tm_min = TEST_MIN;
-	th->_last_fetch->tm_sec = TEST_SEC;
-	th->_last_fetch->tm_wday = TEST_WDAY;
+	th_fetch_ltime(th);
+	th->_is_fetch_allowed = false;
+	th->_ltime->tm_year = TEST_YEAR;
+	th->_ltime->tm_mon = TEST_MON;
+	th->_ltime->tm_mday = TEST_MDAY;
+	th->_ltime->tm_hour = TEST_HOUR;
+	th->_ltime->tm_min = TEST_MIN;
+	th->_ltime->tm_sec = TEST_SEC;
+	th->_ltime->tm_wday = TEST_WDAY;
 	fnf = fnf_init("");
 	/* Swap the thandler so that the tests can use the rigged one
 	we set up above. */
-	thandler_close(fnf->_thandler);
-	free(fnf->_thandler);
+	th_close(fnf->_thandler);
 	fnf->_thandler = th;
 
 	/* Execute tests. */
@@ -259,5 +258,4 @@ run_formatter_tests(char* test_set_title)
 	test_fn_format();
 
 	fnf_close(fnf);
-	thandler_close(th);
 }
