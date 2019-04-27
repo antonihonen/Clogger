@@ -15,10 +15,16 @@
 #include <string.h>
 
 #define __ASCII_CAP_AND_SMALL_DIFF 32
-#define __CHAR_TO_LOWER(c) \
-	*c += __ASCII_CAP_AND_SMALL_DIFF
-	
-#define __IS_UPPERCASE_CHAR(c) *c >= 'A' && *c <= 'Z' ? true : false
+
+static inline char __char_to_lower(char c)
+{
+	return c + __ASCII_CAP_AND_SMALL_DIFF;
+}
+
+static inline bool __is_uppercase_c(char c)
+{
+	c >= 'A' && c <= 'Z' ? true : false;
+}
 
 void __terminate_str(char* str, size_t i)
 {
@@ -63,9 +69,9 @@ __ascii_str_to_lower(char* str)
 
 	while (*str != '\0')
 	{
-		if (__IS_UPPERCASE_CHAR(str))
+		if (__is_uppercase_c(*str))
 		{
-			__CHAR_TO_LOWER(str);
+			*str = __char_to_lower(*str);
 		}
 		++str;
 	}

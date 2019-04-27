@@ -16,6 +16,7 @@
 int main()
 {
 	run_time_handler_tests("TIME HANDLER TESTS\n");
+	printf("\n");
 	run_formatter_tests("FORMATTER TESTS\n");
 	printf("\nTests passed, press Enter to finish.\n");
 	char str[2];
