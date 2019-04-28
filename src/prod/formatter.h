@@ -21,15 +21,15 @@
 
 /* Defines the properties of a filename formatter object. */
 typedef struct {
-	char _form[__MAX_FILENAME_SIZE];
+	char _form[__MAX_FN_FORMAT_SIZE];
 	char _exp_form[__MAX_FILENAME_SIZE];
 	thandler_t* _th;
 } fn_format_t;
 
 /* Defines the properties of an entry formatter object. */
 typedef struct {
-	char _form[__MAX_MSG_SIZE];
-	char _exp_form[__MAX_MSG_SIZE];
+	char _form[__MAX_E_FORMAT_SIZE];
+	char _exp_form[__MAX_ENTRY_SIZE];
 	thandler_t* _th;
 } e_format_t;
 

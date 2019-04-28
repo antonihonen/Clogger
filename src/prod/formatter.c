@@ -378,12 +378,17 @@ macros (some macros can never be in the file name). */
 bool __is_valid_fn_form(const char* format)
 {
 	assert(format);
+	size_t max_len = 0;
+
 	while (*format != '\0')
 	{
 		size_t macro_len = 1;
+		size_t exp_macro_len = 1;
 		if (*format == __FM_BEGIN_INDIC)
 		{
-			switch (__identify_fm(format, &macro_len))
+			__FM_ID id = __identify_fm(format, &macro_len);
+			if (id != __FM_NO_MACRO) { exp_macro_len = __FM_TABLE[id].max_len; }
+			switch (id)
 			{
 			case __FM_MSG:
 			case __FM_LVL_N:
@@ -393,13 +398,12 @@ bool __is_valid_fn_form(const char* format)
 			}
 		}
 		format += macro_len;
+		max_len += exp_macro_len;
 	}
-	return true;
-}
 
-size_t __max_exp_str_len(char* format)
-{
-	return 0;
+	if (max_len < __MAX_FILENAME_SIZE - 1) { return true; }
+
+	return false;
 }
 
 /* Returns true if format is valid, i.e. contains no illegal macros.
@@ -407,5 +411,22 @@ Currently no restrictions. */
 bool __is_valid_e_form(const char* format)
 {
 	assert(format);
-	return true;
+	size_t max_len = 0;
+
+	while (*format != '\0')
+	{
+		size_t macro_len = 1;
+		size_t exp_macro_len = 1;
+		if (*format == __FM_BEGIN_INDIC)
+		{
+			__FM_ID id = __identify_fm(format, &macro_len);
+			if (id != __FM_NO_MACRO) { exp_macro_len = __FM_TABLE[id].max_len; }
+		}
+		format += macro_len;
+		max_len += exp_macro_len;
+	}
+
+	if (max_len < __MAX_ENTRY_SIZE - 1) { return true; }
+
+	return false;
 }

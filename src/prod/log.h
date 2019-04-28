@@ -65,7 +65,7 @@ typedef struct
 
 	/* The format after which log entries are formatted.
 	Macros such as date can be used to determine the format. */
-	char _entry_format[__MAX_FORMAT_SIZE];
+	char _entry_format[__MAX_E_FORMAT_SIZE];
 
 	/* The active threshold level. Any entry with a lower level
 	than the threshold level will be ignored. */

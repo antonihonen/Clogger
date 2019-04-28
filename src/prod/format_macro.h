@@ -24,6 +24,7 @@
 #define FORMAT_MACRO_H
 
 #include "format_macro_handlers.h"
+#include "macros.h"
 
 typedef enum
 {
@@ -118,7 +119,7 @@ const __fm_info_t __FM_TABLE[__FM_COUNT];
 #define __FM_LVL_A_S "LVL"
 #define __FM_LVL_MAX_LEN 8 /* strlen("CRITICAL") */
 #define __FM_MSG_S "MSG"
-#define __FM_MSG_MAX_LEN 512
+#define __FM_MSG_MAX_LEN __MAX_MSG_SIZE
 
 /* The maximum length of a format macro
 in the unexpanded form. */

@@ -12,11 +12,12 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-/* The following values are superfluous. */
 #define __MAX_DIR_SIZE 512
 #define __MAX_FILENAME_SIZE 512
-#define __MAX_MSG_SIZE 1024
-#define __MAX_FORMAT_SIZE 256
+#define __MAX_MSG_SIZE 512
+#define __MAX_FN_FORMAT_SIZE 256
+#define __MAX_E_FORMAT_SIZE 256
+#define __MAX_ENTRY_SIZE 1024
 
 /* The sizes of expanded format macros. */
 #define __FM_YEAR_EXP_SIZE 5
