@@ -23,7 +23,7 @@ static inline char __char_to_lower(char c)
 
 static inline bool __is_uppercase_c(char c)
 {
-	c >= 'A' && c <= 'Z' ? true : false;
+	return c >= 'A' && c <= 'Z' ? true : false;
 }
 
 void __terminate_str(char* str, size_t i)
