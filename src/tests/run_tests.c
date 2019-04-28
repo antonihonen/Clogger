@@ -18,6 +18,8 @@ int main()
 	run_time_handler_tests("TIME HANDLER TESTS\n");
 	printf("\n");
 	run_formatter_tests("FORMATTER TESTS\n");
+	printf("\n");
+	run_file_handler_tests("FILE HANDLER TESTS\n");
 	printf("\nTests passed, press Enter to finish.\n");
 	char str[2];
 	fgets(str, 2, stdin);

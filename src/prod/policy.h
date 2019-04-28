@@ -24,21 +24,21 @@ IGNORE_EXCESS: When the file gets full, no longer accept
 log writes until the file has been emptied by an external
 process. */
 typedef enum {
-	REWRITE,
+	REWRITE = 1,
 	ROTATE,
 	IGNORE_EXCESS
 } LOG_FILE_POLICY;
-#define __VALID_FILEPOL_COUNT 3
+#define __VALID_FILEPOL_COUNT IGNORE_EXCESS
 const LOG_FILE_POLICY __VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT];
 
 /* These three buffering modes correspond 1:1 with the buffering modes
 explained in the documentation of the setbuf function from stdio.h.*/
 typedef enum {
-	NO_BUFFERING,
+	NO_BUFFERING = 1,
 	LINE_BUFFERING,
 	FULL_BUFFERING
 } LOG_BUF_POLICY;
-#define __VALID_BUFPOL_COUNT 3
+#define __VALID_BUFPOL_COUNT FULL_BUFFERING
 const LOG_BUF_POLICY __VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT];
 
 #endif /* POLICY_H */
