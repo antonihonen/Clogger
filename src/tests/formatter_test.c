@@ -169,26 +169,18 @@ test_expand_fm()
 		L_TRACE, "07", sizeof("%(min)") - 1);
 	test_expand_fm_s(fnf_th, "%(sec)", message,
 		L_TRACE, "08", sizeof("%(sec)") - 1);
-	test_expand_fm_s(fnf_th, "%(mname_s)", message,
-		L_TRACE, "jan", sizeof("%(mname_s)") - 1);
 	test_expand_fm_s(fnf_th, "%(Mname_s)", message,
 		L_TRACE, "Jan", sizeof("%(mname_s)") - 1);
 	test_expand_fm_s(fnf_th, "%(MNAME_S)", message,
 		L_TRACE, "JAN", sizeof("%(MNAME_S)") - 1);
-	test_expand_fm_s(fnf_th, "%(mname_l)", message,
-		L_TRACE, "january", sizeof("%(mname_l)") - 1);
 	test_expand_fm_s(fnf_th, "%(Mname_l)", message,
 		L_TRACE, "January", sizeof("%(Mname_l)") - 1);
 	test_expand_fm_s(fnf_th, "%(MNAME_L)", message,
 		L_TRACE, "JANUARY", sizeof("%(MNAME_L)") - 1);
-	test_expand_fm_s(fnf_th, "%(wday_s)", message,
-		L_TRACE, "sun", sizeof("%(wday_s)") - 1);
 	test_expand_fm_s(fnf_th, "%(Wday_s)", message,
 		L_TRACE, "Sun", sizeof("%(Wday_s)") - 1);
 	test_expand_fm_s(fnf_th, "%(WDAY_S)", message,
 		L_TRACE, "SUN", sizeof("%(WDAY_S)") - 1);
-	test_expand_fm_s(fnf_th, "%(wday_l)", message,
-		L_TRACE, "sunday", sizeof("%(wday_l)") - 1);
 	test_expand_fm_s(fnf_th, "%(Wday_l)", message,
 		L_TRACE, "Sunday", sizeof("%(Wday_l)") - 1);
 	test_expand_fm_s(fnf_th, "%(WDAY_L)", message,

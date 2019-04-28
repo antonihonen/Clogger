@@ -150,24 +150,18 @@ void test_get_mname(void)
 {
 	printf("  test_get_mname");
 
-	test_get_mname_s(0, __MN_SHORT_SMALL, "jan");
 	test_get_mname_s(0, __MN_SHORT_FIRST_CAP, "Jan");
 	test_get_mname_s(0, __MN_SHORT_ALL_CAPS, "JAN");
-	test_get_mname_s(0, __MN_LONG_SMALL, "january");
 	test_get_mname_s(0, __MN_LONG_FIRST_CAP, "January");
 	test_get_mname_s(0, __MN_LONG_ALL_CAPS, "JANUARY");
 
-	test_get_mname_s(7, __MN_SHORT_SMALL, "aug");
 	test_get_mname_s(7, __MN_SHORT_FIRST_CAP, "Aug");
 	test_get_mname_s(7, __MN_SHORT_ALL_CAPS, "AUG");
-	test_get_mname_s(7, __MN_LONG_SMALL, "august");
 	test_get_mname_s(7, __MN_LONG_FIRST_CAP, "August");
 	test_get_mname_s(7, __MN_LONG_ALL_CAPS, "AUGUST");
 
-	test_get_mname_s(11, __MN_SHORT_SMALL, "dec");
 	test_get_mname_s(11, __MN_SHORT_FIRST_CAP, "Dec");
 	test_get_mname_s(11, __MN_SHORT_ALL_CAPS, "DEC");
-	test_get_mname_s(11, __MN_LONG_SMALL, "december");
 	test_get_mname_s(11, __MN_LONG_FIRST_CAP, "December");
 	test_get_mname_s(11, __MN_LONG_ALL_CAPS, "DECEMBER");
 
@@ -187,24 +181,18 @@ void test_get_wday(void)
 {
 	printf("  test_get_wday");
 
-	test_get_wday_single_pass(0, __WD_SHORT_SMALL, "sun");
 	test_get_wday_single_pass(0, __WD_SHORT_FIRST_CAP, "Sun");
 	test_get_wday_single_pass(0, __WD_SHORT_ALL_CAPS, "SUN");
-	test_get_wday_single_pass(0, __WD_LONG_SMALL, "sunday");
 	test_get_wday_single_pass(0, __WD_LONG_FIRST_CAP, "Sunday");
 	test_get_wday_single_pass(0, __WD_LONG_ALL_CAPS, "SUNDAY");
 
-	test_get_wday_single_pass(1, __WD_SHORT_SMALL, "mon");
 	test_get_wday_single_pass(1, __WD_SHORT_FIRST_CAP, "Mon");
 	test_get_wday_single_pass(1, __WD_SHORT_ALL_CAPS, "MON");
-	test_get_wday_single_pass(1, __WD_LONG_SMALL, "monday");
 	test_get_wday_single_pass(1, __WD_LONG_FIRST_CAP, "Monday");
 	test_get_wday_single_pass(1, __WD_LONG_ALL_CAPS, "MONDAY");
 
-	test_get_wday_single_pass(6, __WD_SHORT_SMALL, "sat");
 	test_get_wday_single_pass(6, __WD_SHORT_FIRST_CAP, "Sat");
 	test_get_wday_single_pass(6, __WD_SHORT_ALL_CAPS, "SAT");
-	test_get_wday_single_pass(6, __WD_LONG_SMALL, "saturday");
 	test_get_wday_single_pass(6, __WD_LONG_FIRST_CAP, "Saturday");
 	test_get_wday_single_pass(6, __WD_LONG_ALL_CAPS, "SATURDAY");
 

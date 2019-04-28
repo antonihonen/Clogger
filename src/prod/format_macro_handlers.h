@@ -57,10 +57,6 @@ __fm_min_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t
 void
 __fm_sec_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
 
-/* Handler for __FM_MNAME_S_N format macro. */
-void
-__fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
-
 /* Handler for __FM_MNAME_S_F format macro. */
 void
 __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
@@ -68,10 +64,6 @@ __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, 
 /* Handler for __FM_MNAME_S_A format macro. */
 void
 __fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
-
-/* Handler for __FM_MNAME_L_N format macro. */
-void
-__fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
 
 /* Handler for __FM_MNAME_L_F format macro. */
 void
@@ -81,10 +73,6 @@ __fm_mname_l_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, 
 void
 __fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
 
-/* Handler for __FM_WDAY_S_N format macro. */
-void
-__fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
-
 /* Handler for __FM_WDAY_S_F format macro. */
 void
 __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
@@ -92,10 +80,6 @@ __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, s
 /* Handler for __FM_WDAY_S_A format macro. */
 void
 __fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
-
-/* Handler for __FM_WDAY_L_N format macro. */
-void
-__fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len);
 
 /* Handler for __FM_WDAY_L_F format macro. */
 void

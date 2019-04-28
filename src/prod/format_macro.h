@@ -41,16 +41,12 @@ typedef enum
 	__FM_HOUR, /* "07" */
 	__FM_MIN, /* "08" */
 	__FM_SEC, /* "01" */
-	__FM_MNAME_S_N, /* "apr" (short form -> S, no capitals -> N) */
-	__FM_MNAME_S_F, /* "Apr" (first capitalized -> F) */
+	__FM_MNAME_S_F, /* "Apr" (short form -> S, first capitalized -> F) */
 	__FM_MNAME_S_A, /* "APR" (all capitalized -> A) */
-	__FM_MNAME_L_N, /* "april" (long form -> L) */
-	__FM_MNAME_L_F, /* "April" */
+	__FM_MNAME_L_F, /* "April" (long form -> L) */
 	__FM_MNAME_L_A, /* APRIL */
-	__FM_WDAY_S_N, /* "sun" */
 	__FM_WDAY_S_F, /* "Sun" */
 	__FM_WDAY_S_A, /* "SUN" */
-	__FM_WDAY_L_N, /* "sunday" */
 	__FM_WDAY_L_F, /* "Sunday" */
 	__FM_WDAY_L_A, /* "SUNDAY" */
 	__FM_LVL_N, /* "trace" */
@@ -98,19 +94,15 @@ const __fm_info_t __FM_TABLE[__FM_COUNT];
 #define __FM_MIN_MAX_LEN 2
 #define __FM_SEC_S "sec"
 #define __FM_SEC_MAX_LEN 2
-#define __FM_MNAME_S_N_S "mname_s"
 #define __FM_MNAME_S_F_S "Mname_s"
 #define __FM_MNAME_S_A_S "MNAME_S"
 #define __FM_MNAME_S_MAX_LEN 3
-#define __FM_MNAME_L_N_S "mname_l"
 #define __FM_MNAME_L_F_S "Mname_l"
 #define __FM_MNAME_L_A_S "MNAME_L"
 #define __FM_MNAME_L_MAX_LEN 9 /* strlen("SEPTEMBER") */
-#define __FM_WDAY_S_N_S "wday_s"
 #define __FM_WDAY_S_F_S "Wday_s"
 #define __FM_WDAY_S_A_S "WDAY_S"
 #define __FM_WDAY_S_MAX_LEN 3
-#define __FM_WDAY_L_N_S "wday_l"
 #define __FM_WDAY_L_F_S "Wday_l"
 #define __FM_WDAY_L_A_S "WDAY_L"
 #define __FM_WDAY_L_MAX_LEN 9 /*strlen("WEDNESDAY")*/

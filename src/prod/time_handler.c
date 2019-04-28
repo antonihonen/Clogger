@@ -140,24 +140,20 @@ th_get_mname(thandler_t* th, char* mname, __MNAME_FORMAT form)
 	assert(th);
 	assert(th_has_legal_state(th));
 	assert(mname);
-	assert(form >= __MN_SHORT_SMALL);
+	assert(form >= __MN_SHORT_FIRST_CAP);
 	assert(form <= __MN_LONG_ALL_CAPS);
 
 	/* Allocate enough space to accommodate the longest month name. */
 	char full_name_in_caps[10];
 	strcpy(full_name_in_caps, MONTHS[th->_ltime->tm_mon]);
 
-	if (form >= __MN_SHORT_SMALL && form <= __MN_SHORT_ALL_CAPS)
+	if (form == __MN_SHORT_FIRST_CAP || form == __MN_SHORT_ALL_CAPS)
 	{
 		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 
-	if (form == __MN_SHORT_SMALL || form == __MN_LONG_SMALL)
-	{
-		__ascii_str_to_lower(full_name_in_caps);
-	}
-	else if (form == __MN_SHORT_FIRST_CAP || form == __MN_LONG_FIRST_CAP)
+	if (form == __MN_SHORT_FIRST_CAP || form == __MN_LONG_FIRST_CAP)
 	{
 		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
@@ -173,26 +169,23 @@ th_get_wday(thandler_t* th, char* wday, __WDAY_FORMAT form)
 	assert(th);
 	assert(th_has_legal_state(th));
 	assert(wday);
-	assert(form >= __WD_SHORT_SMALL);
+	assert(form >= __WD_SHORT_FIRST_CAP);
 	assert(form <= __WD_LONG_ALL_CAPS);
 
 	/* Allocate enough space to accommodate the longest weekday name. */
 	char full_name_in_caps[10];
 	strcpy(full_name_in_caps, WEEKDAYS[th->_ltime->tm_wday]);
 
-	if (form >= __WD_SHORT_SMALL && form <= __WD_SHORT_ALL_CAPS)
+	if (form == __WD_SHORT_FIRST_CAP || form == __WD_SHORT_ALL_CAPS)
 	{
 		/* The format is short so cut the full name after 3 chars. */
 		full_name_in_caps[3] = '\0';
 	}
 
-	if (form == __WD_SHORT_SMALL || form == __WD_LONG_SMALL)
-	{
-		__ascii_str_to_lower(full_name_in_caps);
-	}
-	else if (form == __WD_SHORT_FIRST_CAP || form == __WD_LONG_FIRST_CAP)
+	if (form == __WD_SHORT_FIRST_CAP || form == __WD_LONG_FIRST_CAP)
 	{
 		__ascii_str_to_lower(full_name_in_caps + 1);
 	}
+
 	strcpy(wday, full_name_in_caps);
 }

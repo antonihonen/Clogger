@@ -108,18 +108,6 @@ __fm_sec_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t
 }
 
 void
-__fm_mname_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
-{
-	assert(thandler); assert(dest); assert(exp_macro_len);
-	assert(th_has_legal_state(thandler));
-
-	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
-	th_get_mname(thandler, mname_str, __MN_SHORT_SMALL);
-	strcpy(dest, mname_str);
-	*exp_macro_len = strlen(dest);
-}
-
-void
 __fm_mname_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest); assert(exp_macro_len);
@@ -139,18 +127,6 @@ __fm_mname_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, 
 
 	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
 	th_get_mname(thandler, mname_str, __MN_SHORT_ALL_CAPS);
-	strcpy(dest, mname_str);
-	*exp_macro_len = strlen(dest);
-}
-
-void
-__fm_mname_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
-{
-	assert(thandler); assert(dest); assert(exp_macro_len);
-	assert(th_has_legal_state(thandler));
-
-	char mname_str[__MAX_FM_MNAME_L_EXP_SIZE];
-	th_get_mname(thandler, mname_str, __MN_LONG_SMALL);
 	strcpy(dest, mname_str);
 	*exp_macro_len = strlen(dest);
 }
@@ -180,18 +156,6 @@ __fm_mname_l_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, 
 }
 
 void
-__fm_wday_s_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
-{
-	assert(thandler); assert(dest); assert(exp_macro_len);
-	assert(th_has_legal_state(thandler));
-
-	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
-	th_get_wday(thandler, wday_str, __WD_SHORT_SMALL);
-	strcpy(dest, wday_str);
-	*exp_macro_len = strlen(dest);
-}
-
-void
 __fm_wday_s_f_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
 {
 	assert(thandler); assert(dest); assert(exp_macro_len);
@@ -211,18 +175,6 @@ __fm_wday_s_a_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, s
 
 	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
 	th_get_wday(thandler, wday_str, __WD_SHORT_ALL_CAPS);
-	strcpy(dest, wday_str);
-	*exp_macro_len = strlen(dest);
-}
-
-void
-__fm_wday_l_n_handler(thandler_t* thandler, char* dest, LOG_LEVEL _, char* __, size_t* exp_macro_len)
-{
-	assert(thandler); assert(dest); assert(exp_macro_len);
-	assert(th_has_legal_state(thandler));
-
-	char wday_str[__MAX_FM_WDAY_L_EXP_SIZE];
-	th_get_wday(thandler, wday_str, __WD_LONG_SMALL);
 	strcpy(dest, wday_str);
 	*exp_macro_len = strlen(dest);
 }

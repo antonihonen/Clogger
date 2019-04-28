@@ -19,13 +19,13 @@
 
 /* Determines whether thandler_get_wday gets the day of the week as
 mon, Mon, MON, monday, Monday or MONDAY. */
-typedef enum { __WD_SHORT_SMALL, __WD_SHORT_FIRST_CAP, __WD_SHORT_ALL_CAPS,
-	__WD_LONG_SMALL, __WD_LONG_FIRST_CAP, __WD_LONG_ALL_CAPS } __WDAY_FORMAT;
+typedef enum { __WD_SHORT_FIRST_CAP, __WD_SHORT_ALL_CAPS,
+	__WD_LONG_FIRST_CAP, __WD_LONG_ALL_CAPS } __WDAY_FORMAT;
 
 /* Determines whether thandler_get_mname gets the month name as
 jan, Jan, JAN, january, January or JANUARY. */
-typedef enum { __MN_SHORT_SMALL, __MN_SHORT_FIRST_CAP, __MN_SHORT_ALL_CAPS,
-	__MN_LONG_SMALL, __MN_LONG_FIRST_CAP, __MN_LONG_ALL_CAPS} __MNAME_FORMAT;
+typedef enum { __MN_SHORT_FIRST_CAP, __MN_SHORT_ALL_CAPS,
+	__MN_LONG_FIRST_CAP, __MN_LONG_ALL_CAPS} __MNAME_FORMAT;
 
 /* Defines the properties of a time handler object. */
 typedef struct
