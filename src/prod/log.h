@@ -29,7 +29,7 @@ typedef struct
 	file at once when the buffer is about to get full
 	if a file policy other than NO_FILE_POLICY
 	has been selected. */
-	LOG_BUFFERING_POLICY _buffering_policy;
+	LOG_BUF_POLICY _buffering_policy;
 
 	/* The capacity of the buffer in bytes. */
 	size_t _buffer_capacity_;
@@ -95,7 +95,7 @@ log_init(log_t* log,
 	char* filename_format,
 	size_t max_file_size,
 	LOG_FILE_POLICY file_policy,
-	LOG_BUFFERING_POLICY buffering_policy);
+	LOG_BUF_POLICY buffering_policy);
 
 /* Enables writing to the log. When writing is enabled,
 entries that exceed the active entry threshold will be
@@ -149,7 +149,7 @@ the buffer are written into the file at once.
 @return:
 */
 LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy);
+log_set_buffering_policy(log_t* log, LOG_BUF_POLICY policy);
 
 /* Gets the active buffering policy.
 @log: A pointer to the log object.
@@ -157,7 +157,7 @@ log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy);
 @return:
 */
 LOG_ERROR
-log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy);
+log_buffering_policy(log_t* log, LOG_BUF_POLICY* policy);
 
 /* Sets a new size for the output buffer. The old buffer is
 discarded - the user must flush the old buffer first if

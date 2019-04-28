@@ -16,7 +16,7 @@ log_init(log_t* log,
 	char* filename_format,
 	size_t max_file_size,
 	LOG_FILE_POLICY file_policy,
-	LOG_BUFFERING_POLICY buffering_policy)
+	LOG_BUF_POLICY buffering_policy)
 {
 	return E_NO_ERROR;
 }
@@ -52,13 +52,13 @@ log_threshold(log_t* log, LOG_LEVEL* threshold)
 }
 
 LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUFFERING_POLICY policy)
+log_set_buffering_policy(log_t* log, LOG_BUF_POLICY policy)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-log_buffering_policy(log_t* log, LOG_BUFFERING_POLICY* policy)
+log_buffering_policy(log_t* log, LOG_BUF_POLICY* policy)
 {
 	return E_NO_ERROR;
 }
