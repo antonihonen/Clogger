@@ -271,7 +271,7 @@ __fm_lvl_f_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __, size_t*
 
 	char* const exp_macro = __LOG_LEVEL_STRS[level];
 	__ascii_str_to_lower(exp_macro + 1);
-	*exp_macro_len = __write_and_pad(dest, exp_macro, strlen(exp_macro), __FM_LVL_MAX_LEN);
+	*exp_macro_len = __write_and_pad(dest, exp_macro, __FM_LVL_MAX_LEN);
 }
 
 void
@@ -279,8 +279,7 @@ __fm_lvl_a_handler(thandler_t* _, char* dest, LOG_LEVEL level, char* __, size_t*
 {
 	assert(dest); assert(exp_macro_len);
 	
-	*exp_macro_len = __write_and_pad(dest, __LOG_LEVEL_STRS[level],
-		strlen(__LOG_LEVEL_STRS[level]), __FM_LVL_MAX_LEN);
+	*exp_macro_len = __write_and_pad(dest, __LOG_LEVEL_STRS[level], __FM_LVL_MAX_LEN);
 }
 
 void
