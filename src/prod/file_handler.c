@@ -21,20 +21,34 @@ fh_init(LOG_BUF_POLICY buf_policy,
 	assert(fn_format);
 	assert(buf_policy > 0 && buf_policy <= __VALID_BUFPOL_COUNT);
 	assert(file_policy > 0 && file_policy <= __VALID_FILEPOL_COUNT);
+	if (buf_policy != NO_BUFFERING && buf_size == 0) { buf_size = BUFSIZ; }
 
 	fhandler_t* new_fh = malloc(sizeof(fhandler_t));
 	fn_format_t* new_fnf = fnf_init(fn_format);
+	char* new_buf = NULL;
+	if (buf_policy != NO_BUFFERING) { new_buf = malloc(buf_size); }
+	else { buf_size = 0; }
 
-	if (!new_fh || !new_fnf)
+	if (!new_fh || !new_fnf || (!new_buf && buf_policy != NO_BUFFERING))
 	{
 		/* Memory allocation failed. Clean up and return NULL. */
 		if (new_fh) { free(new_fh); }
+		if (new_fnf) { free(new_fnf); }
+		if (new_buf) { free(new_buf); }
 		return NULL;
 	}
 
-	new_fh->fnf = new_fnf;
 	new_fh->_fstream = NULL;
-	new_fh->_buf_policy = buf_policy;
+	new_fh->_fnf = new_fnf;
+	new_fh->_buf = new_buf;
+
+	switch (buf_policy)
+	{
+	case NO_BUFFERING: new_fh->_buf_mode = _IONBF; break;
+	case LINE_BUFFERING: new_fh->_buf_mode = _IOLBF; break;
+	case FULL_BUFFERING: new_fh->_buf_mode = _IOFBF; break;
+	}
+
 	new_fh->_buf_cap = buf_size;
 	new_fh->_file_policy = file_policy;
 	new_fh->_has_file_changed = false;
@@ -49,6 +63,36 @@ void fh_close(fhandler_t* fh)
 {
 	assert(fh);
 
-	fnf_close(fh->fnf);
+	fnf_close(fh->_fnf);
 	free(fh);
+}
+
+
+bool fh_write(fhandler_t* fh, char* str)
+{
+	assert(fh); assert(str);
+	
+	/* TODO: Check current file size. */
+	/* TODO: Create new file if current file has
+	reached the maximum size. */
+
+	/* TODO: Only expand the filename when starting to write
+	in a new file */
+	char filename[__MAX_FILENAME_SIZE];
+	
+	fnf_format(fh->_fnf, filename);
+	fh->_fstream = fopen(filename, "a");
+	if (!fh->_fstream) { return false; }
+
+	/* TODO: Create dir if doesn't exist. */
+	/* TODO: Check if file already exists (? may not be needed). */
+
+	setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
+
+	if (fputs(str, fh->_fstream) == EOF) { return false; }
+	if (fclose(fh->_fstream) == EOF) { return false; }
+
+	fh->_fstream = NULL;
+
+	return true;
 }

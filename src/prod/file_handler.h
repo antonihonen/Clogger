@@ -23,10 +23,11 @@
 /* Defines the properties of a file handler object. */
 typedef struct {
 	FILE* _fstream;
-	fn_format_t* fnf;
+	fn_format_t* _fnf;
 
-	LOG_BUF_POLICY _buf_policy;
+	char* _buf;
 	size_t _buf_cap;
+	int _buf_mode;
 
 	LOG_FILE_POLICY _file_policy;
 	size_t _max_file_size;
@@ -64,7 +65,7 @@ LOG_FILE_POLICY
 fh_file_policy(fhandler_t* fh);
 
 bool
-fh_set_fn_format(fhandler_t* fh, char* dir);
+fh_set_fn_format(fhandler_t* fh, char* format);
 
 bool
 fh_set_file_size(fhandler_t* fh, size_t size);
@@ -76,9 +77,9 @@ size_t
 fh_file_iter(fhandler_t* fh);
 
 bool
-fh_write(fhandler_t* fh, char* msg);
+fh_write(fhandler_t* fh, char* str);
 
 void
-fh_flush_buffer(fhandler_t* fh, char* msg);
+fh_flush_buffer(fhandler_t* fh);
 
 #endif /* FILE_HANDLER_H */
