@@ -68,13 +68,6 @@ fnf_format(fn_format_t* fnf, char* formatted_filename)
 		fnf->_th, NULL, __L_NO_LEVEL);
 }
 
-size_t
-fnf_fn_max_len(fn_format_t* fnf)
-{
-	/* TODO: Implement. */
-	return 0;
-}
-
 void
 fnf_close(fn_format_t* fnf)
 {
