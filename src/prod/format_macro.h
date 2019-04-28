@@ -104,7 +104,7 @@ const __fm_info_t __FM_TABLE[__FM_COUNT];
 #define __FM_MNAME_L_N_S "mname_l"
 #define __FM_MNAME_L_F_S "Mname_l"
 #define __FM_MNAME_L_A_S "MNAME_L"
-#define __FM_MNAME_L_MAX_LEN (sizeof("SEPTEMBER") - 1)
+#define __FM_MNAME_L_MAX_LEN 9 /* strlen("SEPTEMBER") */
 #define __FM_WDAY_S_N_S "wday_s"
 #define __FM_WDAY_S_F_S "Wday_s"
 #define __FM_WDAY_S_A_S "WDAY_S"
@@ -112,11 +112,11 @@ const __fm_info_t __FM_TABLE[__FM_COUNT];
 #define __FM_WDAY_L_N_S "wday_l"
 #define __FM_WDAY_L_F_S "Wday_l"
 #define __FM_WDAY_L_A_S "WDAY_L"
-#define __FM_WDAY_L_MAX_LEN (sizeof("WEDNESDAY") - 1)
+#define __FM_WDAY_L_MAX_LEN 9 /*strlen("WEDNESDAY")*/
 #define __FM_LVL_N_S "lvl"
 #define __FM_LVL_F_S "Lvl"
 #define __FM_LVL_A_S "LVL"
-#define __FM_LVL_MAX_LEN sizeof("CRITICAL" - 1)
+#define __FM_LVL_MAX_LEN 8 /* strlen("CRITICAL") */
 #define __FM_MSG_S "MSG"
 #define __FM_MSG_MAX_LEN 512
 

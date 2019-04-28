@@ -199,7 +199,7 @@ test_expand_fm()
 	test_expand_macro_single_pass(thandler, "%(Lvl)", message,
 		L_TRACE, "Trace", sizeof("%(LVL)") - 1); */
 	test_expand_fm_s(fnf_th, "%(LVL)", message,
-		L_TRACE, "TRACE", sizeof("%(LVL)") - 1);
+		L_TRACE, "TRACE   ", sizeof("%(LVL)") - 1);
 	test_expand_fm_s(fnf_th, "%(MSG)", message,
 		L_TRACE, message, sizeof("%(MSG)") - 1);
 
@@ -240,7 +240,6 @@ void test_fnf_s(char* format, char* correct_result)
 	char result[512];
 	fnf_set_format(fnf, format);
 	fnf_format(fnf, result);
-	printf("'%s'\n", result);
 	assert(strncmp(result, correct_result, strlen(correct_result)) == 0);
 }
 
@@ -253,7 +252,7 @@ void test_fnf(void)
 	sprintf(exp_form, format, __FM_YEAR_S, __FM_MONTH_S, __FM_MDAY_S, __FM_MNAME_L_F_S, __FM_WDAY_S_F_S);
 	test_fnf_s(exp_form, "D:\\logs\\2000_01_31_January_Sun.log");
 	
-	printf(" -> OK");
+	printf(" -> OK\n");
 }
 
 void test_ef_s(char* format, char* msg, LOG_LEVEL lvl, char* correct_result)
@@ -274,8 +273,8 @@ void test_ef(void)
 		__FM_HOUR_S, __FM_MIN_S, __FM_SEC_S,
 		__FM_LVL_A_S,
 		__FM_MSG_S);
-	test_ef_s(exp_form, " test _ message \n", L_TRACE, "2000-01-31  06:07:08  TRACE   test _ message \n");
-	test_ef_s(exp_form, " test _ message \n", L_WARNING, "2000-01-31  06:07:08  WARNING   test _ message \n");
+	test_ef_s(exp_form, " test _ message \n", L_TRACE, "2000-01-31  06:07:08  TRACE      test _ message \n");
+	test_ef_s(exp_form, " test _ message \n", L_WARNING, "2000-01-31  06:07:08  WARNING    test _ message \n");
 
 	printf(" -> OK\n");
 }
