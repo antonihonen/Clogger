@@ -57,12 +57,12 @@ test_fm_as_str()
 		/* Allocate memory. +4 because strlen doesn't count null
 		terminator and __FM_BEGIN_INDIC, __FM_LEFT_DELIM and
 		__FM_RIGHT_DELIM will be added. */
-		char* macro_sequence = malloc(strlen(__FORMAT_MACROS[i]) + 4);
-		const char* correct_result = __FORMAT_MACROS[i];
+		char* macro_sequence = malloc(strlen(__FM_TABLE[i].str) + 4);
+		const char* correct_result = __FM_TABLE[i].str;
 		size_t correct_size = strlen(correct_result) + 3;
 		macro_sequence[0] = __FM_BEGIN_INDIC;
 		macro_sequence[1] = __FM_LEFT_DELIM;
-		strcpy(macro_sequence + 2, __FORMAT_MACROS[i]);
+		strcpy(macro_sequence + 2, __FM_TABLE[i].str);
 		macro_sequence[correct_size - 1] = __FM_RIGHT_DELIM;
 		macro_sequence[correct_size] = '\0';
 		correct_size = strlen(macro_sequence);
@@ -101,7 +101,7 @@ test_identify_fm(void)
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
 		char macro_seq[256] = "%(";
-		strcat(macro_seq, __FORMAT_MACROS[i]);
+		strcat(macro_seq, __FM_TABLE[i].str);
 		strcat(macro_seq, ")");
 		test_identify_fm_s(macro_seq, i);
 		strcat(macro_seq, " ");

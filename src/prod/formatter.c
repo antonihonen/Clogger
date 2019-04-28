@@ -139,7 +139,7 @@ ef_close(e_format_t* ef)
 /* Returns a pointer to the macro handler corresponding with id. */
 const __FM_HANDLER const get_fm_handler(__FM_ID id)
 {
-	return __FM_HANDLERS[id];
+	return __FM_TABLE[id].handler;
 }
 
 /* Checks that macro begins with __FM_BEGIN_INDIC
@@ -269,7 +269,7 @@ __identify_fm(const char* const macro, size_t* const macro_len)
 	match their respective __FM_IDs so i == __FM_ID. */
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
-		if (strcmp(macro_as_str, __FORMAT_MACROS[i]) == 0)
+		if (strcmp(macro_as_str, __FM_TABLE[i].str) == 0)
 		{
 			/* Match. */
 			return i;

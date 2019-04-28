@@ -124,12 +124,4 @@ const __fm_info_t __FM_TABLE[__FM_COUNT];
 in the unexpanded form. */
 #define __MAX_FM_S_LEN 16
 
-/* A list of all the valid format macros in the
-string form presented above. */
-const char* __FORMAT_MACROS[__FM_COUNT];
-
-/* An array of format macro handlers. Each macro
-is assigned a unique handler. */
-const __FM_HANDLER const __FM_HANDLERS[__FM_COUNT];
-
 #endif /* FORMAT_MACRO_H */
