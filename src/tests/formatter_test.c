@@ -259,7 +259,7 @@ void test_ef_s(char* format, char* msg, LOG_LEVEL lvl, char* correct_result)
 {
 	char result[512];
 	ef_set_format(ef, format);
-	ef_format(ef, msg, lvl, result);
+	ef_format(ef, result, msg, lvl);
 	assert(strncmp(result, correct_result, strlen(correct_result)) == 0);
 }
 

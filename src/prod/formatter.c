@@ -54,7 +54,6 @@ fnf_set_format(fn_format_t* fnf, char* format)
 	if (!__is_valid_fn_form(format)) { return false; }
 
 	strcpy(fnf->_form, format);
-	__clear_str(fnf->_exp_form);
 
 	return true;
 }
@@ -113,12 +112,11 @@ ef_set_format(e_format_t* ef, const char* const format)
 	if (!__is_valid_e_form(format)) { return false; }
 
 	strcpy(ef->_form, format);
-	__clear_str(ef->_exp_form);
 	return true;
 }
 
 void
-ef_format(e_format_t* ef, char* msg, LOG_LEVEL lvl, char* formatted_entry)
+ef_format(e_format_t* ef, char* formatted_entry, char* msg, LOG_LEVEL lvl)
 {
 	assert(ef); assert(msg); assert(formatted_entry);
 
@@ -137,21 +135,21 @@ ef_close(e_format_t* ef)
 /* Helper functions. */
 
 /* Returns a pointer to the macro handler corresponding with id. */
-const __FM_HANDLER const get_fm_handler(__FM_ID id)
+const __FM_HANDLER const
+get_fm_handler(__FM_ID id)
 {
 	return __FM_TABLE[id].handler;
 }
 
-/* Checks that macro begins with __FM_BEGIN_INDIC
-followed by __FM_LEFT_DELIM and ends with __FM_RIGHT_DELIM,
-then writes the string between the two delimiters to dest,
-adding the null terminator. Macro_len will indicate how
-many characters there were from __FM_BEGIN_INDIC to
-__FM_RIGHT_DELIM (inclusive) - the formatter can jump that many
-characters in the format string since those characters
-have been handled. If the macro doesn't conform to the rule
-stated above, only __FM_BEGIN_INDIC will be written into
-dest (and macro_len will be 1).
+/* Checks that macro conforms to the valid form defined in
+format_macro.h, then writes the string between the two
+delimiters to dest, adding the null terminator.
+Macro_len will indicate how many characters there were
+from __FM_BEGIN_INDIC to __FM_RIGHT_DELIM (inclusive) -
+the formatter can jump that many characters in the format
+string since those characters have been handled.
+If the macro is incomplete, only __FM_BEGIN_INDIC will
+be written into dest (and macro_len will be 1).
 */
 void
 __fm_as_str(const char* macro, char* dest, size_t* const macro_len)
@@ -159,8 +157,8 @@ __fm_as_str(const char* macro, char* dest, size_t* const macro_len)
 	assert(macro); assert(dest); assert(macro_len);
 	assert(*macro == __FM_BEGIN_INDIC);
 
-	/* Save the initial state of macro_as_str. */
-	char* macro_as_str_initial = dest;
+	/* Save the initial state of dest. */
+	char* dest_begin = dest;
 
 	/* Indicates if __FM_RIGHT_DELIM has been encountered in the macro
 	string. */
@@ -221,8 +219,8 @@ __fm_as_str(const char* macro, char* dest, size_t* const macro_len)
 		{
 			/* Invalid format so write __FM_BEGIN_INDIC in the first
 			char of the macro string. */
-			*macro_as_str_initial = __FM_BEGIN_INDIC;
-			dest = macro_as_str_initial + 1;
+			*dest_begin = __FM_BEGIN_INDIC;
+			dest = dest_begin + 1;
 			/* Set length to 0 as if the last character,
 			which caused the macro to be found invalid,
 			was the first one. */
@@ -242,8 +240,8 @@ __fm_as_str(const char* macro, char* dest, size_t* const macro_len)
 	}
 }
 
-/* Figures what the macro indicated by macro_start is
-and writes the corresponding __FM_ID to macro_id.
+/* Figures what format macro macro contains
+and stores the corresponding __FM_ID to macro_id.
 Macro_form_len will contain the length of the macro format,
 i.e. how many characters the macro occupies in the
 format string, not including null terminator.
@@ -264,9 +262,10 @@ __identify_fm(const char* const macro, size_t* const macro_len)
 		return __FM_NO_MACRO;
 	}
 
-	/* Iterate through __FORMAT_MACROS and see if one of them
-	matches. The indexes of the macro strings in __FORMAT_MACROS
-	match their respective __FM_IDs so i == __FM_ID. */
+	/* Iterate through the strings in __FM_TABLE and see if
+	one of them matches. The indices of the macro strings
+	in __FM_TABLE match their respective __FM_IDs so
+	i == __FM_ID. */
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
 		if (strcmp(macro_as_str, __FM_TABLE[i].str) == 0)
@@ -280,17 +279,17 @@ __identify_fm(const char* const macro, size_t* const macro_len)
 	return __FM_NO_MACRO;
 }
 
-/* Expands the format macro in the macro string
-and writes the result to dest without adding the
-null terminator. Thandler will be used to expand
-time-related macros. Msg contains the log message
-entered by the user, if any. Lvl contains the
-log level of the message, if any. Macro_len
-will contain the number of characters the macro
+/* Expands the format macro in macro and writes
+the result to dest without adding the
+null terminator.
+Th will be used to expand time-related macros.
+Msg contains the log message entered by the user, if any.
+Lvl contains the log level of the message, if any.
+Macro_len will contain the number of characters the macro
 format consisted of, exp_macro_len the same but
-for the expanded macro. If the macro format is invalid,
-only __FM_BEGIN_INDIC is written to dest (macro_len
-and exp_macro_len will be 1). */
+for the expanded macro.
+If the macro format is invalid, only __FM_BEGIN_INDIC
+is written to dest (macro_len and exp_macro_len will be 1). */
 void
 __expand_fm(char* macro, char* dest, thandler_t* th,
 	char* msg, LOG_LEVEL lvl, size_t* macro_len, size_t* exp_macro_len)
@@ -317,10 +316,10 @@ __expand_fm(char* macro, char* dest, thandler_t* th,
 	}
 }
 
-/* Expands all macros in the format buffer, writing the expanded
-string to dest. Thandler will be used to expand time-related
-macros. Msg contains the log message entered by the user,
-if any. Lvl contains the log level of the message, if any.
+/* Expands all format macros starting from format, writing the expanded
+string to dest. Th will be used to expand time-related macros.
+Msg contains the log message entered by the user, if any.
+Lvl contains the log level of the message, if any.
 Msg and lvl may be omitted when this function is used to
 format a file name, since they are meaningless in that context. */
 void
@@ -374,8 +373,10 @@ __format_str(char* format, char* dest, thandler_t* th, char* msg, LOG_LEVEL lvl)
 }
 
 /* Returns true if format is valid, i.e. contains no illegal
-macros (some macros can never be in the file name). */
-bool __is_valid_fn_form(const char* format)
+macros and has a maximum length < __MAX_FILENAME_SIZE - 1
+when expanded. */
+bool
+__is_valid_fn_form(const char* format)
 {
 	assert(format);
 	size_t max_len = 0;
@@ -406,9 +407,10 @@ bool __is_valid_fn_form(const char* format)
 	return false;
 }
 
-/* Returns true if format is valid, i.e. contains no illegal macros.
-Currently no restrictions. */
-bool __is_valid_e_form(const char* format)
+/* Returns true if format is valid, i.e. contains no illegal macros and
+has a maximum length < __MAX_ENTRY_SIZE - 1 when expanded. */
+bool
+__is_valid_e_form(const char* format)
 {
 	assert(format);
 	size_t max_len = 0;
