@@ -23,45 +23,45 @@
 typedef struct {
 	char _form[__MAX_FILENAME_SIZE];
 	char _exp_form[__MAX_FILENAME_SIZE];
-	thandler_t* _thandler;
+	thandler_t* _th;
 } fn_format_t;
 
 /* Defines the properties of an entry formatter object. */
 typedef struct {
 	char _form[__MAX_MSG_SIZE];
 	char _exp_form[__MAX_MSG_SIZE];
-	thandler_t* _thandler;
+	thandler_t* _th;
 } e_format_t;
 
 /* File name formatter functions. */
 
 fn_format_t*
-fnf_init(char* fn_format);
+fnf_init(char* format);
 
-LOG_ERROR
-fnf_set_format(fn_format_t* formatter, char* format);
+bool
+fnf_set_format(fn_format_t* fnf, char* format);
 
-LOG_ERROR
-fnf_format(fn_format_t* formatter, char* formatted_filename);
+void
+fnf_format(fn_format_t* fnf, char* formatted_filename);
 
-LOG_ERROR
-fnf_fn_max_len(fn_format_t* formatter, size_t* size);
+size_t
+fnf_fn_max_len(fn_format_t* fnf);
 
-LOG_ERROR
-fnf_close(fn_format_t* formatter);
+void
+fnf_close(fn_format_t* fnf);
 
 /* Entry formatter functions. */
 
 e_format_t*
 ef_init(char* format);
 
-LOG_ERROR
-ef_set_format(e_format_t* formatter, char* format);
+bool
+ef_set_format(e_format_t* ef, char* format);
 
-LOG_ERROR
-ef_format(e_format_t* formatter, char* message, char* formatted_entry);
+void
+ef_format(e_format_t* ef, char* msg, LOG_LEVEL lvl, char* formatted_entry);
 
-LOG_ERROR
-ef_close(e_format_t* formatter);
+void
+ef_close(e_format_t* ef);
 
 #endif /* FORMATTER_H */

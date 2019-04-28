@@ -54,7 +54,7 @@ typedef enum
 	__FM_WDAY_L_A, /* "SUNDAY" */
 	__FM_LVL_N, /* "trace" */
 	__FM_LVL_F, /* "Trace" */
-	__FM_LVL_C, /* "TRACE" */
+	__FM_LVL_A, /* "TRACE" */
 	__FM_MSG /* "\nThis Is Some Weird Log_message\n\n" */
 } __FM_ID;
 /* Because the valid macros values start from 1 (above)

@@ -88,9 +88,8 @@ test_fm_as_str()
 static void
 test_identify_fm_s(char* macro, __FM_ID correct_result)
 {
-	size_t macro_length = 0;
-	__FM_ID result = -1;
-	__identify_fm(macro, &result, &macro_length);
+	size_t macro_len = 0;
+	__FM_ID result = __identify_fm(macro, &macro_len);
 	assert(result == correct_result);
 }
 
@@ -129,18 +128,26 @@ test_identify_fm(void)
 static void
 test_expand_fm_s(thandler_t* thandler, char* macro,
 	char* message, LOG_LEVEL lvl, char* correct_result,
-	size_t correct_skip_over)
+	size_t correct_form_len)
 {
 	char result[__MAX_MSG_SIZE];
-	size_t skip_over_result = 0;
+	result[0] = '\0';
+	size_t macro_form_len = 0;
 	size_t exp_macro_len = 0;
-	__expand_fm(macro, result, thandler, message, lvl, &skip_over_result, &exp_macro_len);
+	__expand_fm(macro, result, thandler, message, lvl, &macro_form_len, &exp_macro_len);
 	/* Compare only as many characters as the result contains, since
 	no null terminator is added to the string in __expand_fm(). */
-	assert(strncmp(result, correct_result, strlen(correct_result) - 1) == 0);
+	if (strlen(correct_result) > 0)
+	{
+		assert(strncmp(result, correct_result, strlen(correct_result) - 1) == 0);
+	}
+	else
+	{
+		assert(result[0] == '\0');
+	}
 	/* TODO: Check that no null terminator was added. Not implemented yet. */
 /*  assert(result[strlen(result)] != '\0'); */
-	assert(skip_over_result == correct_skip_over);
+	assert(macro_form_len == correct_form_len);
 }
 
 static void
@@ -197,13 +204,13 @@ test_expand_fm()
 
 	/* Test cases for invalid macros. */
 	test_expand_fm_s(th, "% (", message,
-		L_TRACE, "%", sizeof("%") - 1);
+		L_TRACE, "", 0);
 	test_expand_fm_s(th, "%__", message,
-		L_TRACE, "%", sizeof("%") - 1);
+		L_TRACE, "", 0);
 	test_expand_fm_s(th, "%     ", message,
-		L_TRACE, "%", sizeof("%") - 1);
+		L_TRACE, "", 0);
 	test_expand_fm_s(th, "%__", message,
-		L_TRACE, "%", sizeof("%") - 1);
+		L_TRACE, "", 0);
 
 	printf(" -> OK\n");
 }
@@ -248,8 +255,8 @@ run_formatter_tests(char* test_set_title)
 	fnf = fnf_init("");
 	/* Swap the thandler so that the tests can use the rigged one
 	we set up above. */
-	th_close(fnf->_thandler);
-	fnf->_thandler = th;
+	th_close(fnf->_th);
+	fnf->_th = th;
 
 	/* Execute tests. */
 	test_fm_as_str();

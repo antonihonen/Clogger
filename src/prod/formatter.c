@@ -14,196 +14,306 @@
 #include <stdbool.h>
 #include <string.h>
 
+/* Helper function prototypes. */
+
+static inline const __FM_HANDLER const get_fm_handler(__FM_ID id);
+void __fm_as_str(const char*, char*, size_t* const);
+__FM_ID __identify_fm(const char* const, size_t* const);
+void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*, size_t*);
+void __format_str(char*, char*, thandler_t*, char*, LOG_LEVEL);
+static bool __is_valid_fn_form(const char*);
+static bool __is_valid_e_form(const char*);
+
+ /* File name formatter functions. */
+
+fn_format_t*
+fnf_init(char* format)
+{
+	assert(format);
+	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
+	thandler_t* new_th = th_init();
+
+	if (new_fnf && new_th
+		&& fnf_set_format(new_fnf, format))
+	{
+		new_fnf->_th = new_th;
+		return new_fnf;
+	}
+
+	/* Memory allocation failed or format was invalid. Clean up
+	and return NULL. */
+	if (new_fnf) { free(new_fnf); }
+	return NULL;
+}
+
+bool
+fnf_set_format(fn_format_t* fnf, char* format)
+{
+	assert(fnf);
+	assert(format);
+	if (!__is_valid_fn_form(format)) { return false; }
+
+	strcpy(fnf->_form, format);
+	__clear_str(fnf->_exp_form);
+
+	return true;
+}
+
+void
+fnf_format(fn_format_t* fnf, char* formatted_filename)
+{
+	assert(fnf);
+	assert(formatted_filename);
+
+	__format_str(fnf->_form, formatted_filename,
+		fnf->_th, NULL, __L_NO_LEVEL);
+}
+
+size_t
+fnf_fn_max_len(fn_format_t* fnf)
+{
+	/* TODO: Implement. */
+	return 0;
+}
+
+void
+fnf_close(fn_format_t* fnf)
+{
+	assert(fnf);
+	th_close(fnf->_th);
+	free(fnf);
+}
+
+/* Entry formatter functions. */
+
+e_format_t*
+ef_init(char* format)
+{
+	assert(format);
+	e_format_t* new_ef = malloc(sizeof(e_format_t));
+	thandler_t* new_th = th_init();
+
+	if (new_ef && new_th && ef_set_format(new_ef, format))
+	{
+		new_ef->_th = new_th;
+		return new_ef;
+	}
+
+	/* Memory allocation failed or format was invalid. Clean up
+	and return NULL. */
+	if (new_ef) { free(new_ef); }
+	return NULL;
+}
+
+bool
+ef_set_format(e_format_t* ef, const char* const format)
+{
+	assert(ef); assert(format);
+
+	if (!__is_valid_e_form(format)) { return false; }
+
+	strcpy(ef->_form, format);
+	__clear_str(ef->_exp_form);
+	return true;
+}
+
+void
+ef_format(e_format_t* ef, char* msg, LOG_LEVEL lvl, char* formatted_entry)
+{
+	assert(ef); assert(msg); assert(formatted_entry);
+
+	__format_str(ef->_form, formatted_entry,
+		ef->_th, msg, lvl);
+}
+
+void
+ef_close(e_format_t* ef)
+{
+	assert(ef);
+	th_close(ef->_th);
+	free(ef);
+}
+
+/* Helper functions. */
+
 /* Returns a pointer to the macro handler corresponding with id. */
-static inline const __FM_HANDLER const get_fm_handler(__FM_ID id)
+const __FM_HANDLER const get_fm_handler(__FM_ID id)
 {
 	return __FM_HANDLERS[id];
 }
 
-/* Private helper functions. */
-
-/* Checks that the format macro indicated by macro_start
-begins with __FM_BEGIN_INDIC followed by __FM_LEFT_DELIM
-and ends with __FM_RIGHT_DELIM, then writes the string
-between the two delimiters to macro_as_str, adding the null
-terminator. Macro_length will indicate how many characters
-there were between __FM_BEGIN_INDIC and __FM_RIGHT_DELIM
-(including those two) - the formatter can jump that many
+/* Checks that macro begins with __FM_BEGIN_INDIC
+followed by __FM_LEFT_DELIM and ends with __FM_RIGHT_DELIM,
+then writes the string between the two delimiters to dest,
+adding the null terminator. Macro_len will indicate how
+many characters there were from __FM_BEGIN_INDIC to
+__FM_RIGHT_DELIM (inclusive) - the formatter can jump that many
 characters in the format string since those characters
 have been handled. If the macro doesn't conform to the rule
 stated above, only __FM_BEGIN_INDIC will be written into
-macro_as_str (and macro_length will be 1).
+dest (and macro_len will be 1).
 */
 void
-__fm_as_str(const char* macro_start, char* macro_as_str,
-	size_t* const macro_length)
+__fm_as_str(const char* macro, char* dest, size_t* const macro_len)
 {
-	assert(macro_start); assert(macro_as_str); assert(macro_length);
-	assert(*macro_start == __FM_BEGIN_INDIC);
+	assert(macro); assert(dest); assert(macro_len);
+	assert(*macro == __FM_BEGIN_INDIC);
 
 	/* Save the initial state of macro_as_str. */
-	char* macro_as_str_initial = macro_as_str;
-	
+	char* macro_as_str_initial = dest;
+
 	/* Indicates if __FM_RIGHT_DELIM has been encountered in the macro
 	string. */
-	bool has_macro_ended = false; 
+	bool has_ended = false;
 	/* Indicates if __FM_LEFT_DELIM was encountered as the second char. */
-	bool has_macro_begun = false;
+	bool has_begun = false;
 	/* Indicates whether the macro conforms to the format described in
 	format_macro.h, except that in terms of this function the macro
 	body doesn't need to be a valid one. */
-	bool has_macro_valid_format = true;
-	*macro_length = 0;
+	bool has_valid_format = true;
+	*macro_len = 0;
 
 	/* Read the macro string one character at a time until the macro
 	either ends or is found to be invalid. */
-	while (!has_macro_ended)
-	{	
-		switch (*macro_start)
+	while (!has_ended)
+	{
+		switch (*macro)
 		{
 		case __FM_LEFT_DELIM:
 			/* Only one __FM_LEFT_DELIM can be contained
 			by a valid macro sequence and it must
 			be the second character. */
-			if (has_macro_begun || *macro_length != 1)
+			if (has_begun || *macro_len != 1)
 			{
-				has_macro_valid_format = false;
-				has_macro_ended = true;
+				has_valid_format = false;
+				has_ended = true;
 			}
-			has_macro_begun = true;
+			has_begun = true;
 			break;
 		case __FM_RIGHT_DELIM:
 			/* __FM_LEFT_DELIM must come before __FM_RIGHT_DELIM */
-			if (!has_macro_begun)
-			{
-				has_macro_valid_format = false;
-			}
-			has_macro_ended = true;
+			if (!has_begun) { has_valid_format = false; }
+			has_ended = true;
 			break;
 		case __FM_BEGIN_INDIC:
 			/* A valid macro cannot contain __FM_BEGIN_INDIC
 			unless it's the first char. */
-			if (*macro_length > 0)
+			if (*macro_len > 0)
 			{
-				has_macro_valid_format = false;
-				has_macro_ended = true;
+				has_valid_format = false;
+				has_ended = true;
 			}
 			break;
 		case '\0':
 			/* End of macro string. */
-			if (!has_macro_begun)
-			{
-				has_macro_valid_format = false;
-			}
-			if (!has_macro_ended)
-			{
-				has_macro_valid_format = false;
-			}
-			has_macro_ended = true;
+			if (!has_begun || !has_ended) { has_valid_format = false; }
+			has_ended = true;
 			break;
 		default:
 			/* Only the characters forming the body of the macro
 			is written into the macro_as_str buffer. */
-			*macro_as_str = *macro_start;
-			++macro_as_str;
+			*dest = *macro;
+			++dest;
 			break;
 		}
 
-		if (!has_macro_valid_format)
+		if (!has_valid_format)
 		{
 			/* Invalid format so write __FM_BEGIN_INDIC in the first
 			char of the macro string. */
 			*macro_as_str_initial = __FM_BEGIN_INDIC;
-			macro_as_str = macro_as_str_initial + 1;
+			dest = macro_as_str_initial + 1;
 			/* Set length to 0 as if the last character,
 			which caused the macro to be found invalid,
 			was the first one. */
-			*macro_length = 0;
+			*macro_len = 0;
 		}
-		
-		++*macro_length;
-		
-		if (has_macro_ended)
+
+		++*macro_len;
+
+		if (has_ended)
 		{
 			/* Finish the macro string by appending null. */
-			*macro_as_str = '\0';
+			*dest = '\0';
 		}
-	
-		/* Move on to the next char of the macro sequence. */
-		++macro_start;
+
+		/* Move on to the next char of the macro. */
+		++macro;
 	}
 }
 
 /* Figures what the macro indicated by macro_start is
 and writes the corresponding __FM_ID to macro_id.
-Macro_length will contain the length of the macro sequence,
+Macro_form_len will contain the length of the macro format,
 i.e. how many characters the macro occupies in the
 format string, not including null terminator.
 */
-void
-__identify_fm(const char* const macro_start, __FM_ID* const macro_id, size_t* const macro_length)
+__FM_ID
+__identify_fm(const char* const macro, size_t* const macro_len)
 {
-	assert(macro_start); assert(macro_id); assert(macro_length);
-	assert(*macro_start == __FM_BEGIN_INDIC);
+	assert(macro); assert(macro_len);
+	assert(*macro == __FM_BEGIN_INDIC);
 
 	/* Get the macro as a string as well as the number of
 	characters the macro sequence consists of. */
 	char macro_as_str[__MAX_FM_S_LEN];
-	__fm_as_str(macro_start, macro_as_str, macro_length);
+	__fm_as_str(macro, macro_as_str, macro_len);
+
+	if (macro_len == 1 && strncmp(macro_as_str, "%", 1) == 0)
+	{
+		return __FM_NO_MACRO;
+	}
 
 	/* Iterate through __FORMAT_MACROS and see if one of them
 	matches. The indexes of the macro strings in __FORMAT_MACROS
-	match their respective __FM_IDs so i = __FM_ID. */
+	match their respective __FM_IDs so i == __FM_ID. */
 	for (size_t i = 0; i < __FM_COUNT; ++i)
 	{
-		if (strcmp(macro_as_str, __FORMAT_MACROS[i]) == 0) {
+		if (strcmp(macro_as_str, __FORMAT_MACROS[i]) == 0)
+		{
 			/* Match. */
-			*macro_id = i;
-			return;
+			return i;
 		}
 	}
-	
+
 	/* No match. */
-	*macro_id = __FM_NO_MACRO;
+	return __FM_NO_MACRO;
 }
 
-/* Expands the format macro indicated by macro_start
+/* Expands the format macro in the macro string
 and writes the result to dest without adding the
 null terminator. Thandler will be used to expand
 time-related macros. Msg contains the log message
 entered by the user, if any. Lvl contains the
-log level of the message, if any. Macro_length
+log level of the message, if any. Macro_len
 will contain the number of characters the macro
-sequence consisted of. If the macro format is invalid,
-only __FM_BEGIN_INDIC is written to dest (macro_length
-will be 1). */
+format consisted of, exp_macro_len the same but
+for the expanded macro. If the macro format is invalid,
+only __FM_BEGIN_INDIC is written to dest (macro_len
+and exp_macro_len will be 1). */
 void
-__expand_fm(char* macro_start, char* dest, thandler_t* thandler,
-	char* msg, LOG_LEVEL lvl, size_t* macro_length, size_t* exp_macro_length)
+__expand_fm(char* macro, char* dest, thandler_t* th,
+	char* msg, LOG_LEVEL lvl, size_t* macro_len, size_t* exp_macro_len)
 {
-	assert(macro_start); assert(dest);
-	assert(*macro_start == __FM_BEGIN_INDIC);
-	assert(macro_length);
-	/* Local time must have been fetched. */
-	/* TODO: Add a function to the thandler interface
-	for this. */
-	assert(th_has_legal_state(thandler));
+	assert(macro); assert(dest); assert(macro_len);
+	assert(*macro == __FM_BEGIN_INDIC);
+	/* Local time must have been fetched prior to call to this function. */
+	assert(th_has_legal_state(th));
 
 	/* Figure out which macro is in question. */
-	__FM_ID macro_id = __FM_NO_MACRO;
-	__identify_fm(macro_start, &macro_id, macro_length);
+	__FM_ID macro_id = __identify_fm(macro, macro_len);
 
 	if (macro_id != __FM_NO_MACRO)
 	{
-		/* Valid macro detected. Call the handler, it will
+		/* Valid macro detected. Get and call the handler, it will
 		expand the macro. */
-		get_fm_handler(macro_id)(thandler, dest, lvl, msg, exp_macro_length);
+		get_fm_handler(macro_id)(th, dest, lvl, msg, exp_macro_len);
 	}
 	else
 	{
-		/* Invalid macro detected. Only write __FM_BEGIN_INDIC
-		to dest. Macro length is already set to 1. */
-		*dest = __FM_BEGIN_INDIC;
+		/* The "macro" was incomplete. Don't expand. */
+		*macro_len = 0;
+		*exp_macro_len = 0;
 	}
 }
 
@@ -214,138 +324,83 @@ if any. Lvl contains the log level of the message, if any.
 Msg and lvl may be omitted when this function is used to
 format a file name, since they are meaningless in that context. */
 void
-__format_str(char* format, char* dest, thandler_t* thandler,
-	char* msg, LOG_LEVEL lvl)
+__format_str(char* format, char* dest, thandler_t* th, char* msg, LOG_LEVEL lvl)
 {
-	assert(format); assert(dest); assert(thandler);
-	/* If message is given, logging level must also be given - if not,
-	logging level must not be given either. */
+	assert(format); assert(dest); assert(th);
+	/* If message is given, logging level must also be given (this function
+	was called by the entry formatter) - if not, logging level must not be
+	given either (called by filename formatter). */
 	assert((msg && lvl != __L_NO_LEVEL) || (!msg && lvl == __L_NO_LEVEL));
-
-	/* Pointer to the next byte to be written in the formatted_filename
-	buffer. */
-	char* dest_head = dest;
-	/* Pointer to the first byte in the format string that hasn't yet
-	been handled. */
-	char* format_head = format;
 
 	/* Fetch the local time for time-related macros so they all
 	refer to the same point in time. */
+	th_fetch_ltime(th);
 
-	th_fetch_ltime(thandler);
-	while (*format_head != '\0')
+	while (*format != '\0')
 	{
-		/* Copy characters one at a time until
-		the beginning of a macro is found. */
-		if (*format_head != __FM_BEGIN_INDIC)
+		if (*format != __FM_BEGIN_INDIC)
 		{
-			*dest_head = *format_head;
-			++dest_head;
-			++format_head;
+			/* No macro begin encountered. */
+			*dest = *format;
+			++dest;
+			++format;
 		}
-		else {
-			/* Macro begin was discovered.
-			Expand the macro. */
-			size_t macro_length = 0;
-			size_t exp_macro_length = 0;
-			__expand_fm(format_head, dest_head, thandler,
-				msg, lvl, &macro_length, &exp_macro_length);
-			/* The macro was handled so skip the rest of the characters
-			in the macro. */
-			format_head += macro_length;
-			dest_head += exp_macro_length;
+		else
+		{
+			/* Macro begin encountered. */
+
+			/* Unexpanded macro length. */
+			size_t macro_len = 0;
+			/* Expanded macro length. */
+			size_t exp_macro_len = 0;
+			/* Expand the macro. */
+			__expand_fm(format, dest, th, msg, lvl, &macro_len, &exp_macro_len);
+
+			if (macro_len == 0 && exp_macro_len == 0)
+			{
+				/* False alarm, no valid macro found. */
+				*dest = *format;
+				macro_len = 1;
+				exp_macro_len = 1;
+			}
+			format += macro_len;
+			dest += exp_macro_len;
 		}
 	}
 	/* Add the null terminator which was excluded in the
 	while loop. */
-	*dest_head = *format_head;
+	assert(*format == '\0');
+	*dest = *format;
 }
 
- /* File name formatter functions. */
-
-fn_format_t*
-fnf_init(char* fn_format)
+/* Returns true if format is valid, i.e. contains no illegal
+macros (some macros can never be in the file name). */
+bool __is_valid_fn_form(const char* format)
 {
-	assert(fn_format);
-	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
-	thandler_t* new_th = th_init();
-	if (!new_fnf || !new_th)
-	{
-		if (new_fnf) { free(new_fnf); }
-		return NULL;
-	}
-	new_fnf->_thandler = new_th;
-	fnf_set_format(new_fnf, fn_format);
-	
-	return new_fnf;
-}
-
-LOG_ERROR
-fnf_set_format(fn_format_t* formatter, char* format)
-{
-	assert(formatter);
 	assert(format);
-
-	strcpy(formatter->_form, format);
-
-	/* Clear the expanded filename string since the format was changed. */
-	__clear_str(formatter->_exp_form);
-
-	return E_NO_ERROR;
+	while (*format != '\0')
+	{
+		size_t macro_len = 1;
+		if (*format == __FM_BEGIN_INDIC)
+		{
+			switch (__identify_fm(format, &macro_len))
+			{
+			case __FM_MSG:
+			case __FM_LVL_N:
+			case __FM_LVL_F:
+			case __FM_LVL_A:
+				return false;
+			}
+		}
+		format += macro_len;
+	}
+	return true;
 }
 
-LOG_ERROR
-fnf_format(fn_format_t* formatter, char* formatted_filename)
+/* Returns true if format is valid, i.e. contains no illegal macros.
+Currently no restrictions. */
+bool __is_valid_e_form(const char* format)
 {
-	assert(formatter);
-	assert(formatted_filename);
-
-	__format_str(formatter->_form, formatted_filename,
-		formatter->_thandler, NULL, __L_NO_LEVEL);
-	strcpy(formatter->_exp_form, formatted_filename);
-
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-fnf_fn_max_len(fn_format_t* formatter, size_t* size)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-fnf_close(fn_format_t* formatter)
-{
-	assert(formatter);
-	th_close(formatter->_thandler);
-	free(formatter);
-	return E_NO_ERROR;
-}
-
-/* Entry formatter functions. */
-
-e_format_t*
-ef_init(char* format)
-{
-	return NULL;
-}
-
-LOG_ERROR
-ef_set_format(e_format_t* formatter, char* format)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-ef_format(e_format_t* formatter, char* message, char* formatted_entry)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-ef_close(e_format_t* formatter)
-{
-	th_close(formatter->_thandler);
-	free(formatter->_thandler);
-	return E_NO_ERROR;
+	assert(format);
+	return true;
 }
