@@ -15,7 +15,8 @@
 /* Global for convenience. */
 fn_format_t* fnf;
 e_format_t* ef;
-thandler_t* th;
+thandler_t* fnf_th;
+thandler_t* ef_th;
 
 static const int TEST_YEAR = 100;
 static const char* const TEST_YEAR_S = "2000";
@@ -156,60 +157,60 @@ test_expand_fm()
 	printf("  test_expand_macro");
 
 	char* message = "this is a message";
-	test_expand_fm_s(th, "%(year)", message,
+	test_expand_fm_s(fnf_th, "%(year)", message,
 		L_TRACE, "2000", sizeof("%(year)") - 1);
-	test_expand_fm_s(th, "%(month)", message,
+	test_expand_fm_s(fnf_th, "%(month)", message,
 		L_TRACE, "01", sizeof("%(month)") - 1);
-	test_expand_fm_s(th, "%(mday)", message,
+	test_expand_fm_s(fnf_th, "%(mday)", message,
 		L_TRACE, "31", sizeof("%(mday)") - 1);
-	test_expand_fm_s(th, "%(hour)", message,
+	test_expand_fm_s(fnf_th, "%(hour)", message,
 		L_TRACE, "06", sizeof("%(hour)") - 1);
-	test_expand_fm_s(th, "%(min)", message,
+	test_expand_fm_s(fnf_th, "%(min)", message,
 		L_TRACE, "07", sizeof("%(min)") - 1);
-	test_expand_fm_s(th, "%(sec)", message,
+	test_expand_fm_s(fnf_th, "%(sec)", message,
 		L_TRACE, "08", sizeof("%(sec)") - 1);
-	test_expand_fm_s(th, "%(mname_s)", message,
+	test_expand_fm_s(fnf_th, "%(mname_s)", message,
 		L_TRACE, "jan", sizeof("%(mname_s)") - 1);
-	test_expand_fm_s(th, "%(Mname_s)", message,
+	test_expand_fm_s(fnf_th, "%(Mname_s)", message,
 		L_TRACE, "Jan", sizeof("%(mname_s)") - 1);
-	test_expand_fm_s(th, "%(MNAME_S)", message,
+	test_expand_fm_s(fnf_th, "%(MNAME_S)", message,
 		L_TRACE, "JAN", sizeof("%(MNAME_S)") - 1);
-	test_expand_fm_s(th, "%(mname_l)", message,
+	test_expand_fm_s(fnf_th, "%(mname_l)", message,
 		L_TRACE, "january", sizeof("%(mname_l)") - 1);
-	test_expand_fm_s(th, "%(Mname_l)", message,
+	test_expand_fm_s(fnf_th, "%(Mname_l)", message,
 		L_TRACE, "January", sizeof("%(Mname_l)") - 1);
-	test_expand_fm_s(th, "%(MNAME_L)", message,
+	test_expand_fm_s(fnf_th, "%(MNAME_L)", message,
 		L_TRACE, "JANUARY", sizeof("%(MNAME_L)") - 1);
-	test_expand_fm_s(th, "%(wday_s)", message,
+	test_expand_fm_s(fnf_th, "%(wday_s)", message,
 		L_TRACE, "sun", sizeof("%(wday_s)") - 1);
-	test_expand_fm_s(th, "%(Wday_s)", message,
+	test_expand_fm_s(fnf_th, "%(Wday_s)", message,
 		L_TRACE, "Sun", sizeof("%(Wday_s)") - 1);
-	test_expand_fm_s(th, "%(WDAY_S)", message,
+	test_expand_fm_s(fnf_th, "%(WDAY_S)", message,
 		L_TRACE, "SUN", sizeof("%(WDAY_S)") - 1);
-	test_expand_fm_s(th, "%(wday_l)", message,
+	test_expand_fm_s(fnf_th, "%(wday_l)", message,
 		L_TRACE, "sunday", sizeof("%(wday_l)") - 1);
-	test_expand_fm_s(th, "%(Wday_l)", message,
+	test_expand_fm_s(fnf_th, "%(Wday_l)", message,
 		L_TRACE, "Sunday", sizeof("%(Wday_l)") - 1);
-	test_expand_fm_s(th, "%(WDAY_L)", message,
+	test_expand_fm_s(fnf_th, "%(WDAY_L)", message,
 		L_TRACE, "SUNDAY", sizeof("%(WDAY_L)") - 1);
 	/* Not implemented yet.
 	test_expand_macro_single_pass(thandler, "%(lvl)", message,
 		L_TRACE, "trace", sizeof("%(LVL)") - 1);
 	test_expand_macro_single_pass(thandler, "%(Lvl)", message,
 		L_TRACE, "Trace", sizeof("%(LVL)") - 1); */
-	test_expand_fm_s(th, "%(LVL)", message,
+	test_expand_fm_s(fnf_th, "%(LVL)", message,
 		L_TRACE, "TRACE", sizeof("%(LVL)") - 1);
-	test_expand_fm_s(th, "%(MSG)", message,
+	test_expand_fm_s(fnf_th, "%(MSG)", message,
 		L_TRACE, message, sizeof("%(MSG)") - 1);
 
 	/* Test cases for invalid macros. */
-	test_expand_fm_s(th, "% (", message,
+	test_expand_fm_s(fnf_th, "% (", message,
 		L_TRACE, "", 0);
-	test_expand_fm_s(th, "%__", message,
+	test_expand_fm_s(fnf_th, "%__", message,
 		L_TRACE, "", 0);
-	test_expand_fm_s(th, "%     ", message,
+	test_expand_fm_s(fnf_th, "%     ", message,
 		L_TRACE, "", 0);
-	test_expand_fm_s(th, "%__", message,
+	test_expand_fm_s(fnf_th, "%__", message,
 		L_TRACE, "", 0);
 
 	printf(" -> OK\n");
@@ -234,35 +235,88 @@ void test_fn_format(void)
 	printf(" -> OK\n");
 }
 
+void test_fnf_s(char* format, char* correct_result)
+{
+	char result[512];
+	fnf_set_format(fnf, format);
+	fnf_format(fnf, result);
+	printf("'%s'\n", result);
+	assert(strncmp(result, correct_result, strlen(correct_result)) == 0);
+}
+
+void test_fnf(void)
+{
+	printf("  test_fnf");
+	
+	char format[512] = "D:\\logs\\%%(%s)_%%(%s)_%%(%s)_%%(%s)_%%(%s).log";
+	char exp_form[512];
+	sprintf(exp_form, format, __FM_YEAR_S, __FM_MONTH_S, __FM_MDAY_S, __FM_MNAME_L_F_S, __FM_WDAY_S_F_S);
+	test_fnf_s(exp_form, "D:\\logs\\2000_01_31_January_Sun.log");
+	
+	printf(" -> OK");
+}
+
+void test_ef_s(char* format, char* msg, LOG_LEVEL lvl, char* correct_result)
+{
+	char result[512];
+	ef_set_format(ef, format);
+	ef_format(ef, msg, lvl, result);
+	assert(strncmp(result, correct_result, strlen(correct_result)) == 0);
+}
+
+void test_ef(void)
+{
+	printf("  test_ef");
+
+	char format[512] = "%%(%s)-%%(%s)-%%(%s)  %%(%s):%%(%s):%%(%s)  %%(%s)  %%(%s)";
+	char exp_form[512];
+	sprintf(exp_form, format, __FM_YEAR_S, __FM_MONTH_S, __FM_MDAY_S,
+		__FM_HOUR_S, __FM_MIN_S, __FM_SEC_S,
+		__FM_LVL_A_S,
+		__FM_MSG_S);
+	test_ef_s(exp_form, " test _ message \n", L_TRACE, "2000-01-31  06:07:08  TRACE   test _ message \n");
+	test_ef_s(exp_form, " test _ message \n", L_WARNING, "2000-01-31  06:07:08  WARNING   test _ message \n");
+
+	printf(" -> OK\n");
+}
+
 void
 run_formatter_tests(char* test_set_title)
 {
 	printf(test_set_title);
 
 	/* Set up the global objects. */
-	th = th_init();
-	
+
+	fnf_th = th_init();
+	ef_th = th_init();
 	/* Set thandler time to be constant. */
-	th_fetch_ltime(th);
-	th->_is_fetch_allowed = false;
-	th->_ltime->tm_year = TEST_YEAR;
-	th->_ltime->tm_mon = TEST_MON;
-	th->_ltime->tm_mday = TEST_MDAY;
-	th->_ltime->tm_hour = TEST_HOUR;
-	th->_ltime->tm_min = TEST_MIN;
-	th->_ltime->tm_sec = TEST_SEC;
-	th->_ltime->tm_wday = TEST_WDAY;
+	th_fetch_ltime(fnf_th);
+	fnf_th->_is_fetch_allowed = false;
+	fnf_th->_ltime->tm_year = TEST_YEAR;
+	fnf_th->_ltime->tm_mon = TEST_MON;
+	fnf_th->_ltime->tm_mday = TEST_MDAY;
+	fnf_th->_ltime->tm_hour = TEST_HOUR;
+	fnf_th->_ltime->tm_min = TEST_MIN;
+	fnf_th->_ltime->tm_sec = TEST_SEC;
+	fnf_th->_ltime->tm_wday = TEST_WDAY;
+	memcpy(ef_th->_ltime, fnf_th->_ltime, sizeof(struct tm));
+	ef_th->_is_fetch_allowed = false;
 	fnf = fnf_init("");
+	ef = ef_init("");
 	/* Swap the thandler so that the tests can use the rigged one
 	we set up above. */
 	th_close(fnf->_th);
-	fnf->_th = th;
+	fnf->_th = fnf_th;
+	ef->_th = ef_th;
 
 	/* Execute tests. */
 	test_fm_as_str();
 	test_identify_fm();
 	test_expand_fm();
 	test_fn_format();
+	test_fnf();
+	test_ef();
 
 	fnf_close(fnf);
+	ef_close(ef);
 }

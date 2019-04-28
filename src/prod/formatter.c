@@ -397,6 +397,11 @@ bool __is_valid_fn_form(const char* format)
 	return true;
 }
 
+size_t __max_exp_str_len(char* format)
+{
+	return 0;
+}
+
 /* Returns true if format is valid, i.e. contains no illegal macros.
 Currently no restrictions. */
 bool __is_valid_e_form(const char* format)
