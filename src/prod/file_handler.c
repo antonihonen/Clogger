@@ -9,7 +9,12 @@
 #include "file_handler.h"
 #include <assert.h>
 #include <malloc.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+static bool __fh_fopen_if_good_size(fhandler_t*, size_t);
+static bool __file_size(FILE*, fpos_t*);
 
 fhandler_t*
 fh_init(LOG_BUF_POLICY buf_policy,
@@ -71,6 +76,8 @@ void fh_close(fhandler_t* fh)
 bool fh_write(fhandler_t* fh, char* str)
 {
 	assert(fh); assert(str);
+
+	size_t write_size = strlen(str);
 	
 	/* TODO: Check current file size. */
 	/* TODO: Create new file if current file has
@@ -81,6 +88,14 @@ bool fh_write(fhandler_t* fh, char* str)
 	char filename[__MAX_FILENAME_SIZE];
 	
 	fnf_format(fh->_fnf, filename);
+
+	if (!__fh_fopen_if_good_size(fh, write_size))
+	{
+		assert(!fh->_fstream);
+		return false;
+	}
+	if (!fh->_fstream) { return false; }
+
 	fh->_fstream = fopen(filename, "a");
 	if (!fh->_fstream) { return false; }
 
@@ -93,6 +108,44 @@ bool fh_write(fhandler_t* fh, char* str)
 	if (fclose(fh->_fstream) == EOF) { return false; }
 
 	fh->_fstream = NULL;
+
+	return true;
+}
+
+bool __fh_fopen_if_good_size(fhandler_t* fh, size_t next_write_size)
+{
+	assert(fh);
+
+	char path[__MAX_FILENAME_SIZE];
+	fnf_format(fh->_fnf, path);
+	fh->_fstream = fopen(path, "a");
+	if (!fh->_fstream) { /* TODO: Handle. */ return false; }
+	fpos_t current_size = 0;
+
+	if (!__file_size(fh->_fstream, &current_size))
+	{
+		fclose(fh);
+		fh->_fstream = NULL;
+		return false;
+	}
+	else if (current_size + (fpos_t)next_write_size >= fh->_max_file_size)
+	{
+		fclose(fh);
+		fh->_fstream = NULL;
+	}
+	return true;
+}
+
+bool __file_size(FILE* fstream, fpos_t* size)
+{
+	assert(fstream); assert(size);
+
+	fpos_t orig_pos = 0;
+	if (fgetpos(fstream, &orig_pos) != 0) { return false; }
+	if (fseek(fstream, 0L, SEEK_END) != 0) { return false; }
+	if (fgetpos(fstream, size) != 0) { return false; }
+	
+	fsetpos(fstream, &orig_pos);
 
 	return true;
 }

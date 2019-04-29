@@ -11,10 +11,17 @@
 
 #include "time_handler_test.h"
 #include "formatter_test.h"
+#include "file_handler_test.h"
 #include <stdio.h>
 
 int main()
 {
+	fhandler_t* fh = fh_init(FULL_BUFFERING, 512, ROTATE, "D:\\logs\\%(year)%(month)%(mday)\\log1.log", 100);
+	e_format_t* ef = ef_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n");
+	char fmsg[512];
+	ef_format(ef, fmsg, "Hello world!", L_CRITICAL);
+	fh_write(fh, fmsg);
+
 	run_time_handler_tests("TIME HANDLER TESTS\n");
 	printf("\n");
 	run_formatter_tests("FORMATTER TESTS\n");
