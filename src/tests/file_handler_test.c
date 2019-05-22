@@ -19,13 +19,42 @@ static void init_test()
 
 	if (fh) { fh_close(fh); }
 
-	fh = fh_init(FULL_BUFFERING, 1024, ROTATE, "D:\\logs\\%(year)_%(month)_%(mday)\\log.log", 1024 * 1024 * 8);
+	fh = fh_init("D:\\logs\\%(year)_%(month)_%(mday)", "log.log", 1024 * 1024 * 8, ROTATE, _IOFBF, 256);
 	assert(fh);
-	fh = fh_init(NO_BUFFERING, 0, REWRITE, "D:\\logs\\%(year)_%(month)_%(mday)\\log.log", 0);
-	assert(fh);
-
+	assert(fh->_buf);
+	assert(fh->_buf_cap == 256);
 	fh_close(fh);
+
+	fh = fh_init("D:\\logs\\%(year)_%(month)_%(mday)", "log.log", 1024 * 1024 * 8, ROTATE, _IOLBF, 0);
+	assert(fh);
+	assert(fh->_buf);
+	assert(fh->_buf_cap == BUFSIZ);
+	fh_close(fh);
+
+	fh = fh_init("D:\\logs\\%(year)_%(month)_%(mday)", "log.log", 0, REWRITE, _IONBF, 0);
+	assert(fh);
+	assert(!fh->_buf);
+	assert(fh->_buf_cap == 0);
+	fh_close(fh);
+
+	fh = fh_init("D:\\logs\\%(year)_%(month)_%(mday)", "log.log", 0, REWRITE, _IONBF, 64);
+	assert(fh);
+	assert(!fh->_buf);
+	assert(fh->_buf_cap == 0);
+	fh_close(fh);
+
 	printf(" -> OK\n");
+}
+
+static void fhandler_write_test()
+{
+	fhandler_t* fh = fh_init("D:\\logs\\%(year)%(month)%(mday)", "log.log", 100, ROTATE, _IOLBF, 256);
+	e_format_t* ef = ef_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n");
+	char fmsg[512];
+	ef_format(ef, fmsg, "Hello world!", L_CRITICAL);
+	fh_write(fh, fmsg);
+	fh_close(fh);
+	ef_close(ef);
 }
 
 void run_file_handler_tests(char* test_set_title)

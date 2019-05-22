@@ -24,24 +24,27 @@
 typedef struct {
 	FILE* _fstream;
 	fn_format_t* _fnf;
+	fn_format_t* _dirnf;
+	char _cur_fp[__MAX_FILENAME_SIZE];
+	char _cur_dirn[__MAX_FILENAME_SIZE];
 
 	char* _buf;
 	size_t _buf_cap;
 	int _buf_mode;
 
-	LOG_FILE_POLICY _file_policy;
-	size_t _max_file_size;
+	LOG_FILE_POLICY _file_mode;
+	size_t _max_fsize;
 	bool _is_file_creator;
 	bool _has_file_changed;
-	size_t _file_iter;
 } fhandler_t;
 
 fhandler_t*
-fh_init(LOG_BUF_POLICY buf_policy,
-	size_t buf_size,
-	LOG_FILE_POLICY file_policy,
-	char* fn_format,
-	size_t max_file_size);
+fh_init(char* dirn_form,
+	char* fn_form,
+	size_t max_fsize,
+	LOG_FILE_POLICY file_mode,
+	int buf_mode,
+	size_t bufsize);
 
 void
 fh_close(fhandler_t* fh);
