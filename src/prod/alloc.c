@@ -7,6 +7,7 @@
  */
 
 #include "alloc.h"
+#include <assert.h>
 #include <malloc.h>
 
 static void* (*__ALLOC_FUN)(size_t) = malloc;
@@ -14,6 +15,7 @@ static void (*__DEALLOC_FUN)(void*) = free;
 
 extern bool __register_alloc(void* (*alloc)(size_t), void (*dealloc)(void*))
 {
+	assert(alloc); assert(dealloc);
 	__ALLOC_FUN = alloc;
 	__DEALLOC_FUN = dealloc;
 	return true;

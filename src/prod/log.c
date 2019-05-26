@@ -6,9 +6,9 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#include "alloc.h"
 #include "log.h"
 #include <assert.h>
-#include "alloc.h"
 
 static inline log_t*
 __log_malloc(char* dir_form, char* filename_form,
