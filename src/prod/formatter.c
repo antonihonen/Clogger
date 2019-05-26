@@ -6,11 +6,11 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#include "alloc.h"
 #include "formatter.h"
 #include "string_util.h"
 #include "time_handler.h"
 #include <assert.h>
-#include "alloc.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -31,7 +31,7 @@ __expand_fm(const char* macro, char* dest, thandler_t* const th,
 	const char* msg, const LOG_LEVEL lvl, size_t* const macro_len,
 	size_t* const exp_macro_len);
 
-static void
+void
 __format_str(const char* format, char* dest,
 	thandler_t* const th, const char* const msg, const LOG_LEVEL lvl);
 

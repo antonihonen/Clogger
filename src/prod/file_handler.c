@@ -196,8 +196,7 @@ fh_max_fsize(const fhandler_t* const fh)
 bool
 fh_write(fhandler_t* const fh, const char* const data_out)
 {
-	assert(fh); assert(data_out);
-	assert(!fh->_fstream);
+	assert(fh); assert(data_out); assert(!fh->_fstream);
 
 	/* Attempt to open the correct file. */
 	if (!__fh_open_fstream(fh, data_out)) { return false; }
