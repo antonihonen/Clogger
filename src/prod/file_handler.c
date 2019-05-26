@@ -192,11 +192,10 @@ fh_max_fsize(const fhandler_t* const fh)
 }
 
 bool
-fh_write(fhandler_t* fh, const char* const data_out)
+fh_write(fhandler_t* fh, char* data_out)
 {
-	char orig_str[__MAX_MSG_SIZE];
-	strcpy(orig_str, data_out);
 	assert(fh); assert(data_out);
+	assert(!fh->_fstream);
 
 	/* Attempt to open the correct file. */
 	if (!__fh_open_fstream(fh, data_out)) { return false; }
@@ -206,18 +205,19 @@ fh_write(fhandler_t* fh, const char* const data_out)
 	/* Set output buffer if any. */
 	setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
 
-	assert(data_out);
-	assert(strcmp(data_out, orig_str) == 0);
-
 	/* Write. */
 	if (fputs(data_out, fh->_fstream) == EOF)
 	{
 		fclose(fh->_fstream);
+		fh->_fstream = NULL;
 		return false;
 	}
-	if (fclose(fh->_fstream) == EOF) { return false; }
-	fh->_has_file_changed = true;
 	
+	if (fclose(fh->_fstream) == EOF) { fh->_fstream = NULL; false; }
+	
+	fh->_has_file_changed = true;
+	fh->_fstream = NULL;
+
 	return true;
 }
 
