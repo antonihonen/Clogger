@@ -89,29 +89,13 @@ fh_init(const char* const dirn_form,
 	return fh;
 }
 
-/* Allocates memory for the fhandler object and its sub-objects. */
-fhandler_t* __fh_malloc(const size_t bufsize)
-{
-	fhandler_t* fh = malloc(sizeof(fhandler_t));
-	if (!fh) { return NULL; }
-	fh->_fnf = fnf_init("");
-	fh->_dirnf = fnf_init("");
-	fh->_buf = NULL;
-	if (bufsize) { fh->_buf = malloc(bufsize); }
-	if (!fh->_fnf || !fh->_dirnf || (!fh->_buf && bufsize))
-	{
-		fh_close(fh);
-		return NULL;
-	}
-	return fh;
-}
-
 /* Frees the memory reserved for fh and its sub-objects. */
 void
 fh_close(fhandler_t* const fh)
 {
 	assert(fh);
 
+	if (fh->_fstream) { fclose(fh->_fstream); }
 	if (fh->_fnf) { fnf_close(fh->_fnf); }
 	if (fh->_dirnf) { fnf_close(fh->_dirnf); }
 	if (fh->_buf) { free(fh->_buf); }
@@ -235,6 +219,23 @@ fh_write(fhandler_t* fh, const char* const data_out)
 	fh->_has_file_changed = true;
 	
 	return true;
+}
+
+/* Allocates memory for the fhandler object and its sub-objects. */
+fhandler_t* __fh_malloc(const size_t bufsize)
+{
+	fhandler_t* fh = malloc(sizeof(fhandler_t));
+	if (!fh) { return NULL; }
+	fh->_fnf = fnf_init("");
+	fh->_dirnf = fnf_init("");
+	fh->_buf = NULL;
+	if (bufsize) { fh->_buf = malloc(bufsize); }
+	if (!fh->_fnf || !fh->_dirnf || (!fh->_buf && bufsize))
+	{
+		fh_close(fh);
+		return NULL;
+	}
+	return fh;
 }
 
 bool

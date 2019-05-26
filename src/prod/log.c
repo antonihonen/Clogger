@@ -7,178 +7,195 @@
  */
 
 #include "log.h"
+#include <assert.h>
 #include <malloc.h>
-#include <string.h>
 
-LOG_ERROR
-log_init(log_t* log,
-	char* dir,
-	char* filename_format,
-	size_t max_file_size,
-	LOG_FILE_MODE file_policy,
-	LOG_BUF_MODE buffering_policy)
+static inline log_t*
+__log_malloc(char* dir_form, char* filename_form,
+	LOG_FILE_MODE file_mode, int buf_mode);
+
+log_t*
+log_init(char* dir_form,
+	char* filename_form,
+	LOG_FILE_MODE file_mode,
+	int buf_mode)
 {
-	return E_NO_ERROR;
+	assert(dir_form); assert(filename_form);
+	assert(file_mode == ROTATE || file_mode == REWRITE);
+	assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
+
+	log_t* log = __log_malloc(dir_form, filename_form, file_mode, buf_mode);
+	if (!log) { return NULL; }
+
+	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE, file_mode,
+		buf_mode, BUFSIZ);
+	log->_is_enabled = true;
+	log->_threshold = __DEF_THRESHOLD;
+
+	return log;
 }
 
-LOG_ERROR
+bool log_close(log_t* log)
+{
+	assert(log);
+
+	if (log->_fh) { fh_close(log->_fh); }
+	free(log);
+	return true;
+}
+
+bool
 log_enable(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	log->_is_enabled = true;
+	return true;
 }
 
-LOG_ERROR
+bool
 log_disable(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	log->_is_enabled = false;
+	return true;
 }
 
-LOG_ERROR
-log_close(log_t* log)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
+bool
 log_set_threshold(log_t* log, LOG_LEVEL threshold)
 {
-	return E_NO_ERROR;
+	assert(log); assert(threshold >= 0 && threshold <= __VALID_LVL_COUNT - 1);
+	log->_threshold = threshold;
 }
 
-LOG_ERROR
-log_threshold(log_t* log, LOG_LEVEL* threshold)
+LOG_LEVEL
+log_threshold(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return log->_threshold;
 }
 
-LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUF_MODE policy)
+bool
+log_set_buf_mode(log_t* log, LOG_BUF_MODE mode)
 {
-	return E_NO_ERROR;
+	assert(log);
+	assert(mode == _IONBF || mode == _IOLBF || mode == _IOFBF);
+	fh_set_buf_mode(log->_fh, mode);
+	return true;
 }
 
-LOG_ERROR
-log_buffering_policy(log_t* log, LOG_BUF_MODE* policy)
+LOG_BUF_MODE
+log_buf_mode(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_buf_mode(log->_fh);
 }
 
-LOG_ERROR
-log_set_buffer_size(log_t* log, size_t buffer_size)
+bool
+log_set_buf_size(log_t* log, size_t buf_size)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_set_buf_size(log->_fh, buf_size);
 }
 
-LOG_ERROR
-log_flush_buffer(log_t* log)
+bool
+log_set_file_mode(log_t* log, LOG_FILE_MODE mode)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_set_file_mode(log->_fh, mode);
 }
 
-LOG_ERROR
-log_set_file_policy(log_t* log, LOG_FILE_MODE policy)
+LOG_FILE_MODE
+log_file_mode(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_file_mode(log->_fh);
 }
 
-LOG_ERROR
-log_file_policy(log_t* log, LOG_FILE_MODE* policy)
+bool
+log_set_filename_format(log_t* log, char* fn_form)
 {
-	return E_NO_ERROR;
+	assert(log); assert(fn_form);
+	return fh_set_fn_format(log->_fh, fn_form);
 }
 
-LOG_ERROR
-log_set_dir(log_t* log, char* dir)
+bool
+log_set_max_fsize(log_t* log, size_t size)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_set_max_fsize(log->_fh, size);
 }
 
-LOG_ERROR
-log_dir(log_t* log, char* dir)
+size_t
+log_max_fsize(log_t* log)
 {
-	return E_NO_ERROR;
+	assert(log);
+	return fh_max_fsize(log->_fh);
 }
 
-LOG_ERROR
-log_set_filename_format(log_t* log, char* filename_format)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_current_file_name(log_t* log, char* filename)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_filepath(log_t* log, char* path)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_set_max_file_size(log_t* log, size_t file_size)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_max_file_size(log_t* log, size_t* file_size)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_current_file_size(log_t* log, size_t* file_size)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
-log_set_entry_format(log_t* log, char* entry_format)
-{
-	return E_NO_ERROR;
-}
-
-LOG_ERROR
+bool
 log_write(log_t* log, LOG_LEVEL level, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	if (level >= log->_threshold &&
+		log->_is_enabled)
+	{
+		return fh_write(log->_fh, message);
+	}
+	return false;
 }
 
-LOG_ERROR
+bool
 log_trace(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_TRACE, message);
 }
 
-LOG_ERROR
+bool
 log_debug(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_DEBUG, message);
 }
 
-LOG_ERROR
+bool
 log_info(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_INFO, message);
 }
 
-LOG_ERROR
+bool
 log_warning(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_WARNING, message);
 }
 
-LOG_ERROR
+bool
 log_error(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_ERROR, message);
 }
 
-LOG_ERROR
+bool
 log_critical(log_t* log, char* message)
 {
-	return E_NO_ERROR;
+	assert(log); assert(message);
+	return log_write(log, L_CRITICAL, message);
+}
+
+log_t*
+__log_malloc(char* dir_form, char* filename_form,
+	LOG_FILE_MODE file_mode, int buf_mode)
+{
+	log_t* log = malloc(sizeof(log_t));
+	if (!log) { return NULL; }
+
+	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE,
+		file_mode, buf_mode, BUFSIZ);
+	if (!log->_fh) { log_close(log); return NULL; }
+
+	return log;
 }
