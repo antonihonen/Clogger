@@ -14,20 +14,37 @@
 #include <stdbool.h>
 #include <string.h>
 
-/* Helper function prototypes. */
+static inline __FM_HANDLER
+__get_fm_handler(const __FM_ID id);
 
-static inline const __FM_HANDLER const get_fm_handler(__FM_ID id);
-void __fm_as_str(const char*, char*, size_t* const);
-__FM_ID __identify_fm(const char* const, size_t* const);
-void __expand_fm(char*, char*, thandler_t*, char*, LOG_LEVEL, size_t*, size_t*);
-void __format_str(char*, char*, thandler_t*, char*, LOG_LEVEL);
-static bool __is_valid_fn_form(const char*);
-static bool __is_valid_e_form(const char*);
+/* TODO: Make static after refactoring tests. */
+void
+__fm_as_str(const char* macro, char* dest, size_t* const macro_len);
 
- /* File name formatter functions. */
+/* TODO: Make static after refactoring tests. */
+__FM_ID
+__identify_fm(const char* const macro, size_t* const macro_len);
+
+/* TODO: Make static after refactoring tests. */
+void
+__expand_fm(const char* macro, char* dest, thandler_t* const th,
+	const char* msg, const LOG_LEVEL lvl, size_t* const macro_len,
+	size_t* const exp_macro_len);
+
+static void
+__format_str(const char* format, char* dest,
+	thandler_t* const th, const char* const msg, const LOG_LEVEL lvl);
+
+static bool
+__is_valid_fn_form(const char* format);
+
+static bool
+__is_valid_e_form(const char* format);
+
+/* File name formatter functions. */
 
 fn_format_t*
-fnf_init(char* format)
+fnf_init(const char* const format)
 {
 	assert(format);
 	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
@@ -47,7 +64,7 @@ fnf_init(char* format)
 }
 
 bool
-fnf_set_format(fn_format_t* fnf, char* format)
+fnf_set_format(fn_format_t* const fnf, const char* const format)
 {
 	assert(fnf);
 	assert(format);
@@ -59,7 +76,7 @@ fnf_set_format(fn_format_t* fnf, char* format)
 }
 
 void
-fnf_format(fn_format_t* fnf, char* formatted_filename)
+fnf_format(fn_format_t* const fnf, char* formatted_filename)
 {
 	assert(fnf);
 	assert(formatted_filename);
@@ -69,7 +86,7 @@ fnf_format(fn_format_t* fnf, char* formatted_filename)
 }
 
 void
-fnf_close(fn_format_t* fnf)
+fnf_close(fn_format_t* const fnf)
 {
 	assert(fnf);
 	th_close(fnf->_th);
@@ -79,7 +96,7 @@ fnf_close(fn_format_t* fnf)
 /* Entry formatter functions. */
 
 e_format_t*
-ef_init(char* format)
+ef_init(const char* const format)
 {
 	assert(format);
 	e_format_t* new_ef = malloc(sizeof(e_format_t));
@@ -98,7 +115,7 @@ ef_init(char* format)
 }
 
 bool
-ef_set_format(e_format_t* ef, const char* const format)
+ef_set_format(e_format_t* const ef, const char* const format)
 {
 	assert(ef); assert(format);
 
@@ -109,7 +126,7 @@ ef_set_format(e_format_t* ef, const char* const format)
 }
 
 void
-ef_format(e_format_t* ef, char* formatted_entry, char* msg, LOG_LEVEL lvl)
+ef_format(e_format_t* const ef, char* formatted_entry, const char* const msg, const LOG_LEVEL lvl)
 {
 	assert(ef); assert(msg); assert(formatted_entry);
 
@@ -118,7 +135,7 @@ ef_format(e_format_t* ef, char* formatted_entry, char* msg, LOG_LEVEL lvl)
 }
 
 void
-ef_close(e_format_t* ef)
+ef_close(e_format_t* const ef)
 {
 	assert(ef);
 	th_close(ef->_th);
@@ -128,8 +145,8 @@ ef_close(e_format_t* ef)
 /* Helper functions. */
 
 /* Returns a pointer to the macro handler corresponding with id. */
-const __FM_HANDLER const
-get_fm_handler(__FM_ID id)
+__FM_HANDLER
+__get_fm_handler(const __FM_ID id)
 {
 	return __FM_TABLE[id].handler;
 }
@@ -284,8 +301,9 @@ for the expanded macro.
 If the macro format is invalid, only __FM_BEGIN_INDIC
 is written to dest (macro_len and exp_macro_len will be 1). */
 void
-__expand_fm(char* macro, char* dest, thandler_t* th,
-	char* msg, LOG_LEVEL lvl, size_t* macro_len, size_t* exp_macro_len)
+__expand_fm(const char* macro, char* dest, thandler_t* const th,
+	const char* msg, const LOG_LEVEL lvl, size_t* const macro_len,
+	size_t* const exp_macro_len)
 {
 	assert(macro); assert(dest); assert(macro_len);
 	assert(*macro == __FM_BEGIN_INDIC);
@@ -299,7 +317,7 @@ __expand_fm(char* macro, char* dest, thandler_t* th,
 	{
 		/* Valid macro detected. Get and call the handler, it will
 		expand the macro. */
-		get_fm_handler(macro_id)(th, dest, lvl, msg, exp_macro_len);
+		__get_fm_handler(macro_id)(th, dest, lvl, msg, exp_macro_len);
 	}
 	else
 	{
@@ -316,7 +334,8 @@ Lvl contains the log level of the message, if any.
 Msg and lvl may be omitted when this function is used to
 format a file name, since they are meaningless in that context. */
 void
-__format_str(char* format, char* dest, thandler_t* th, char* msg, LOG_LEVEL lvl)
+__format_str(const char* format, char* dest,
+	thandler_t* const th, const char* const msg, const LOG_LEVEL lvl)
 {
 	assert(format); assert(dest); assert(th);
 	/* If message is given, logging level must also be given (this function
