@@ -9,13 +9,17 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#include "time_handler_test.h"
-#include "formatter_test.h"
 #include "file_handler_test.h"
+#include "formatter_test.h"
+#include "perftest.h"
+#include "time_handler_test.h"
 #include <stdio.h>
 
 int main()
 {
+	run_perftest("%(year)-%(month)-%(mday) %(hour):%(min):%(sec) %(LVL) %(MSG)\n",
+		"Hello! This is just a tiny little test message!",
+		15);
 	run_time_handler_tests("TIME HANDLER TESTS\n");
 	printf("\n");
 	run_formatter_tests("FORMATTER TESTS\n");
