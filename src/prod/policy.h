@@ -27,9 +27,9 @@ typedef enum {
 	REWRITE = 1,
 	ROTATE,
 	IGNORE_EXCESS
-} LOG_FILE_POLICY;
+} LOG_FILE_MODE;
 #define __VALID_FILEPOL_COUNT IGNORE_EXCESS
-const LOG_FILE_POLICY __VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT];
+const LOG_FILE_MODE __VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT];
 
 /* These three buffering modes correspond 1:1 with the buffering modes
 explained in the documentation of the setbuf function from stdio.h.*/
@@ -37,8 +37,8 @@ typedef enum {
 	NO_BUFFERING = 1,
 	LINE_BUFFERING,
 	FULL_BUFFERING
-} LOG_BUF_POLICY;
+} LOG_BUF_MODE;
 #define __VALID_BUFPOL_COUNT FULL_BUFFERING
-const LOG_BUF_POLICY __VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT];
+const LOG_BUF_MODE __VALID_BUF_POLICIES[__VALID_BUFPOL_COUNT];
 
 #endif /* POLICY_H */

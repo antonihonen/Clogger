@@ -29,14 +29,14 @@ typedef struct
 	file at once when the buffer is about to get full
 	if a file policy other than NO_FILE_POLICY
 	has been selected. */
-	LOG_BUF_POLICY _buffering_policy;
+	LOG_BUF_MODE _buffering_policy;
 
 	/* The capacity of the buffer in bytes. */
 	size_t _buffer_capacity_;
 
 	/* Determines what action is taken when the log file
 	reaches its maximum size. */
-	LOG_FILE_POLICY _file_policy;
+	LOG_FILE_MODE _file_policy;
 
 	/* Full path of the directory the log file resides in. */
 	char _file_dir[__MAX_DIR_SIZE];
@@ -94,8 +94,8 @@ log_init(log_t* log,
 	char* dir,
 	char* filename_format,
 	size_t max_file_size,
-	LOG_FILE_POLICY file_policy,
-	LOG_BUF_POLICY buffering_policy);
+	LOG_FILE_MODE file_policy,
+	LOG_BUF_MODE buffering_policy);
 
 /* Enables writing to the log. When writing is enabled,
 entries that exceed the active entry threshold will be
@@ -149,7 +149,7 @@ the buffer are written into the file at once.
 @return:
 */
 LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUF_POLICY policy);
+log_set_buffering_policy(log_t* log, LOG_BUF_MODE policy);
 
 /* Gets the active buffering policy.
 @log: A pointer to the log object.
@@ -157,7 +157,7 @@ log_set_buffering_policy(log_t* log, LOG_BUF_POLICY policy);
 @return:
 */
 LOG_ERROR
-log_buffering_policy(log_t* log, LOG_BUF_POLICY* policy);
+log_buffering_policy(log_t* log, LOG_BUF_MODE* policy);
 
 /* Sets a new size for the output buffer. The old buffer is
 discarded - the user must flush the old buffer first if
@@ -185,7 +185,7 @@ its maximum size.
 @return:
 */
 LOG_ERROR
-log_set_file_policy(log_t* log, LOG_FILE_POLICY policy);
+log_set_file_policy(log_t* log, LOG_FILE_MODE policy);
 
 /* Gets the active file policy.
 @log: A pointer to the log object.
@@ -193,7 +193,7 @@ log_set_file_policy(log_t* log, LOG_FILE_POLICY policy);
 @return:
 */
 LOG_ERROR
-log_file_policy(log_t* log, LOG_FILE_POLICY* policy);
+log_file_policy(log_t* log, LOG_FILE_MODE* policy);
 
 /* Sets the directory in which the log file will be found.
 Full path to the directory is expected.

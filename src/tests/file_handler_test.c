@@ -48,7 +48,7 @@ static void init_test()
 
 static void fhandler_write_test()
 {
-	fhandler_t* fh = fh_init("D:\\logs\\%(year)%(month)%(mday)", "log.log", 100, ROTATE, _IOLBF, 256);
+	fh = fh_init("D:\\logs\\%(year)%(month)%(mday)", "log.log", 100, ROTATE, _IOLBF, 256);
 	e_format_t* ef = ef_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n");
 	char fmsg[512];
 	ef_format(ef, fmsg, "Hello world!", L_CRITICAL);
@@ -62,4 +62,5 @@ void run_file_handler_tests(char* test_set_title)
 	fh = NULL;
 	printf(test_set_title);
 	init_test();
+	fhandler_write_test();
 }

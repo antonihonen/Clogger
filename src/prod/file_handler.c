@@ -17,26 +17,48 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define __USE_WINAPI
 #include <windows.h>
-#define __WIN_PATH_DELIM "\\"
+#define __WIN_PATH_DELIM_CHAR '\\'
+#define __WIN_PATH_DELIM_STR "\\"
 #endif
 
-static bool __fh_open_fstream(fhandler_t*, char*);
-static fhandler_t* __fh_malloc(size_t);
-static void __fh_refresh_fp(fhandler_t*);
-static bool __rotate_files(const char* const);
-static bool __file_size(FILE*, fpos_t*);
-static bool __does_dir_exist(const char* const);
-static bool __create_dir(const char* const);
-static bool __does_file_exist(const char* const);
+#define __MAX_OPEN_ATTEMPTS 3
+
+
+static fhandler_t*
+__fh_malloc(const size_t bufsize);
+
+static bool
+__fh_open_fstream(fhandler_t* const fh, const char* const data_out);
+
+static inline void
+__fh_refresh_path(fhandler_t* const fh);
+
+static bool
+__rotate_files(const char* const abs_filepath);
+
+static inline bool
+__file_size(FILE* const fstream, fpos_t* const size);
+
+static inline bool
+__does_dir_exist(const char* const abs_path);
+
+static bool
+__create_dir(const char* const abs_path);
+
+static bool
+__remove_dir(const char* const abs_path);
+
+static inline bool
+__does_file_exist(const char* const abs_filepath);
 
 /* Allocates and initializes a new fhandler_t object and returns
 a pointer to it. */
 fhandler_t*
-fh_init(char* dirn_form,
-	char* fn_form,
-	size_t max_fsize,
-	LOG_FILE_POLICY file_mode,
-	int buf_mode,
+fh_init(const char* const dirn_form,
+	const char* const fn_form,
+	const size_t max_fsize,
+	const LOG_FILE_MODE file_mode,
+	const int buf_mode,
 	size_t bufsize)
 {
 	/* Assert parameter validity and/or correctness. */
@@ -44,7 +66,7 @@ fh_init(char* dirn_form,
 	assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
 	assert(file_mode > 0 && file_mode <= __VALID_FILEPOL_COUNT);
 	if (buf_mode == _IONBF) { bufsize = 0; }
-	else if (bufsize == 0) { bufsize = BUFSIZ; }
+	else if (bufsize == 0) { bufsize = __DEF_BUF_SIZE; }
 
 	/* Allocate memory. */
 	fhandler_t* fh = __fh_malloc(bufsize);
@@ -58,6 +80,7 @@ fh_init(char* dirn_form,
 	fh->_buf_cap = bufsize;
 	fh->_file_mode = file_mode;
 	fh->_has_file_changed = false;
+	fh->_is_dir_creator = false;
 	fh->_is_file_creator = false;
 	fh->_max_fsize = max_fsize;
 	__clear_str(fh->_cur_dirn);
@@ -67,7 +90,7 @@ fh_init(char* dirn_form,
 }
 
 /* Allocates memory for the fhandler object and its sub-objects. */
-fhandler_t* __fh_malloc(size_t bufsize)
+fhandler_t* __fh_malloc(const size_t bufsize)
 {
 	fhandler_t* fh = malloc(sizeof(fhandler_t));
 	if (!fh) { return NULL; }
@@ -85,7 +108,7 @@ fhandler_t* __fh_malloc(size_t bufsize)
 
 /* Frees the memory reserved for fh and its sub-objects. */
 void
-fh_close(fhandler_t* fh)
+fh_close(fhandler_t* const fh)
 {
 	assert(fh);
 
@@ -96,25 +119,114 @@ fh_close(fhandler_t* fh)
 }
 
 bool
-fh_write(fhandler_t* fh, char* str)
+fh_set_buf_mode(fhandler_t* const fh, const int mode)
 {
-	char orig_str[256];
-	strcpy(orig_str, str);
-	assert(fh); assert(str);
+	assert(fh); assert(mode);
+	assert(mode == _IONBF || mode == _IOLBF || mode == _IOFBF);
+	
+	if (fh->_buf_mode == mode) { return true; }
+
+	if (mode == _IONBF)
+	{
+		if (fh->_buf) { free(fh->_buf); fh->_buf = NULL; }
+		fh->_buf_cap = 0;
+	}
+	else
+	{
+		fh->_buf = malloc(__DEF_BUF_SIZE);
+		if (!fh->_buf) { return false; }
+	}
+	
+	fh->_buf_mode = mode;
+	return true;
+}
+
+int
+fh_buf_mode(const fhandler_t* const fh)
+{
+	assert(fh);
+	return fh->_buf_mode;
+}
+
+bool
+fh_set_buf_size(fhandler_t* const fh, const size_t size)
+{
+	assert(fh);
+
+	if (fh->_buf_cap == size) { return true; }
+	else if (size == 0) { return fh_set_buf_mode(fh, _IONBF); }
+	
+	if (fh->_buf) { free(fh->_buf); fh->_buf = NULL; }
+	fh->_buf = malloc(size);
+	fh->_buf_cap = size;
+	return true;
+}
+
+size_t
+fh_buf_size(const fhandler_t* const fh)
+{
+	assert(fh);
+	return fh->_buf_cap;
+}
+
+bool
+fh_set_file_mode(fhandler_t* const fh, const LOG_FILE_MODE mode)
+{
+	assert(fh); assert(mode == ROTATE || mode == REWRITE);
+	fh->_file_mode = mode;
+	return true;
+}
+
+LOG_FILE_MODE
+fh_file_mode(const fhandler_t* const fh)
+{
+	assert(fh);
+	return fh->_file_mode;
+}
+
+bool
+fh_set_fn_format(fhandler_t* const fh, const char* const format)
+{
+	assert(fh); assert(format);
+
+	if (!fnf_set_format(fh->_fnf, format)) { return false; }
+	__fh_refresh_path(fh);
+	return true;
+}
+
+bool
+fh_set_max_fsize(fhandler_t* const fh, const size_t size)
+{
+	fh->_max_fsize = size;
+	return true;
+}
+
+size_t
+fh_max_fsize(const fhandler_t* const fh)
+{
+	return fh->_max_fsize;
+}
+
+bool
+fh_write(fhandler_t* fh, const char* const data_out)
+{
+	char orig_str[__MAX_MSG_SIZE];
+	strcpy(orig_str, data_out);
+	assert(fh); assert(data_out);
 
 	/* Attempt to open the correct file. */
-	if (!__fh_open_fstream(fh, str)) { return false; }
+	if (!__fh_open_fstream(fh, data_out)) { return false; }
 
 	assert(fh->_fstream);
 
 	/* Set output buffer if any. */
 	setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
 
-	assert(str);
-	assert(strcmp(str, orig_str) == 0);
+	assert(data_out);
+	assert(strcmp(data_out, orig_str) == 0);
 
 	/* Write. */
-	if (fputs(str, fh->_fstream) == EOF)
+	if (fputs(data_out, fh->_fstream) == EOF)
 	{
 		fclose(fh->_fstream);
 		return false;
@@ -125,17 +237,18 @@ fh_write(fhandler_t* fh, char* str)
 	return true;
 }
 
-bool __fh_open_fstream(fhandler_t* fh, char* str)
+bool
+__fh_open_fstream(fhandler_t* const fh, const char* const data_out)
 {
 	/* Attempt to open the correct file up to 3 times. */
-	size_t data_size = strlen(str);
+	size_t data_size = strlen(data_out);
 	size_t opening_attempts = 0;
-	while (!fh->_fstream && opening_attempts < 3)
+	while (!fh->_fstream && opening_attempts < __MAX_OPEN_ATTEMPTS)
 	{
 		if (__is_empty_str(fh->_cur_fp))
 		{
 			/* A new file needs to be created. Get the new filepath. */
-			__fh_refresh_fp(fh);
+			__fh_refresh_path(fh);
 		}
 
 		/* First attempt was unsuccessful. Check if this was due to
@@ -145,6 +258,7 @@ bool __fh_open_fstream(fhandler_t* fh, char* str)
 			if (!__does_dir_exist(fh->_cur_dirn))
 			{
 				if (!__create_dir(fh->_cur_dirn)) { return false; }
+				fh->_is_dir_creator = true;
 			}
 		}
 
@@ -168,7 +282,7 @@ bool __fh_open_fstream(fhandler_t* fh, char* str)
 				/* Close the stream and get the name for the new file. */
 				if (fclose(fh->_fstream) == EOF) { return false; }
 				fh->_fstream = NULL;
-				__fh_refresh_fp(fh);
+				__fh_refresh_path(fh);
 
 				/* Rotate the pre-existing files if rotate mode. */
 				if (fh->_file_mode == ROTATE) { __rotate_files(fh->_cur_fp); }
@@ -187,7 +301,8 @@ bool __fh_open_fstream(fhandler_t* fh, char* str)
 
 /* Updates the active filepath. The fhandler will attempt to write in
 that file. */
-void __fh_refresh_fp(fhandler_t* fh)
+void
+__fh_refresh_path(fhandler_t* const fh)
 {
 	char fn[__MAX_FILENAME_SIZE];
 
@@ -195,14 +310,14 @@ void __fh_refresh_fp(fhandler_t* fh)
 	fnf_format(fh->_dirnf, fh->_cur_dirn);
 	fnf_format(fh->_fnf, fn);
 	strcpy(fh->_cur_fp, fh->_cur_dirn);
-	strcat(fh->_cur_fp, __WIN_PATH_DELIM);
+	strcat(fh->_cur_fp, __WIN_PATH_DELIM_STR);
 	strcat(fh->_cur_fp, fn);
 }
 
 bool
-__rotate_files(const char* const filepath)
+__rotate_files(const char* const abs_filepath)
 {
-	assert(filepath);
+	assert(abs_filepath);
 
 	char file_to_rename[__MAX_FILENAME_SIZE];
 	char new_filename[__MAX_FILENAME_SIZE];
@@ -210,23 +325,23 @@ __rotate_files(const char* const filepath)
 
 	/* Rename old file to old_filename.0 to simplify logic
 	below. */
-	if (__does_file_exist(filepath))
+	if (__does_file_exist(abs_filepath))
 	{
-		sprintf(new_filename, "%s.0", filepath);
-		rename(filepath, new_filename);
+		sprintf(new_filename, "%s.0", abs_filepath);
+		rename(abs_filepath, new_filename);
 	}
 	else { return true; }
 
 	do
 	{
-		sprintf(file_to_rename, "%s.%u", filepath, i);
+		sprintf(file_to_rename, "%s.%u", abs_filepath, i);
 		++i;
 	} while (__does_file_exist(file_to_rename));
 	
 	for (i; i >= 1; --i)
 	{
-		sprintf(file_to_rename, "%s.%u", filepath, i - 1);
-		sprintf(new_filename, "%s.%u", filepath, i);
+		sprintf(file_to_rename, "%s.%u", abs_filepath, i - 1);
+		sprintf(new_filename, "%s.%u", abs_filepath, i);
 		rename(file_to_rename, new_filename);
 	}
 	return true;
@@ -235,7 +350,7 @@ __rotate_files(const char* const filepath)
 /* Writes the current size of the file associated with fstream into size.
 Returns false if an error occurred. */
 bool
-__file_size(FILE* fstream, fpos_t* size)
+__file_size(FILE* const fstream, fpos_t* const size)
 {
 	assert(fstream); assert(size);
 
@@ -251,12 +366,12 @@ __file_size(FILE* fstream, fpos_t* size)
 
 /* Returns true if dir_path points to an existing directory. */
 bool
-__does_dir_exist(const char* const dir_path)
+__does_dir_exist(const char* const abs_path)
 {
-	assert(dir_path);
+	assert(abs_path);
 
 #ifdef __USE_WINAPI
-	DWORD ftyp = GetFileAttributesA(dir_path);
+	DWORD ftyp = GetFileAttributesA(abs_path);
 	if (ftyp == INVALID_FILE_ATTRIBUTES) { return false; }
 	else if (ftyp & FILE_ATTRIBUTE_DIRECTORY) { return true; }
 	return false;
@@ -265,20 +380,32 @@ __does_dir_exist(const char* const dir_path)
 
 /* Creates the directory in dir_path and returns true if successful. */
 bool
-__create_dir(const char* const dir_path)
+__create_dir(const char* const abs_path)
 {
-	assert(dir_path);
+	assert(abs_path);
 
 #ifdef __USE_WINAPI
-	return CreateDirectoryA(dir_path, NULL) != 0;
+	/* TODO: Recursive folder creation, i.e. create parent folder(s) */
+	return CreateDirectoryA(abs_path, NULL) != 0;
 #endif
+}
+
+bool
+__remove_dir(const char* const abs_path)
+{
+	assert(abs_path);
+
+#ifdef __USE_WINAPI
+	return RemoveDirectoryA(abs_path) == 0;
+#endif
+		return false;
 }
 
 /* Returns true if filepath points to an existing file. */
 bool
-__does_file_exist(const char* const filepath)
+__does_file_exist(const char* const abs_filepath)
 {
-	FILE* f = fopen(filepath, "r");
+	FILE* f = fopen(abs_filepath, "r");
 	if (f) { fclose(f); return true; }
 	return false;
 }

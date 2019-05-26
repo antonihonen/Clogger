@@ -20,6 +20,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#define __DEF_BUF_SIZE BUFSIZ
+
 /* Defines the properties of a file handler object. */
 typedef struct {
 	FILE* _fstream;
@@ -32,57 +34,52 @@ typedef struct {
 	size_t _buf_cap;
 	int _buf_mode;
 
-	LOG_FILE_POLICY _file_mode;
+	LOG_FILE_MODE _file_mode;
 	size_t _max_fsize;
+	bool _is_dir_creator;
 	bool _is_file_creator;
 	bool _has_file_changed;
 } fhandler_t;
 
 fhandler_t*
-fh_init(char* dirn_form,
-	char* fn_form,
-	size_t max_fsize,
-	LOG_FILE_POLICY file_mode,
-	int buf_mode,
+fh_init(const char* const dirn_form,
+	const char* const fn_form,
+	const size_t max_fsize,
+	const LOG_FILE_MODE file_mode,
+	const int buf_mode,
 	size_t bufsize);
 
 void
-fh_close(fhandler_t* fh);
+fh_close(fhandler_t* const fh);
 
 bool
-fh_set_buf_policy(fhandler_t* fh, LOG_BUF_POLICY policy);
+fh_set_buf_mode(fhandler_t* const fh, const int mode);
 
-LOG_BUF_POLICY
-fh_buf_policy(fhandler_t* fh);
+int
+fh_buf_mode(const fhandler_t* const fh);
 
 bool
-fh_set_buf_size(fhandler_t* fh, size_t size);
+fh_set_buf_size(fhandler_t* const fh, const size_t size);
 
 size_t
-fh_buf_size(fhandler_t* fh);
+fh_buf_size(const fhandler_t* const fh);
 
 bool
-fh_set_file_policy(fhandler_t* fh, LOG_FILE_POLICY policy);
+fh_set_file_mode(fhandler_t* const fh, const LOG_FILE_MODE mode);
 
-LOG_FILE_POLICY
-fh_file_policy(fhandler_t* fh);
-
-bool
-fh_set_fn_format(fhandler_t* fh, char* format);
+LOG_FILE_MODE
+fh_file_mode(const fhandler_t* const fh);
 
 bool
-fh_set_file_size(fhandler_t* fh, size_t size);
+fh_set_fn_format(fhandler_t* const fh, const char* const format);
+
+bool
+fh_set_max_fsize(fhandler_t* const fh, const size_t size);
 
 size_t
-fh_max_file_size(fhandler_t* fh);
-
-size_t
-fh_file_iter(fhandler_t* fh);
+fh_max_fsize(const fhandler_t* const fh);
 
 bool
-fh_write(fhandler_t* fh, char* str);
-
-void
-fh_flush_buffer(fhandler_t* fh);
+fh_write(fhandler_t* fh, const char* const data_out);
 
 #endif /* FILE_HANDLER_H */

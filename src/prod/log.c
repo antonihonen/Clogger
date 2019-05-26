@@ -15,8 +15,8 @@ log_init(log_t* log,
 	char* dir,
 	char* filename_format,
 	size_t max_file_size,
-	LOG_FILE_POLICY file_policy,
-	LOG_BUF_POLICY buffering_policy)
+	LOG_FILE_MODE file_policy,
+	LOG_BUF_MODE buffering_policy)
 {
 	return E_NO_ERROR;
 }
@@ -52,13 +52,13 @@ log_threshold(log_t* log, LOG_LEVEL* threshold)
 }
 
 LOG_ERROR
-log_set_buffering_policy(log_t* log, LOG_BUF_POLICY policy)
+log_set_buffering_policy(log_t* log, LOG_BUF_MODE policy)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-log_buffering_policy(log_t* log, LOG_BUF_POLICY* policy)
+log_buffering_policy(log_t* log, LOG_BUF_MODE* policy)
 {
 	return E_NO_ERROR;
 }
@@ -76,13 +76,13 @@ log_flush_buffer(log_t* log)
 }
 
 LOG_ERROR
-log_set_file_policy(log_t* log, LOG_FILE_POLICY policy)
+log_set_file_policy(log_t* log, LOG_FILE_MODE policy)
 {
 	return E_NO_ERROR;
 }
 
 LOG_ERROR
-log_file_policy(log_t* log, LOG_FILE_POLICY* policy)
+log_file_policy(log_t* log, LOG_FILE_MODE* policy)
 {
 	return E_NO_ERROR;
 }
