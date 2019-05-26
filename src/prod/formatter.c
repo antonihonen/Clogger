@@ -10,7 +10,7 @@
 #include "string_util.h"
 #include "time_handler.h"
 #include <assert.h>
-#include <malloc.h>
+#include "alloc.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -47,7 +47,7 @@ fn_format_t*
 fnf_init(const char* const format)
 {
 	assert(format);
-	fn_format_t* new_fnf = malloc(sizeof(fn_format_t));
+	fn_format_t* new_fnf = __get_alloc()(sizeof(fn_format_t));
 	thandler_t* new_th = th_init();
 
 	if (new_fnf && new_th
@@ -59,7 +59,7 @@ fnf_init(const char* const format)
 
 	/* Memory allocation failed or format was invalid. Clean up
 	and return NULL. */
-	if (new_fnf) { free(new_fnf); }
+	if (new_fnf) { __get_dealloc()(new_fnf); }
 	return NULL;
 }
 
@@ -90,7 +90,7 @@ fnf_close(fn_format_t* const fnf)
 {
 	assert(fnf);
 	th_close(fnf->_th);
-	free(fnf);
+	__get_dealloc()(fnf);
 }
 
 /* Entry formatter functions. */
@@ -99,7 +99,7 @@ e_format_t*
 ef_init(const char* const format)
 {
 	assert(format);
-	e_format_t* new_ef = malloc(sizeof(e_format_t));
+	e_format_t* new_ef = __get_alloc()(sizeof(e_format_t));
 	thandler_t* new_th = th_init();
 
 	if (new_ef && new_th && ef_set_format(new_ef, format))
@@ -110,7 +110,7 @@ ef_init(const char* const format)
 
 	/* Memory allocation failed or format was invalid. Clean up
 	and return NULL. */
-	if (new_ef) { free(new_ef); }
+	if (new_ef) { __get_dealloc()(new_ef); }
 	return NULL;
 }
 
@@ -139,7 +139,7 @@ ef_close(e_format_t* const ef)
 {
 	assert(ef);
 	th_close(ef->_th);
-	free(ef);
+	__get_dealloc()(ef);
 }
 
 /* Helper functions. */

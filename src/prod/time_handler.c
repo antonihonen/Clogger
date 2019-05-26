@@ -6,10 +6,10 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#include "alloc.h"
 #include "time_handler.h"
 #include "string_util.h"
 #include <assert.h>
-#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -29,11 +29,11 @@ static const char* const WEEKDAYS[7] =
 thandler_t*
 th_init()
 {
-	thandler_t* new_th = malloc(sizeof(thandler_t));
-	struct tm* new_ltime = malloc(sizeof(struct tm));
+	thandler_t* new_th = __get_alloc()(sizeof(thandler_t));
+	struct tm* new_ltime = __get_alloc()(sizeof(struct tm));
 	if (!new_th || !new_ltime)
 	{
-		if (new_th) { free(new_th); }
+		if (new_th) { __get_dealloc()(new_th); }
 		return NULL;
 	}
 	new_th->_ltime = new_ltime;
@@ -46,8 +46,8 @@ void
 th_close(thandler_t* th)
 {
 	assert(th);
-	free(th->_ltime);
-	free(th);
+	__get_dealloc()(th->_ltime);
+	__get_dealloc()(th);
 }
 
 bool

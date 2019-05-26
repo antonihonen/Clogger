@@ -8,7 +8,7 @@
 
 #include "log.h"
 #include <assert.h>
-#include <malloc.h>
+#include "alloc.h"
 
 static inline log_t*
 __log_malloc(char* dir_form, char* filename_form,
@@ -41,7 +41,7 @@ bool log_close(log_t* log)
 
 	if (log->_fh) { fh_close(log->_fh); }
 	if (log->_ef) { ef_close(log->_ef); }
-	free(log);
+	__get_dealloc()(log);
 	return true;
 }
 
@@ -209,7 +209,7 @@ log_t*
 __log_malloc(char* dir_form, char* filename_form,
 	LOG_FILE_MODE file_mode, int buf_mode)
 {
-	log_t* log = malloc(sizeof(log_t));
+	log_t* log = __get_alloc()(sizeof(log_t));
 	if (!log) { return NULL; }
 
 	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE,
