@@ -7,6 +7,10 @@
  * These error codes may be returned to the user of
  * the library or used internally within the library.
  *
+ * The module also provides a way for all other modules
+ * in the project to register errors and fetch information
+ * of the error that last took place.
+ *
  * Copyright (C) 2019. Anton Ihonen
  */
 
@@ -14,11 +18,18 @@
 #define ERROR_H
 
 #include <limits.h>
+#include <stdbool.h>
 
 typedef enum {
 	E_FIRST_ERROR_PLACEHOLDER = INT_MIN, /* Error codes are negative */
 	/* Add new error codes here */
 	E_NO_ERROR = 0
 } LOG_ERROR;
+
+inline bool
+__register_error(LOG_ERROR error);
+
+inline LOG_ERROR
+__last_error();
 
 #endif /* ERROR_H */
