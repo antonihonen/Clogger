@@ -9,7 +9,10 @@
  *
  * The module also provides a way for all other modules
  * in the project to register errors and fetch information
- * of the error that last took place.
+ * of the error that last took place. Information of an
+ * error is stored by calling the __register_error() function
+ * and fetched by calling log_get_error(). Currently
+ * only the last error that occurred is stored.
  *
  * Copyright (C) 2019. Anton Ihonen
  */
@@ -21,15 +24,17 @@
 #include <stdbool.h>
 
 typedef enum {
-	E_FIRST_ERROR_PLACEHOLDER = INT_MIN, /* Error codes are negative */
-	/* Add new error codes here */
 	E_NO_ERROR = 0
 } LOG_ERROR;
 
-inline bool
+/* Stores an error code that can be fetched
+by calling log_get_error. */
+extern inline bool
 __register_error(LOG_ERROR error);
 
-inline LOG_ERROR
-__last_error();
+/* Returns the last error registered by
+calling __register_error. */
+extern inline LOG_ERROR
+log_get_error();
 
 #endif /* ERROR_H */

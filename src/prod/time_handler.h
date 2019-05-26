@@ -27,7 +27,7 @@ jan, Jan, JAN, january, January or JANUARY. */
 typedef enum { __MN_SHORT_FIRST_CAP, __MN_SHORT_ALL_CAPS,
 	__MN_LONG_FIRST_CAP, __MN_LONG_ALL_CAPS} __MNAME_FORMAT;
 
-/* Defines the properties of a time handler object. */
+/* Time handler. */
 typedef struct
 {
 	/* Contains the result of the last call to localtime()
@@ -46,31 +46,31 @@ typedef struct
 thandler_t*
 th_init();
 
-void
+extern inline void
 th_close(thandler_t* th);
 
-void
+extern inline void
 th_fetch_ltime(thandler_t* th);
 
 extern inline bool
 th_has_legal_state(thandler_t* th);
 
-void
+extern inline void
 th_get_year(thandler_t* th, char* year);
 
-void
+extern inline void
 th_get_month(thandler_t* th, char* month);
 
-void
+extern inline void
 th_get_mday(thandler_t* th, char* mday);
 
-void
+extern inline void
 th_get_hour(thandler_t* th, char* hours);
 
-void
+extern inline void
 th_get_min(thandler_t* th, char* mins);
 
-void
+extern inline void
 th_get_sec(thandler_t* th, char* secs);
 
 void

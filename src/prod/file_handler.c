@@ -6,10 +6,10 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
+#include "alloc.h"
 #include "file_handler.h"
 #include "string_util.h"
 #include <assert.h>
-#include "alloc.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,7 +22,6 @@
 #endif
 
 #define __MAX_OPEN_ATTEMPTS 3
-
 
 static fhandler_t*
 __fh_malloc(const size_t bufsize);

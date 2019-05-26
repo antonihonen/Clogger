@@ -18,7 +18,7 @@ __register_error(LOG_ERROR error)
 }
 
 LOG_ERROR
-__last_error()
+log_get_error()
 {
 	return LAST_ERROR;
 }

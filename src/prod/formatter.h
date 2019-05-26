@@ -40,7 +40,7 @@
 #include "macros.h"
 #include "time_handler.h"
 
-/* Defines the properties of a filename formatter object. */
+/* Filename formatter. */
 typedef struct {
 	/* Format string. */
 	char _form[__MAX_FN_FORMAT_SIZE];
@@ -49,9 +49,9 @@ typedef struct {
 	thandler_t* _th;
 } fn_format_t;
 
-/* Defines the properties of an entry formatter object. */
+/* Entry formatter. */
 typedef struct {
-	/* as above. */
+	/* As above. */
 	char _form[__MAX_E_FORMAT_SIZE];
 	/* As above. */
 	thandler_t* _th;
@@ -69,17 +69,17 @@ fnf_init(const char* const format);
 /* Sets a new format string for the formatter. Returns true if
 the format string was valid, false otherwise (contained illegal
 macros and/or was too long). */
-bool
+extern inline bool
 fnf_set_format(fn_format_t* const fnf, const char* const format);
 
 /* Updates the file name according to the format string
 contained by fnf and writes it to formatted_filename. */
-void
+extern inline void
 fnf_format(fn_format_t* const fnf, char* formatted_filename);
 
 /* Deallocates all memory reserved by the formatter.
 Must always be called when discarding a formatter.*/
-void
+extern inline void
 fnf_close(fn_format_t* const fnf);
 
 /* Entry formatter functions. */
@@ -90,18 +90,18 @@ functions above. */
 e_format_t*
 ef_init(const char* const format);
 
-bool
+extern inline bool
 ef_set_format(e_format_t* const ef, const char* const format);
 
 /* Msg and lvl indicate the message requested to be written and the
 level of the request. These are needed here because only an entry
 format string is allowed to contain the macros corresponding with
 these two. */
-void
+extern inline void
 ef_format(e_format_t* const ef, char* formatted_entry, const char* const msg,
 	const LOG_LEVEL lvl);
 
-void
+extern inline void
 ef_close(e_format_t* const ef);
 
 #endif /* FORMATTER_H */

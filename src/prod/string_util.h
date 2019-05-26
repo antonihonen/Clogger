@@ -3,8 +3,8 @@
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This module contains utilities that help
- * with handling strings.
+ * This module contains utilities that make handling
+ * strings easier.
  *
  * Copyright (C) 2019. Anton Ihonen
  */

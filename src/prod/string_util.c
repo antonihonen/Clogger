@@ -3,9 +3,6 @@
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
- * This module contains utilities that help
- * with handling strings.
- *
  * Copyright (C) 2019. Anton Ihonen
  */
 

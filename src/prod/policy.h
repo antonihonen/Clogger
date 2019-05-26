@@ -25,14 +25,13 @@ log writes until the file has been emptied by an external
 process. */
 typedef enum {
 	REWRITE = 1,
-	ROTATE,
-	IGNORE_EXCESS
+	ROTATE
 } LOG_FILE_MODE;
-#define __VALID_FILEPOL_COUNT IGNORE_EXCESS
+#define __VALID_FILEPOL_COUNT ROTATE
 const LOG_FILE_MODE __VALID_FILE_POLICIES[__VALID_FILEPOL_COUNT];
 
 /* These three buffering modes correspond 1:1 with the buffering modes
-explained in the documentation of the setbuf function from stdio.h.*/
+explained in the documentation of the setvbuf function(stdio.h).*/
 typedef enum {
 	NO_BUFFERING = 1,
 	LINE_BUFFERING,

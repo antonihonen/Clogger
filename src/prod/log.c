@@ -66,6 +66,7 @@ log_set_threshold(log_t* log, LOG_LEVEL threshold)
 {
 	assert(log); assert(threshold >= 0 && threshold <= __VALID_LVL_COUNT - 1);
 	log->_threshold = threshold;
+	return true;
 }
 
 LOG_LEVEL
