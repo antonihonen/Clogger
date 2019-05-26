@@ -181,6 +181,7 @@ fh_set_fn_format(fhandler_t* const fh, const char* const format)
 bool
 fh_set_max_fsize(fhandler_t* const fh, const size_t size)
 {
+	assert(fh);
 	fh->_max_fsize = size;
 	return true;
 }
@@ -188,11 +189,12 @@ fh_set_max_fsize(fhandler_t* const fh, const size_t size)
 size_t
 fh_max_fsize(const fhandler_t* const fh)
 {
+	assert(fh);
 	return fh->_max_fsize;
 }
 
 bool
-fh_write(fhandler_t* fh, char* data_out)
+fh_write(fhandler_t* const fh, const char* const data_out)
 {
 	assert(fh); assert(data_out);
 	assert(!fh->_fstream);
@@ -241,6 +243,8 @@ fhandler_t* __fh_malloc(const size_t bufsize)
 bool
 __fh_open_fstream(fhandler_t* const fh, const char* const data_out)
 {
+	assert(fh); assert(data_out);
+
 	/* Attempt to open the correct file up to 3 times. */
 	size_t data_size = strlen(data_out);
 	size_t opening_attempts = 0;
@@ -305,6 +309,8 @@ that file. */
 void
 __fh_refresh_path(fhandler_t* const fh)
 {
+	assert(fh);
+
 	char fn[__MAX_FILENAME_SIZE];
 
 	/* TODO Add the length of the expanded fn to fn_format_t. */
@@ -406,6 +412,7 @@ __remove_dir(const char* const abs_path)
 bool
 __does_file_exist(const char* const abs_filepath)
 {
+	assert(abs_filepath);
 	FILE* f = fopen(abs_filepath, "r");
 	if (f) { fclose(f); return true; }
 	return false;
