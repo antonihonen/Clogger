@@ -19,6 +19,7 @@
 
 #define __DEF_MAX_FSIZE 102400 /* 100 kiB */
 #define __DEF_THRESHOLD L_TRACE
+#define __DEF_ENTRY_FORMAT "%(MSG)\n"
 
 /* Defines the properties of a log object. */
 typedef struct
@@ -28,6 +29,8 @@ typedef struct
 	know anything about any of that, it only passes the information
 	to the file handler. */
 	fhandler_t* _fh;
+
+	e_format_t* _ef;
 
 	/* The active threshold level. Any entry with a lower level
 	than the threshold level will be ignored. */

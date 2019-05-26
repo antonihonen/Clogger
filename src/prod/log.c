@@ -40,6 +40,7 @@ bool log_close(log_t* log)
 	assert(log);
 
 	if (log->_fh) { fh_close(log->_fh); }
+	if (log->_ef) { ef_close(log->_ef); }
 	free(log);
 	return true;
 }
@@ -132,14 +133,32 @@ log_max_fsize(log_t* log)
 	return fh_max_fsize(log->_fh);
 }
 
-bool
+size_t
+log_current_fsize(log_t* log)
+{
+	return 0;
+}
+
+extern bool
+log_set_entry_format(log_t* log, char* entry_format)
+{
+	assert(log); assert(entry_format);
+	ef_set_format(log->_ef, entry_format);
+	return true;
+}
+
+extern bool
 log_write(log_t* log, LOG_LEVEL level, char* message)
 {
 	assert(log); assert(message);
+
+	char formatted_msg[__MAX_MSG_SIZE];
+	ef_format(log->_ef, formatted_msg, message, level);
+
 	if (level >= log->_threshold &&
 		log->_is_enabled)
 	{
-		return fh_write(log->_fh, message);
+		return fh_write(log->_fh, formatted_msg);
 	}
 	return false;
 }
@@ -195,7 +214,12 @@ __log_malloc(char* dir_form, char* filename_form,
 
 	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE,
 		file_mode, buf_mode, BUFSIZ);
-	if (!log->_fh) { log_close(log); return NULL; }
+	log->_ef = ef_init(__DEF_ENTRY_FORMAT);
+	if (!log->_fh || !log->_ef)
+	{
+		log_close(log);
+		return NULL;
+	}
 
 	return log;
 }
