@@ -39,8 +39,8 @@ typedef struct
 	with their time fetching, so that the time values are consistent
 	with each other. */
 	struct tm* _ltime;
-	/* For testing purposes: */
-	bool _is_fetch_allowed;
+	
+	bool _is_not_locked;
 } thandler_t;
 
 thandler_t*
@@ -51,6 +51,12 @@ th_close(thandler_t* th);
 
 void
 th_fetch_ltime(thandler_t* th);
+
+void
+th_lock(thandler_t* th);
+
+void
+th_unlock(thandler_t* th);
 
 bool
 th_has_legal_state(thandler_t* th);

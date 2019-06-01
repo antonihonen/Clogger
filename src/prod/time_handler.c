@@ -37,7 +37,7 @@ th_init()
 		return NULL;
 	}
 	new_th->_ltime = new_ltime;
-	new_th->_is_fetch_allowed = true;
+	new_th->_is_not_locked = true;
 	
 	return new_th;
 }
@@ -63,13 +63,25 @@ th_fetch_ltime(thandler_t* th)
 {
 	assert(th);
 
-	if (th->_is_fetch_allowed)
+	if (th->_is_not_locked)
 	{
 		time_t raw_time;
 		time(&raw_time);
 		/* Create a static copy of the struct returned by localtime(). */
 		memcpy(th->_ltime, localtime(&raw_time), sizeof(struct tm));
 	}
+}
+
+void
+th_lock(thandler_t* th)
+{
+    th->_is_not_locked = false;
+}
+
+void
+th_unlock(thandler_t* th)
+{
+    th->_is_not_locked = true;
 }
 
 void
