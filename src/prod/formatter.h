@@ -39,38 +39,28 @@
 #include "format_macro.h"
 #include "macros.h"
 #include "time_handler.h"
+#include <stdint.h>
 
-/* Filename formatter. */
+#define FORMAT_PATHS 0x01
+#define FORMAT_ENTRIES 0x02
+
 typedef struct {
-    /* Format string. */
-    char _form[_MAX_FN_FORMAT_SIZE];
-    /* Time handler responsible for fetching the current date
-    and time for the format macros needing those. */
-    thandler_t* _th;
-} fn_format_t;
+    char        _format[_MAX_EXP_FORMAT_SIZE];
+    thandler_t* _thandler;
+    uint8_t     _flags;
+} format_t;
 
-/* Entry formatter. */
-typedef struct {
-    /* As above. */
-    char _form[_MAX_E_FORMAT_SIZE];
-    /* As above. */
-    thandler_t* _th;
-} e_format_t;
+format_t* format_init(const char* format, uint8_t flags);
 
-fn_format_t* fnf_init(const char* format);
+bool format_set(format_t* const fnf, const char* format);
 
-bool fnf_set_format(fn_format_t* const fnf, const char* format);
+char* format_path(format_t* formatter, char* dest);
 
-void fnf_format(fn_format_t* fnf, char* dest);
+char* format_entry(format_t* formatter,
+                   char* dest,
+                   const char* msg,
+                   LOG_LEVEL level);
 
-void fnf_close(fn_format_t* fnf);
-
-e_format_t* ef_init(const char* format);
-
-bool ef_set_format(e_format_t* const ef, const char* format);
-
-void ef_format(e_format_t* ef, char* dest, const char* src, LOG_LEVEL lvl);
-
-void ef_close(e_format_t* ef);
+void format_free(format_t* fnf);
 
 #endif /* FORMATTER_H */

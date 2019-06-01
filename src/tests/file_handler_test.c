@@ -49,12 +49,13 @@ static void init_test()
 static void fhandler_write_test()
 {
     fh = fh_init("D:\\logs\\%(year)%(month)%(mday)", "log.log", 100, ROTATE, _IOLBF, 256);
-    e_format_t* ef = ef_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n");
+    format_t* ef = format_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n",
+        FORMAT_ENTRIES);
     char fmsg[512];
-    ef_format(ef, fmsg, "Hello world!", L_CRITICAL);
+    format_entry(ef, fmsg, "Hello world!", L_CRITICAL);
     fh_fwrite(fh, fmsg);
     fh_close(fh);
-    ef_close(ef);
+    format_free(ef);
 }
 
 void run_file_handler_tests(char* test_set_title)

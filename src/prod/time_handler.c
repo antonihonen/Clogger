@@ -44,7 +44,7 @@ thandler_t* th_init()
     return new_th;
 }
 
-void th_close(thandler_t* th)
+void th_free(thandler_t* th)
 {
     _log_dealloc(th->_ltime);
     _log_dealloc(th);

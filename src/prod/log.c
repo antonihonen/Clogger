@@ -40,7 +40,7 @@ log_t* log_init(const char* dname_format,
 bool log_close(log_t* log)
 {
     if (log->_fh) { fh_close(log->_fh); }
-    if (log->_ef) { ef_close(log->_ef); }
+    if (log->_ef) { format_free(log->_ef); }
     _log_dealloc(log);
     return true;
 }
@@ -137,14 +137,14 @@ size_t log_current_fsize(log_t* log)
 
 bool log_set_entry_format(log_t* log, const char* format)
 {
-    ef_set_format(log->_ef, format);
+    format_set(log->_ef, format);
     return true;
 }
 
 bool log_write(log_t* log, LOG_LEVEL level, const char* message)
 {
     char formatted_msg[_MAX_MSG_SIZE];
-    ef_format(log->_ef, formatted_msg, message, level);
+    format_entry(log->_ef, formatted_msg, message, level);
 
     if (level >= log->_threshold && log->_is_enabled)
     {
@@ -200,7 +200,7 @@ log_t* _log_t_alloc(const char* dname_format,
                        file_mode,
                        buf_mode,
                        BUFSIZ);
-    log->_ef = ef_init(_DEF_ENTRY_FORMAT);
+    log->_ef = format_init(_DEF_ENTRY_FORMAT, FORMAT_ENTRIES);
     if (!log->_fh || !log->_ef)
     {
         log_close(log);

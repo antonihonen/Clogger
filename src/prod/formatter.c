@@ -12,109 +12,99 @@
 #include "string_util.h"
 #include "time_handler.h"
 #include <assert.h>
-#include <stdbool.h>
 #include <string.h>
 
-void _format_str(const char* format,
-                 char* dest,
-                 thandler_t* th,
-                 const char* msg,
-                 LOG_LEVEL lvl);
+char* _format_str(const char* format,
+                  char* dest,
+                  thandler_t* th,
+                  const char* msg,
+                  LOG_LEVEL lvl);
 
-static bool _is_valid_fn_form(const char* format);
+static bool _is_valid_path_format(const char* format);
 
-static bool _is_valid_e_form(const char* format);
+static bool _is_valid_entry_format(const char* format);
 
-/* File name formatter functions. */
-
-fn_format_t* fnf_init(const char* format)
+format_t* format_init(const char* format, uint8_t flags)
 {
-    fn_format_t* new_fnf = _log_alloc(sizeof(fn_format_t));
-    thandler_t* new_th = th_init();
-
-    if (new_fnf && new_th
-        && fnf_set_format(new_fnf, format))
+    if (!((flags & FORMAT_PATHS) || (flags & FORMAT_ENTRIES)))
     {
-        new_fnf->_th = new_th;
-        return new_fnf;
+        return NULL;
+    }
+
+    format_t* formatter = _log_alloc(sizeof(format_t));
+    thandler_t* thandler = th_init();
+
+    if (formatter && thandler)
+    {
+        formatter->_flags = flags;
+        formatter->_thandler = thandler;
+        if (format_set(formatter, format))
+        {
+            return formatter;
+        }
     }
 
     /* Memory allocation failed or format was invalid. Clean up
     and return NULL. */
-    if (new_fnf)
+    if (formatter)
     {
-        _log_dealloc(new_fnf);
+        _log_dealloc(formatter);
+    }
+    if (thandler)
+    {
+        _log_dealloc(formatter);
     }
     return NULL;
 }
 
-bool fnf_set_format(fn_format_t* const fnf, const char* format)
+void format_free(format_t* formatter)
 {
-    if (!_is_valid_fn_form(format))
+    th_free(formatter->_thandler);
+    _log_dealloc(formatter);
+}
+
+bool format_set(format_t* formatter, const char* format)
+{
+    if (formatter->_flags & FORMAT_PATHS
+            && !_is_valid_path_format(format))
     {
         return false;
     }
-
-    strcpy(fnf->_form, format);
+    else if (formatter->_flags & FORMAT_ENTRIES
+                 && !_is_valid_entry_format(format))
+    {
+        return false;
+    }
+    
+    strcpy(formatter->_format, format);
 
     return true;
 }
 
-void fnf_format(fn_format_t* fnf, char* dest)
+char* format_entry(format_t* formatter,
+                   char* dest,
+                   const char* msg,
+                   LOG_LEVEL level)
 {
-    _format_str(fnf->_form, dest,
-        fnf->_th, NULL, _L_NO_LEVEL);
+    assert(formatter->_flags & FORMAT_ENTRIES);
+
+    return _format_str(formatter->_format,
+                       dest,
+                       formatter->_thandler,
+                       msg,
+                       level);
 }
 
-void fnf_close(fn_format_t* fnf)
+char* format_path(format_t* formatter, char* dest)
 {
-    th_close(fnf->_th);
-    _log_dealloc(fnf);
-}
+    assert(formatter->_flags & FORMAT_PATHS);
 
-/* Entry formatter functions. */
-
-e_format_t* ef_init(const char* format)
-{
-    e_format_t* new_ef = _log_alloc(sizeof(e_format_t));
-    thandler_t* new_th = th_init();
-
-    if (new_ef && new_th && ef_set_format(new_ef, format))
-    {
-        new_ef->_th = new_th;
-        return new_ef;
-    }
-
-    /* Memory allocation failed or format was invalid. Clean up
-    and return NULL. */
-    if (new_ef)
-    {
-        _log_dealloc(new_ef);
-    }
-    return NULL;
-}
-
-bool ef_set_format(e_format_t* const ef, const char* format)
-{
-    if (!_is_valid_e_form(format))
-    {
-        return false;
-    }
-
-    strcpy(ef->_form, format);
-    return true;
-}
-
-void ef_format(e_format_t* ef, char* dest, const char* src, LOG_LEVEL lvl)
-{
-    _format_str(ef->_form, dest,
-        ef->_th, src, lvl);
-}
-
-void ef_close(e_format_t* ef)
-{
-    th_close(ef->_th);
-    _log_dealloc(ef);
+    _format_str(formatter->_format,
+                dest,
+                formatter->_thandler,
+                NULL,
+                _L_NO_LEVEL);
+    return dest;
 }
 
 /* Helper functions. */
@@ -125,11 +115,11 @@ Msg contains the log message entered by the user, if any.
 Lvl contains the log level of the message, if any.
 Msg and lvl may be omitted when this function is used to
 format a file name, since they are meaningless in that context. */
-void _format_str(const char* format,
-                 char* dest,
-                 thandler_t* th,
-                 const char* msg,
-                 LOG_LEVEL lvl)
+char* _format_str(const char* format,
+                  char* dest,
+                  thandler_t* th,
+                  const char* msg,
+                  LOG_LEVEL lvl)
 {
     /* If message is given, logging level must also be given (this function
     was called by the entry formatter) - if not, logging level must not be
@@ -175,12 +165,13 @@ void _format_str(const char* format,
     while loop. */
     assert(*format == '\0');
     *dest = *format;
+    return dest;
 }
 
 /* Returns true if format is valid, i.e. contains no illegal
 macros and has a maximum length < _MAX_FILENAME_SIZE - 1
 when expanded. */
-bool _is_valid_fn_form(const char* format)
+bool _is_valid_path_format(const char* format)
 {
     size_t max_len = 0;
 
@@ -197,11 +188,13 @@ bool _is_valid_fn_form(const char* format)
             }
             switch (id)
             {
-            case _FM_MSG:
-            case _FM_LVL_N:
-            case _FM_LVL_F:
-            case _FM_LVL_A:
-                return false;
+                case _FM_MSG:
+                case _FM_LVL_N:
+                case _FM_LVL_F:
+                case _FM_LVL_A:
+                    return false;
+                default:
+                    break;
             }
         }
         format += macro_len;
@@ -218,7 +211,7 @@ bool _is_valid_fn_form(const char* format)
 
 /* Returns true if format is valid, i.e. contains no illegal macros and
 has a maximum length < _MAX_ENTRY_SIZE - 1 when expanded. */
-bool _is_valid_e_form(const char* format)
+bool _is_valid_entry_format(const char* format)
 {
     size_t max_len = 0;
 

@@ -331,6 +331,7 @@ ASALocalRun/
 
 # SELF-ADDED
 
+*.exe
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user

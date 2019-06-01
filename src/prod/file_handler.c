@@ -70,8 +70,8 @@ fhandler_t* fh_init(const char* dname_format,
     }
 
     /* Finish initialization. */
-    fnf_set_format(fh->_fnf, fname_format);
-    fnf_set_format(fh->_dirnf, dname_format);
+    format_set(fh->_fname_formatter, fname_format);
+    format_set(fh->_dname_formatter, dname_format);
     fh->_buf_mode = buf_mode;
     fh->_fstream = NULL;
     fh->_buf_cap = buf_size;
@@ -91,10 +91,10 @@ fhandler_t* fh_init(const char* dname_format,
 /* Frees the memory reserved for fh and its sub-objects. */
 void fh_close(fhandler_t* fh)
 {
-    if (fh->_fstream) { fclose(fh->_fstream);   }
-    if (fh->_fnf)     { fnf_close(fh->_fnf);    }
-    if (fh->_dirnf)   { fnf_close(fh->_dirnf);  }
-    if (fh->_buf)     { _log_dealloc(fh->_buf); }
+    if (fh->_fstream)         { fclose(fh->_fstream); }
+    if (fh->_fname_formatter) { format_free(fh->_fname_formatter); }
+    if (fh->_dname_formatter) { format_free(fh->_dname_formatter); }
+    if (fh->_buf)             { _log_dealloc(fh->_buf); }
 
     _log_dealloc(fh);
 }
@@ -174,7 +174,7 @@ LOG_FILE_MODE fh_file_mode(const fhandler_t* fh)
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format)
 {
-    if (!fnf_set_format(fh->_fnf, format))
+    if (!format_set(fh->_fname_formatter, format))
     {
         return false;
     }
@@ -202,7 +202,7 @@ char* fh_curr_fpath(const fhandler_t* fh, char* dest)
 
 bool fh_set_dname_format(fhandler_t* fh, const char* format)
 {
-    if (!fnf_set_format(fh->_dirnf, format))
+    if (!format_set(fh->_dname_formatter, format))
     {
         return false;
     }
@@ -268,14 +268,14 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 {
     fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
     if (!fh) { return NULL; }
-    fh->_fnf = fnf_init("");
-    fh->_dirnf = fnf_init("");
+    fh->_fname_formatter = format_init("", FORMAT_PATHS);
+    fh->_dname_formatter = format_init("", FORMAT_PATHS);
     fh->_buf = NULL;
     if (buf_size != 0)
     {
         fh->_buf = _log_alloc(buf_size);
     }
-    if (!fh->_fnf || !fh->_dirnf || (!fh->_buf && buf_size))
+    if (!fh->_fname_formatter || !fh->_dname_formatter || (!fh->_buf && buf_size))
     {
         fh_close(fh);
         return NULL;
@@ -361,8 +361,8 @@ void _fh_refresh_path(fhandler_t* fh)
     _clear_str(fh->_cur_dirn);
     _clear_str(fh->_cur_fn);
     _clear_str(fh->_cur_fp);
-    fnf_format(fh->_dirnf, fh->_cur_dirn);
-    fnf_format(fh->_fnf, fh->_cur_fn);
+    format_path(fh->_dname_formatter, fh->_cur_dirn);
+    format_path(fh->_fname_formatter, fh->_cur_fn);
     strcpy(fh->_cur_fp, fh->_cur_dirn);
 #ifdef _USE_WINAPI
     strcat(fh->_cur_fp, _WIN_PATH_DELIM_STR);

@@ -45,7 +45,7 @@ typedef struct
 
 thandler_t* th_init();
 
-void th_close(thandler_t* th);
+void th_free(thandler_t* th);
 
 void th_fetch_ltime(thandler_t* th);
 

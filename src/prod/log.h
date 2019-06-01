@@ -30,7 +30,7 @@ typedef struct
     fhandler_t* _fh;
 
     /* Entry formatter. Required to expand format macros in log entries. */
-    e_format_t* _ef;
+    format_t* _ef;
 
     /* The active threshold level. Any entry with a lower level
     than the threshold level will be ignored. */

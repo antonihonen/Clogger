@@ -54,11 +54,11 @@ typedef struct {
     
     /* File name formatter: required to support user macros
     in file names. */
-    fn_format_t* _fnf;
+    format_t* _fname_formatter;
 
     /* Directory name formatter: required to support user macros
     in directory names. */
-    fn_format_t* _dirnf;
+    format_t* _dname_formatter;
 
     /* The name of the currently active file. */
     char _cur_fn[_MAX_FILENAME_SIZE];

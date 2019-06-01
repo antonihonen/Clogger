@@ -212,5 +212,5 @@ void run_time_handler_tests(char* test_set_title)
     test_get_seconds();
     test_get_mname();
     test_get_wday();
-    th_close(t);
+    th_free(t);
 }
