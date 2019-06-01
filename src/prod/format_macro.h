@@ -10,10 +10,10 @@
  * conforms to the form "<1><2><3><4>",
  * where
  *
- * 1 = __FM_BEGIN_INDIC (begin indicator)
- * 2 = __FM_LEFT_DELIM (left delimiter)
- * 3 = a valid macro body (one of the values in the __FORMAT_MACROS array)
- * 4 = __FM_RIGHT_DELIM (right delimiter)
+ * 1 = _FM_BEGIN_INDIC (begin indicator)
+ * 2 = _FM_LEFT_DELIM (left delimiter)
+ * 3 = a valid macro body (one of the values in the _FORMAT_MACROS array)
+ * 4 = _FM_RIGHT_DELIM (right delimiter)
  * 
  * All of the values presented above have been defined in this module.
  *
@@ -28,93 +28,93 @@
 
 typedef enum
 {
-	/* Suppose it is Sun 7 April 2019 and the time is
-	07:09:01 (hh:mm:ss) in the morning. A log message
-	"\nThis Is Some Weird Log_message\n\n" has been requested to be
-	written into the log with the logging level "trace".
-	Below is listed each macro type along with the
-	value it would expand to. */
-	__FM_NO_MACRO = -1,
-	__FM_YEAR = 1, /* "2019" */
-	__FM_MONTH, /* "04" */
-	__FM_MDAY, /* "07" */
-	__FM_HOUR, /* "07" */
-	__FM_MIN, /* "08" */
-	__FM_SEC, /* "01" */
-	__FM_MNAME_S_F, /* "Apr" (short form -> S, first capitalized -> F) */
-	__FM_MNAME_S_A, /* "APR" (all capitalized -> A) */
-	__FM_MNAME_L_F, /* "April" (long form -> L) */
-	__FM_MNAME_L_A, /* APRIL */
-	__FM_WDAY_S_F, /* "Sun" */
-	__FM_WDAY_S_A, /* "SUN" */
-	__FM_WDAY_L_F, /* "Sunday" */
-	__FM_WDAY_L_A, /* "SUNDAY" */
-	__FM_LVL_N, /* "trace" */
-	__FM_LVL_F, /* "Trace" */
-	__FM_LVL_A, /* "TRACE" */
-	__FM_MSG /* "\nThis Is Some Weird Log_message\n\n" */
-} __FM_ID;
+    /* Suppose it is Sun 7 April 2019 and the time is
+    07:09:01 (hh:mm:ss) in the morning. A log message
+    "\nThis Is Some Weird Log_message\n\n" has been requested to be
+    written into the log with the logging level "trace".
+    Below is listed each macro type along with the
+    value it would expand to. */
+    _FM_NO_MACRO = -1,
+    _FM_YEAR = 1, /* "2019" */
+    _FM_MONTH, /* "04" */
+    _FM_MDAY, /* "07" */
+    _FM_HOUR, /* "07" */
+    _FM_MIN, /* "08" */
+    _FM_SEC, /* "01" */
+    _FM_MNAME_S_F, /* "Apr" (short form -> S, first capitalized -> F) */
+    _FM_MNAME_S_A, /* "APR" (all capitalized -> A) */
+    _FM_MNAME_L_F, /* "April" (long form -> L) */
+    _FM_MNAME_L_A, /* APRIL */
+    _FM_WDAY_S_F, /* "Sun" */
+    _FM_WDAY_S_A, /* "SUN" */
+    _FM_WDAY_L_F, /* "Sunday" */
+    _FM_WDAY_L_A, /* "SUNDAY" */
+    _FM_LVL_N, /* "trace" */
+    _FM_LVL_F, /* "Trace" */
+    _FM_LVL_A, /* "TRACE" */
+    _FM_MSG /* "\nThis Is Some Weird Log_message\n\n" */
+} _FM_ID;
 /* Because the valid macros values start from 1 (above)
 the last macro in the list gives the number of
 valid format macros. */
-#define __FM_COUNT __FM_MSG
+#define _FM_COUNT _FM_MSG
 
 /* Every format macro must begin with this character.
 This character CAN be used normally, however -
 it is only interpreted to be the macro beginning
 when it is followed by a valid macro. */
-#define __FM_BEGIN_INDIC '%'
+#define _FM_BEGIN_INDIC '%'
 /* In a valid macro, this has to come right after
-__FM_BEGIN_INDIC. */
-#define __FM_LEFT_DELIM '('
+_FM_BEGIN_INDIC. */
+#define _FM_LEFT_DELIM '('
 /* In a valid macro, this ends the macro sequence
 and must be preceded by the macro body
 (see below). */
-#define __FM_RIGHT_DELIM ')'
+#define _FM_RIGHT_DELIM ')'
 
 typedef struct
 {
-	char* str;
-	size_t max_len;
-	__FM_HANDLER handler;
-} __fm_info_t;
+    char*       str;
+    size_t      max_len;
+    _FM_HANDLER handler;
+} _fm_info_t;
 
-const __fm_info_t __FM_TABLE[__FM_COUNT];
+const _fm_info_t _FM_TABLE[_FM_COUNT];
 
 /* The body of each macro. */
-#define __FM_YEAR_S "year"
-#define __FM_YEAR_MAX_LEN 4
-#define __FM_MONTH_S "month"
-#define __FM_MONTH_MAX_LEN 2
-#define __FM_MDAY_S "mday"
-#define __FM_MDAY_MAX_LEN 2
-#define __FM_HOUR_S "hour"
-#define __FM_HOUR_MAX_LEN 2
-#define __FM_MIN_S "min"
-#define __FM_MIN_MAX_LEN 2
-#define __FM_SEC_S "sec"
-#define __FM_SEC_MAX_LEN 2
-#define __FM_MNAME_S_F_S "Mname_s"
-#define __FM_MNAME_S_A_S "MNAME_S"
-#define __FM_MNAME_S_MAX_LEN 3
-#define __FM_MNAME_L_F_S "Mname_l"
-#define __FM_MNAME_L_A_S "MNAME_L"
-#define __FM_MNAME_L_MAX_LEN 9 /* strlen("SEPTEMBER") */
-#define __FM_WDAY_S_F_S "Wday_s"
-#define __FM_WDAY_S_A_S "WDAY_S"
-#define __FM_WDAY_S_MAX_LEN 3
-#define __FM_WDAY_L_F_S "Wday_l"
-#define __FM_WDAY_L_A_S "WDAY_L"
-#define __FM_WDAY_L_MAX_LEN 9 /*strlen("WEDNESDAY")*/
-#define __FM_LVL_N_S "lvl"
-#define __FM_LVL_F_S "Lvl"
-#define __FM_LVL_A_S "LVL"
-#define __FM_LVL_MAX_LEN 8 /* strlen("CRITICAL") */
-#define __FM_MSG_S "MSG"
-#define __FM_MSG_MAX_LEN __MAX_MSG_SIZE
+#define _FM_YEAR_S "year"
+#define _FM_YEAR_MAX_LEN 4
+#define _FM_MONTH_S "month"
+#define _FM_MONTH_MAX_LEN 2
+#define _FM_MDAY_S "mday"
+#define _FM_MDAY_MAX_LEN 2
+#define _FM_HOUR_S "hour"
+#define _FM_HOUR_MAX_LEN 2
+#define _FM_MIN_S "min"
+#define _FM_MIN_MAX_LEN 2
+#define _FM_SEC_S "sec"
+#define _FM_SEC_MAX_LEN 2
+#define _FM_MNAME_S_F_S "Mname_s"
+#define _FM_MNAME_S_A_S "MNAME_S"
+#define _FM_MNAME_S_MAX_LEN 3
+#define _FM_MNAME_L_F_S "Mname_l"
+#define _FM_MNAME_L_A_S "MNAME_L"
+#define _FM_MNAME_L_MAX_LEN 9 /* strlen("SEPTEMBER") */
+#define _FM_WDAY_S_F_S "Wday_s"
+#define _FM_WDAY_S_A_S "WDAY_S"
+#define _FM_WDAY_S_MAX_LEN 3
+#define _FM_WDAY_L_F_S "Wday_l"
+#define _FM_WDAY_L_A_S "WDAY_L"
+#define _FM_WDAY_L_MAX_LEN 9 /*strlen("WEDNESDAY")*/
+#define _FM_LVL_N_S "lvl"
+#define _FM_LVL_F_S "Lvl"
+#define _FM_LVL_A_S "LVL"
+#define _FM_LVL_MAX_LEN 8 /* strlen("CRITICAL") */
+#define _FM_MSG_S "MSG"
+#define _FM_MSG_MAX_LEN _MAX_MSG_SIZE
 
 /* The maximum length of a format macro
 in the unexpanded form. */
-#define __MAX_FM_S_LEN 16
+#define _MAX_FM_S_LEN 16
 
 #endif /* FORMAT_MACRO_H */

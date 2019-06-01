@@ -18,6 +18,6 @@
 int main()
 {
     char str[2];
-	fgets(str, 2, stdin);
-	return 0;
+    fgets(str, 2, stdin);
+    return 0;
 }

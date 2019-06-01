@@ -16,22 +16,22 @@
 #include <stdbool.h>
 
 /* Writes '\0' in the ith char of str. */
-void __terminate_str(char* str, size_t i);
+void _terminate_str(char* str, size_t i);
 
 /* Writes '\0' in the first char of str. */
-void __clear_str(char* str);
+void _clear_str(char* str);
 
 /* Returns true if the first char in str is '\0'. */
-bool __is_empty_str(char* str);
+bool _is_empty_str(char* str);
 
 /* Writes the value of i to str with two digits.
 Zero is used as prefix for i < 10, so 1
 will turn into "01" and so on. */
 void
-__two_digit_int_to_str(int i, char* str);
+_two_digit_int_to_str(int i, char* str);
 
 /* Converts alphabetical characters in str to lowercase. */
 void
-__ascii_str_to_lower(char* str);
+_ascii_str_to_lower(char* str);
 
 #endif /* STRING_UTIL_H */

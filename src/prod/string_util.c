@@ -11,65 +11,55 @@
 #include <stdio.h>
 #include <string.h>
 
-#define __ASCII_CAP_AND_SMALL_DIFF 32
+#define _ASCII_CAP_AND_SMALL_DIFF 32
 
-static char __char_to_lower(char c)
+static char _char_to_lower(char c)
 {
-	return c + __ASCII_CAP_AND_SMALL_DIFF;
+    return c + _ASCII_CAP_AND_SMALL_DIFF;
 }
 
-static bool __is_uppercase_c(char c)
+static bool _is_uppercase_c(char c)
 {
-	return c >= 'A' && c <= 'Z' ? true : false;
+    return c >= 'A' && c <= 'Z' ? true : false;
 }
 
-void __terminate_str(char* str, size_t i)
+void _terminate_str(char* str, size_t i)
 {
-	assert(str);
-	str[i] = '\0';
+    str[i] = '\0';
 }
 
-void __clear_str(char* str)
+void _clear_str(char* str)
 {
-	assert(str);
-	__terminate_str(str, 0);
+    _terminate_str(str, 0);
 }
 
-bool __is_empty_str(char* str)
+bool _is_empty_str(char* str)
 {
-	assert(str);
-	return *str == '\0';
+    return *str == '\0';
 }
 
-void
-__two_digit_int_to_str(int i, char* str)
+void _two_digit_int_to_str(int i, char* str)
 {
-	assert(i >= 0);
-	assert(str);
-
-	char format[4];
-	if (i < 10)
-	{
-		strcpy(format, "0%d");
-	}
-	else
-	{
-		strcpy(format, "%d");
-	}
-	sprintf(str, format, i);
+    char format[4];
+    if (i < 10)
+    {
+        strcpy(format, "0%d");
+    }
+    else
+    {
+        strcpy(format, "%d");
+    }
+    sprintf(str, format, i);
 }
 
-void
-__ascii_str_to_lower(char* str)
+void _ascii_str_to_lower(char* str)
 {
-	assert(str);
-
-	while (*str != '\0')
-	{
-		if (__is_uppercase_c(*str))
-		{
-			*str = __char_to_lower(*str);
-		}
-		++str;
-	}
+    while (*str != '\0')
+    {
+        if (_is_uppercase_c(*str))
+        {
+            *str = _char_to_lower(*str);
+        }
+        ++str;
+    }
 }

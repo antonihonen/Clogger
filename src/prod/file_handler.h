@@ -45,116 +45,99 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define __DEF_BUF_SIZE BUFSIZ
+#define _DEF_BUF_SIZE BUFSIZ
 
 /* File handler. */
 typedef struct {
-	/* The file stream used to write in files. */
-	FILE* _fstream;
-	
-	/* File name formatter: required to support user macros
-	in file names. */
-	fn_format_t* _fnf;
+    /* The file stream used to write in files. */
+    FILE* _fstream;
+    
+    /* File name formatter: required to support user macros
+    in file names. */
+    fn_format_t* _fnf;
 
-	/* Directory name formatter: required to support user macros
-	in directory names. */
-	fn_format_t* _dirnf;
+    /* Directory name formatter: required to support user macros
+    in directory names. */
+    fn_format_t* _dirnf;
 
-	/* The name of the currently active file. */
-	char _cur_fn[__MAX_FILENAME_SIZE];
+    /* The name of the currently active file. */
+    char _cur_fn[_MAX_FILENAME_SIZE];
 
-	/* The absolute filepath of the directory where the current
-	log fill resides. */
-	char _cur_dirn[__MAX_FILENAME_SIZE];
+    /* The absolute filepath of the directory where the current
+    log fill resides. */
+    char _cur_dirn[_MAX_FILENAME_SIZE];
 
-	/* The absolute filepath of the currently active log file. */
-	char _cur_fp[__MAX_FILENAME_SIZE];
+    /* The absolute filepath of the currently active log file. */
+    char _cur_fp[_MAX_FILENAME_SIZE];
 
-	/* Output buffer. NULL if buffering mode is _IONBF. */
-	char* _buf;
+    /* Output buffer. NULL if buffering mode is _IONBF. */
+    char* _buf;
 
-	/* The capacity of the buffer in bytes. */
-	size_t _buf_cap;
+    /* The capacity of the buffer in bytes. */
+    size_t _buf_cap;
 
-	/* Buffering mode. One of: _IONBF, _IOLBF, _IOFBF. */
-	int _buf_mode;
+    /* Buffering mode. One of: _IONBF, _IOLBF, _IOFBF. */
+    int _buf_mode;
 
-	/* File mode. One of: ROTATE, REWRITE. */
-	LOG_FILE_MODE _file_mode;
+    /* File mode. One of: ROTATE, REWRITE. */
+    LOG_FILE_MODE _file_mode;
 
-	/* The maximum size of a log file in bytes. Log files are
-	guaranteed to be smaller than this. */
-	size_t _max_fsize;
+    /* The maximum size of a log file in bytes. Log files are
+    guaranteed to be smaller than this. */
+    size_t _max_fsize;
 
-	/* Indicates whether the log directory was created by the
-	file handler. */
-	bool _is_dir_creator;
+    /* Indicates whether the log directory was created by the
+    file handler. */
+    bool _is_dir_creator;
 
-	/* Indicates whether the log file was created by the
-	file handler. */
-	bool _is_file_creator;
-	
-	/* Indicates if the current log file has been written in. */
-	bool _has_file_changed;
+    /* Indicates whether the log file was created by the
+    file handler. */
+    bool _is_file_creator;
+    
+    /* Indicates if the current log file has been written in. */
+    bool _has_file_changed;
 
-	/* Indicates the size of the current log file in bytes. */
-	size_t _current_fsize;
+    /* Indicates the size of the current log file in bytes. */
+    size_t _current_fsize;
 } fhandler_t;
 
-fhandler_t*
-fh_init(const char* const dirn_format,
-	const char* const fn_format,
-	const size_t max_fsize,
-	const LOG_FILE_MODE file_mode,
-	const int buf_mode,
-	size_t bufsize);
+fhandler_t* fh_init(const char* dname_format,
+    const char* fname_format,
+    size_t max_fsize,
+    LOG_FILE_MODE fmode,
+    int buf_mode,
+    size_t buf_size);
 
-void
-fh_close(fhandler_t* const fh);
+void fh_close(fhandler_t* fh);
 
-bool
-fh_set_buf_mode(fhandler_t* const fh, const int mode);
+bool fh_set_buf_mode(fhandler_t* fh, int mode);
 
-int
-fh_buf_mode(const fhandler_t* const fh);
+int fh_buf_mode(const fhandler_t* fh);
 
-bool
-fh_set_buf_size(fhandler_t* const fh, const size_t size);
+bool fh_set_buf_size(fhandler_t* fh, size_t size);
 
-size_t
-fh_buf_size(const fhandler_t* const fh);
+size_t fh_buf_size(const fhandler_t* fh);
 
-bool
-fh_set_file_mode(fhandler_t* const fh, const LOG_FILE_MODE mode);
+bool fh_set_file_mode(fhandler_t* fh, LOG_FILE_MODE mode);
 
-LOG_FILE_MODE
-fh_file_mode(const fhandler_t* const fh);
+LOG_FILE_MODE fh_file_mode(const fhandler_t* fh);
 
-bool
-fh_set_fn_format(fhandler_t* const fh, const char* const format);
+bool fh_set_fname_format(fhandler_t* fh, const char* format);
 
-char*
-fh_curr_fname(const fhandler_t* const fh, char* filename);
+char* fh_curr_fname(const fhandler_t* fh, char* dest);
 
-bool
-fh_set_dirn_format(fhandler_t* const fh, const char* const format);
+char* fh_curr_dname(const fhandler_t* fh, char* dest);
 
-char*
-fh_curr_dirname(const fhandler_t* const fh, char* dir);
+char* fh_curr_fpath(const fhandler_t* fh, char* dest);
 
-char*
-fh_curr_fpath(const fhandler_t* const fh, char* filepath);
+bool fh_set_dname_format(fhandler_t* fh, const char* format);
 
-bool
-fh_set_max_fsize(fhandler_t* const fh, const size_t size);
+bool fh_set_max_fsize(fhandler_t* fh, size_t size);
 
-size_t
-fh_max_fsize(const fhandler_t* const fh);
+size_t fh_max_fsize(const fhandler_t* fh);
 
-size_t
-fh_current_fsize(fhandler_t* const fh);
+size_t fh_current_fsize(const fhandler_t* fh);
 
-bool
-fh_write(fhandler_t* fh, const char* const data_out);
+bool fh_fwrite(fhandler_t* fh, const char* data_out);
 
 #endif /* FILE_HANDLER_H */
