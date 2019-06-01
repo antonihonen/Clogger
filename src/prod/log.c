@@ -15,19 +15,19 @@ __log_malloc(char* dir_form, char* filename_form,
 	LOG_FILE_MODE file_mode, int buf_mode);
 
 log_t*
-log_init(char* dir_form,
-	char* filename_form,
+log_init(char* dirn_format,
+	char* fn_format,
 	LOG_FILE_MODE file_mode,
 	int buf_mode)
 {
-	assert(dir_form); assert(filename_form);
+	assert(dirn_format); assert(fn_format);
 	assert(file_mode == ROTATE || file_mode == REWRITE);
 	assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
 
-	log_t* log = __log_malloc(dir_form, filename_form, file_mode, buf_mode);
+	log_t* log = __log_malloc(dirn_format, fn_format, file_mode, buf_mode);
 	if (!log) { return NULL; }
 
-	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE, file_mode,
+	log->_fh = fh_init(dirn_format, fn_format, __DEF_MAX_FSIZE, file_mode,
 		buf_mode, BUFSIZ);
 	log->_is_enabled = true;
 	log->_threshold = __DEF_THRESHOLD;
@@ -77,15 +77,14 @@ log_threshold(log_t* log)
 }
 
 bool
-log_set_buf_mode(log_t* log, LOG_BUF_MODE mode)
+log_set_buf_mode(log_t* log, int mode)
 {
 	assert(log);
 	assert(mode == _IONBF || mode == _IOLBF || mode == _IOFBF);
-	fh_set_buf_mode(log->_fh, mode);
-	return true;
+	return fh_set_buf_mode(log->_fh, mode);
 }
 
-LOG_BUF_MODE
+int
 log_buf_mode(log_t* log)
 {
 	assert(log);
@@ -114,10 +113,38 @@ log_file_mode(log_t* log)
 }
 
 bool
-log_set_filename_format(log_t* log, char* fn_form)
+log_set_dirn_format(log_t* log, char* format)
 {
-	assert(log); assert(fn_form);
-	return fh_set_fn_format(log->_fh, fn_form);
+	assert(log); assert(format);
+	return fh_set_dirn_format(log->_fh, format);
+}
+
+char*
+log_curr_dirname(log_t* log, char* dir)
+{
+	assert(log); assert(dir);
+	return fh_curr_dirname(log->_fh, dir);
+}
+
+bool
+log_set_fname_format(log_t* log, char* format)
+{
+	assert(log); assert(format);
+	return fh_set_fn_format(log->_fh, format);
+}
+
+char*
+log_curr_fname(log_t* log, char* filename)
+{
+	assert(log); assert(filename);
+	return fh_curr_fname(log->_fh, filename);
+}
+
+char*
+log_curr_fpath(log_t* log, char* filepath)
+{
+	assert(log); assert(filepath);
+	return fh_curr_fpath(log->_fh, filepath);
 }
 
 bool
@@ -141,10 +168,10 @@ log_current_fsize(log_t* log)
 }
 
 extern bool
-log_set_entry_format(log_t* log, char* entry_format)
+log_set_entry_format(log_t* log, char* format)
 {
-	assert(log); assert(entry_format);
-	ef_set_format(log->_ef, entry_format);
+	assert(log); assert(format);
+	ef_set_format(log->_ef, format);
 	return true;
 }
 

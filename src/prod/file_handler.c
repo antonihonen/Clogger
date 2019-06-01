@@ -27,7 +27,7 @@ static fhandler_t*
 __fh_malloc(const size_t bufsize);
 
 static bool
-__fh_open_fstream(fhandler_t* const fh, const char* const data_out);
+__fh_open_fstream(fhandler_t* const fh, size_t data_size);
 
 static inline void
 __fh_refresh_path(fhandler_t* const fh);
@@ -82,6 +82,8 @@ fh_init(const char* const dirn_form,
 	fh->_is_dir_creator = false;
 	fh->_is_file_creator = false;
 	fh->_max_fsize = max_fsize;
+	fh->_current_fsize = 0;
+	__clear_str(fh->_cur_fn);
 	__clear_str(fh->_cur_dirn);
 	__clear_str(fh->_cur_fp);
 
@@ -177,6 +179,40 @@ fh_set_fn_format(fhandler_t* const fh, const char* const format)
 	return true;
 }
 
+char*
+fh_curr_fname(const fhandler_t* const fh, char* filename)
+{
+	assert(fh); assert(filename);
+	strcpy(filename, fh->_cur_fn);
+	return filename;
+}
+
+char*
+fh_curr_dirname(const fhandler_t* const fh, char* dir)
+{
+	assert(fh); assert(dir);
+	strcpy(dir, fh->_cur_dirn);
+	return dir;
+}
+
+char*
+fh_curr_fpath(const fhandler_t* const fh, char* filepath)
+{
+	assert(fh); assert(filepath);
+	strcpy(filepath, fh->_cur_fp);
+	return filepath;
+}
+
+bool
+fh_set_dirn_format(fhandler_t* const fh, const char* const format)
+{
+	assert(fh); assert(format);
+
+	if (!fnf_set_format(fh->_dirnf, format)) { return false; }
+	__fh_refresh_path(fh);
+	return true;
+}
+
 bool
 fh_set_max_fsize(fhandler_t* const fh, const size_t size)
 {
@@ -192,13 +228,22 @@ fh_max_fsize(const fhandler_t* const fh)
 	return fh->_max_fsize;
 }
 
+size_t
+fh_current_fsize(fhandler_t* const fh)
+{
+	assert(fh);
+	return fh->_current_fsize;
+}
+
 bool
 fh_write(fhandler_t* const fh, const char* const data_out)
 {
 	assert(fh); assert(data_out); assert(!fh->_fstream);
 
+	size_t data_size = strlen(data_out);
+
 	/* Attempt to open the correct file. */
-	if (!__fh_open_fstream(fh, data_out)) { return false; }
+	if (!__fh_open_fstream(fh, data_size)) { return false; }
 
 	assert(fh->_fstream);
 
@@ -216,6 +261,7 @@ fh_write(fhandler_t* const fh, const char* const data_out)
 	if (fclose(fh->_fstream) == EOF) { fh->_fstream = NULL; false; }
 	
 	fh->_has_file_changed = true;
+	fh->_current_fsize += data_size;
 	fh->_fstream = NULL;
 
 	return true;
@@ -239,12 +285,11 @@ fhandler_t* __fh_malloc(const size_t bufsize)
 }
 
 bool
-__fh_open_fstream(fhandler_t* const fh, const char* const data_out)
+__fh_open_fstream(fhandler_t* const fh, size_t data_size)
 {
-	assert(fh); assert(data_out);
+	assert(fh);
 
 	/* Attempt to open the correct file up to 3 times. */
-	size_t data_size = strlen(data_out);
 	size_t opening_attempts = 0;
 	while (!fh->_fstream && opening_attempts < __MAX_OPEN_ATTEMPTS)
 	{
@@ -286,6 +331,7 @@ __fh_open_fstream(fhandler_t* const fh, const char* const data_out)
 				if (fclose(fh->_fstream) == EOF) { return false; }
 				fh->_fstream = NULL;
 				__fh_refresh_path(fh);
+				fh->_current_fsize = 0;
 
 				/* Rotate the pre-existing files if rotate mode. */
 				if (fh->_file_mode == ROTATE) { __rotate_files(fh->_cur_fp); }
@@ -309,14 +355,17 @@ __fh_refresh_path(fhandler_t* const fh)
 {
 	assert(fh);
 
-	char fn[__MAX_FILENAME_SIZE];
-
 	/* TODO Add the length of the expanded fn to fn_format_t. */
+	__clear_str(fh->_cur_dirn);
+	__clear_str(fh->_cur_fn);
+	__clear_str(fh->_cur_fp);
 	fnf_format(fh->_dirnf, fh->_cur_dirn);
-	fnf_format(fh->_fnf, fn);
+	fnf_format(fh->_fnf, fh->_cur_fn);
 	strcpy(fh->_cur_fp, fh->_cur_dirn);
+#ifdef __USE_WINAPI
 	strcat(fh->_cur_fp, __WIN_PATH_DELIM_STR);
-	strcat(fh->_cur_fp, fn);
+#endif
+	strcat(fh->_cur_fp, fh->_cur_fn);
 }
 
 bool

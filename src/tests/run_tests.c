@@ -19,7 +19,7 @@ int main()
 {
 	run_perftest("%(year)-%(month)-%(mday) %(hour):%(min):%(sec) %(LVL) %(MSG)\n",
 		"Hello! This is just a tiny little test message!",
-		15);
+		65);
 	run_time_handler_tests("TIME HANDLER TESTS\n");
 	printf("\n");
 	run_formatter_tests("FORMATTER TESTS\n");

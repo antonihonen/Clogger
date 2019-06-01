@@ -60,12 +60,15 @@ typedef struct {
 	in directory names. */
 	fn_format_t* _dirnf;
 
-	/* The absolute filepath of the currently active log file. */
-	char _cur_fp[__MAX_FILENAME_SIZE];
+	/* The name of the currently active file. */
+	char* _cur_fn[__MAX_FILENAME_SIZE];
 
 	/* The absolute filepath of the directory where the current
 	log fill resides. */
 	char _cur_dirn[__MAX_FILENAME_SIZE];
+
+	/* The absolute filepath of the currently active log file. */
+	char _cur_fp[__MAX_FILENAME_SIZE];
 
 	/* Output buffer. NULL if buffering mode is _IONBF. */
 	char* _buf;
@@ -93,11 +96,14 @@ typedef struct {
 	
 	/* Indicates if the current log file has been written in. */
 	bool _has_file_changed;
+
+	/* Indicates the size of the current log file in bytes. */
+	size_t _current_fsize;
 } fhandler_t;
 
 fhandler_t*
-fh_init(const char* const dirn_form,
-	const char* const fn_form,
+fh_init(const char* const dirn_format,
+	const char* const fn_format,
 	const size_t max_fsize,
 	const LOG_FILE_MODE file_mode,
 	const int buf_mode,
@@ -127,11 +133,26 @@ fh_file_mode(const fhandler_t* const fh);
 extern inline bool
 fh_set_fn_format(fhandler_t* const fh, const char* const format);
 
+extern inline char*
+fh_curr_fname(const fhandler_t* const fh, char* filename);
+
+extern inline bool
+fh_set_dirn_format(fhandler_t* const fh, const char* const format);
+
+extern inline char*
+fh_curr_dirname(const fhandler_t* const fh, char* dir);
+
+extern inline char*
+fh_curr_fpath(const fhandler_t* const fh, char* filepath);
+
 extern inline bool
 fh_set_max_fsize(fhandler_t* const fh, const size_t size);
 
 extern inline size_t
 fh_max_fsize(const fhandler_t* const fh);
+
+extern inline size_t
+fh_current_fsize(fhandler_t* const fh);
 
 bool
 fh_write(fhandler_t* fh, const char* const data_out);

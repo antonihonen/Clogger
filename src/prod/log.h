@@ -45,8 +45,8 @@ typedef struct
 /* Initializes a log object. The object can be used
 immediately after initialization. */
 log_t*
-log_init(char* dir_form,
-	char* filename_form,
+log_init(char* dirn_format,
+	char* fn_format,
 	LOG_FILE_MODE file_mode,
 	int buf_mode);
 
@@ -78,13 +78,13 @@ extern inline LOG_LEVEL
 log_threshold(log_t* log);
 
 extern inline bool
-log_set_buf_mode(log_t* log, int policy);
+log_set_buf_mode(log_t* log, int mode);
 
 extern inline int
 log_buf_mode(log_t* log);
 
 extern inline bool
-log_set_buf_size(log_t* log, size_t buffer_size);
+log_set_buf_size(log_t* log, size_t size);
 
 /* Sets the file mode for the log. The file mode
 determines what action is taken when the log file reaches
@@ -96,32 +96,27 @@ log_set_file_mode(log_t* log, LOG_FILE_MODE mode);
 extern inline LOG_FILE_MODE
 log_file_mode(log_t* log);
 
-/* Sets the directory in which the log file will be found.
-Absolute path to the directory is expected. */
 extern inline bool
-log_set_dir(log_t* log, char* dir);
+log_set_dirn_format(log_t* log, char* format);
 
 /* Gets the absolute path of the log file directory. */
 extern inline char*
-log_dir(log_t* log, char* dir);
+log_curr_dirname(log_t* log, char* dir);
 
 /* Sets the file name format for the log. */
 extern inline bool
-log_set_filename_format(log_t* log, char* filename_format);
+log_set_fname_format(log_t* log, char* format);
 
-/* Gets the exact name of the current log file
-including the file format but excluding the
-directory path. */
 extern inline char*
-log_current_filename(log_t* log, char* filename);
+log_curr_fname(log_t* log, char* filename);
 
 /* Returns the full path of the current log file. */
 extern inline char*
-log_filepath(log_t* log, char* path);
+log_curr_fpath(log_t* log, char* filepath);
 
 /* Sets the maximum size of a single log file in bytes. */
 extern inline bool
-log_set_max_fsize(log_t* log, size_t file_size);
+log_set_max_fsize(log_t* log, size_t size);
 
 /* Gets the maximum size of a single log file in bytes. */
 extern inline size_t
@@ -134,7 +129,7 @@ log_current_fsize(log_t* log);
 /* Sets the entry format that all new entries will be formatted
 after. */
 extern inline bool
-log_set_entry_format(log_t* log, char* entry_format);
+log_set_entry_format(log_t* log, char* format);
 
 /* Formats a log message according to the active entry
 format and writes it to the buffer if buffering is enabled
