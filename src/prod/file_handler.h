@@ -61,7 +61,7 @@ typedef struct {
 	fn_format_t* _dirnf;
 
 	/* The name of the currently active file. */
-	char* _cur_fn[__MAX_FILENAME_SIZE];
+	char _cur_fn[__MAX_FILENAME_SIZE];
 
 	/* The absolute filepath of the directory where the current
 	log fill resides. */
@@ -109,49 +109,49 @@ fh_init(const char* const dirn_format,
 	const int buf_mode,
 	size_t bufsize);
 
-extern inline void
+void
 fh_close(fhandler_t* const fh);
 
-extern inline bool
+bool
 fh_set_buf_mode(fhandler_t* const fh, const int mode);
 
-extern inline int
+int
 fh_buf_mode(const fhandler_t* const fh);
 
-extern inline bool
+bool
 fh_set_buf_size(fhandler_t* const fh, const size_t size);
 
-extern inline size_t
+size_t
 fh_buf_size(const fhandler_t* const fh);
 
-extern inline bool
+bool
 fh_set_file_mode(fhandler_t* const fh, const LOG_FILE_MODE mode);
 
-extern inline LOG_FILE_MODE
+LOG_FILE_MODE
 fh_file_mode(const fhandler_t* const fh);
 
-extern inline bool
+bool
 fh_set_fn_format(fhandler_t* const fh, const char* const format);
 
-extern inline char*
+char*
 fh_curr_fname(const fhandler_t* const fh, char* filename);
 
-extern inline bool
+bool
 fh_set_dirn_format(fhandler_t* const fh, const char* const format);
 
-extern inline char*
+char*
 fh_curr_dirname(const fhandler_t* const fh, char* dir);
 
-extern inline char*
+char*
 fh_curr_fpath(const fhandler_t* const fh, char* filepath);
 
-extern inline bool
+bool
 fh_set_max_fsize(fhandler_t* const fh, const size_t size);
 
-extern inline size_t
+size_t
 fh_max_fsize(const fhandler_t* const fh);
 
-extern inline size_t
+size_t
 fh_current_fsize(fhandler_t* const fh);
 
 bool

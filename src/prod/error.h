@@ -29,12 +29,12 @@ typedef enum {
 
 /* Stores an error code that can be fetched
 by calling log_get_error. */
-extern inline bool
+bool
 __register_error(LOG_ERROR error);
 
 /* Returns the last error registered by
 calling __register_error. */
-extern inline LOG_ERROR
+LOG_ERROR
 log_get_error();
 
 #endif /* ERROR_H */

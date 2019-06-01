@@ -46,31 +46,31 @@ typedef struct
 thandler_t*
 th_init();
 
-extern inline void
+void
 th_close(thandler_t* th);
 
-extern inline void
+void
 th_fetch_ltime(thandler_t* th);
 
-extern inline bool
+bool
 th_has_legal_state(thandler_t* th);
 
-extern inline void
+void
 th_get_year(thandler_t* th, char* year);
 
-extern inline void
+void
 th_get_month(thandler_t* th, char* month);
 
-extern inline void
+void
 th_get_mday(thandler_t* th, char* mday);
 
-extern inline void
+void
 th_get_hour(thandler_t* th, char* hours);
 
-extern inline void
+void
 th_get_min(thandler_t* th, char* mins);
 
-extern inline void
+void
 th_get_sec(thandler_t* th, char* secs);
 
 void

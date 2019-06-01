@@ -16,13 +16,13 @@
 #include <stdbool.h>
 
 /* Writes '\0' in the ith char of str. */
-extern inline void __terminate_str(char* str, size_t i);
+void __terminate_str(char* str, size_t i);
 
 /* Writes '\0' in the first char of str. */
-extern inline void __clear_str(char* str);
+void __clear_str(char* str);
 
 /* Returns true if the first char in str is '\0'. */
-extern inline bool __is_empty_str(char* str);
+bool __is_empty_str(char* str);
 
 /* Writes the value of i to str with two digits.
 Zero is used as prefix for i < 10, so 1

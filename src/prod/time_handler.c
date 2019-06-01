@@ -29,11 +29,11 @@ static const char* const WEEKDAYS[7] =
 thandler_t*
 th_init()
 {
-	thandler_t* new_th = __get_alloc()(sizeof(thandler_t));
-	struct tm* new_ltime = __get_alloc()(sizeof(struct tm));
+	thandler_t* new_th = _log_alloc(sizeof(thandler_t));
+	struct tm* new_ltime = _log_alloc(sizeof(struct tm));
 	if (!new_th || !new_ltime)
 	{
-		if (new_th) { __get_dealloc()(new_th); }
+		if (new_th) { _log_dealloc(new_th); }
 		return NULL;
 	}
 	new_th->_ltime = new_ltime;
@@ -46,8 +46,8 @@ void
 th_close(thandler_t* th)
 {
 	assert(th);
-	__get_dealloc()(th->_ltime);
-	__get_dealloc()(th);
+	_log_dealloc(th->_ltime);
+	_log_dealloc(th);
 }
 
 bool

@@ -29,16 +29,16 @@ __fh_malloc(const size_t bufsize);
 static bool
 __fh_open_fstream(fhandler_t* const fh, size_t data_size);
 
-static inline void
+static void
 __fh_refresh_path(fhandler_t* const fh);
 
 static bool
 __rotate_files(const char* const abs_filepath);
 
-static inline bool
+static bool
 __file_size(FILE* const fstream, fpos_t* const size);
 
-static inline bool
+static bool
 __does_dir_exist(const char* const abs_path);
 
 static bool
@@ -47,7 +47,7 @@ __create_dir(const char* const abs_path);
 static bool
 __remove_dir(const char* const abs_path);
 
-static inline bool
+static bool
 __does_file_exist(const char* const abs_filepath);
 
 /* Allocates and initializes a new fhandler_t object and returns
@@ -99,8 +99,8 @@ fh_close(fhandler_t* const fh)
 	if (fh->_fstream) { fclose(fh->_fstream); }
 	if (fh->_fnf) { fnf_close(fh->_fnf); }
 	if (fh->_dirnf) { fnf_close(fh->_dirnf); }
-	if (fh->_buf) { __get_dealloc()(fh->_buf); }
-	__get_dealloc()(fh);
+	if (fh->_buf) { _log_dealloc(fh->_buf); }
+	_log_dealloc(fh);
 }
 
 bool
@@ -113,12 +113,12 @@ fh_set_buf_mode(fhandler_t* const fh, const int mode)
 
 	if (mode == _IONBF)
 	{
-		if (fh->_buf) { __get_dealloc()(fh->_buf); fh->_buf = NULL; }
+		if (fh->_buf) { _log_dealloc(fh->_buf); fh->_buf = NULL; }
 		fh->_buf_cap = 0;
 	}
 	else
 	{
-		fh->_buf = __get_alloc()(__DEF_BUF_SIZE);
+		fh->_buf = _log_alloc(__DEF_BUF_SIZE);
 		if (!fh->_buf) { return false; }
 	}
 	
@@ -141,8 +141,8 @@ fh_set_buf_size(fhandler_t* const fh, const size_t size)
 	if (fh->_buf_cap == size) { return true; }
 	else if (size == 0) { return fh_set_buf_mode(fh, _IONBF); }
 	
-	if (fh->_buf) { __get_dealloc()(fh->_buf); fh->_buf = NULL; }
-	fh->_buf = __get_alloc()(size);
+	if (fh->_buf) { _log_dealloc(fh->_buf); fh->_buf = NULL; }
+	fh->_buf = _log_alloc(size);
 	fh->_buf_cap = size;
 	return true;
 }
@@ -270,12 +270,12 @@ fh_write(fhandler_t* const fh, const char* const data_out)
 /* Allocates memory for the fhandler object and its sub-objects. */
 fhandler_t* __fh_malloc(const size_t bufsize)
 {
-	fhandler_t* fh = __get_alloc()(sizeof(fhandler_t));
+	fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
 	if (!fh) { return NULL; }
 	fh->_fnf = fnf_init("");
 	fh->_dirnf = fnf_init("");
 	fh->_buf = NULL;
-	if (bufsize) { fh->_buf = __get_alloc()(bufsize); }
+	if (bufsize) { fh->_buf = _log_alloc(bufsize); }
 	if (!fh->_fnf || !fh->_dirnf || (!fh->_buf && bufsize))
 	{
 		fh_close(fh);

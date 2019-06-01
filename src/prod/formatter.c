@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-static inline __FM_HANDLER
+static __FM_HANDLER
 __get_fm_handler(const __FM_ID id);
 
 /* TODO: Make static after refactoring tests. */
@@ -47,7 +47,7 @@ fn_format_t*
 fnf_init(const char* const format)
 {
 	assert(format);
-	fn_format_t* new_fnf = __get_alloc()(sizeof(fn_format_t));
+	fn_format_t* new_fnf = _log_alloc(sizeof(fn_format_t));
 	thandler_t* new_th = th_init();
 
 	if (new_fnf && new_th
@@ -59,7 +59,7 @@ fnf_init(const char* const format)
 
 	/* Memory allocation failed or format was invalid. Clean up
 	and return NULL. */
-	if (new_fnf) { __get_dealloc()(new_fnf); }
+	if (new_fnf) { _log_dealloc(new_fnf); }
 	return NULL;
 }
 
@@ -90,7 +90,7 @@ fnf_close(fn_format_t* const fnf)
 {
 	assert(fnf);
 	th_close(fnf->_th);
-	__get_dealloc()(fnf);
+	_log_dealloc(fnf);
 }
 
 /* Entry formatter functions. */
@@ -99,7 +99,7 @@ e_format_t*
 ef_init(const char* const format)
 {
 	assert(format);
-	e_format_t* new_ef = __get_alloc()(sizeof(e_format_t));
+	e_format_t* new_ef = _log_alloc(sizeof(e_format_t));
 	thandler_t* new_th = th_init();
 
 	if (new_ef && new_th && ef_set_format(new_ef, format))
@@ -110,7 +110,7 @@ ef_init(const char* const format)
 
 	/* Memory allocation failed or format was invalid. Clean up
 	and return NULL. */
-	if (new_ef) { __get_dealloc()(new_ef); }
+	if (new_ef) { _log_dealloc(new_ef); }
 	return NULL;
 }
 
@@ -139,7 +139,7 @@ ef_close(e_format_t* const ef)
 {
 	assert(ef);
 	th_close(ef->_th);
-	__get_dealloc()(ef);
+	_log_dealloc(ef);
 }
 
 /* Helper functions. */
@@ -267,7 +267,7 @@ __identify_fm(const char* const macro, size_t* const macro_len)
 	char macro_as_str[__MAX_FM_S_LEN];
 	__fm_as_str(macro, macro_as_str, macro_len);
 
-	if (macro_len == 1 && strncmp(macro_as_str, "%", 1) == 0)
+	if (*macro_len == 1 && strncmp(macro_as_str, "%", 1) == 0)
 	{
 		return __FM_NO_MACRO;
 	}

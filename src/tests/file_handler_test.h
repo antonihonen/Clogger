@@ -13,4 +13,6 @@
 
 #include "..\prod\file_handler.h"
 
+void run_file_handler_tests(char* test_set_title);
+
 #endif /* FILE_HANDLER_TEST_H */

@@ -69,17 +69,17 @@ fnf_init(const char* const format);
 /* Sets a new format string for the formatter. Returns true if
 the format string was valid, false otherwise (contained illegal
 macros and/or was too long). */
-extern inline bool
+bool
 fnf_set_format(fn_format_t* const fnf, const char* const format);
 
 /* Updates the file name according to the format string
 contained by fnf and writes it to formatted_filename. */
-extern inline void
+void
 fnf_format(fn_format_t* const fnf, char* formatted_filename);
 
 /* Deallocates all memory reserved by the formatter.
 Must always be called when discarding a formatter.*/
-extern inline void
+void
 fnf_close(fn_format_t* const fnf);
 
 /* Entry formatter functions. */
@@ -90,18 +90,18 @@ functions above. */
 e_format_t*
 ef_init(const char* const format);
 
-extern inline bool
+bool
 ef_set_format(e_format_t* const ef, const char* const format);
 
 /* Msg and lvl indicate the message requested to be written and the
 level of the request. These are needed here because only an entry
 format string is allowed to contain the macros corresponding with
 these two. */
-extern inline void
+void
 ef_format(e_format_t* const ef, char* formatted_entry, const char* const msg,
 	const LOG_LEVEL lvl);
 
-extern inline void
+void
 ef_close(e_format_t* const ef);
 
 #endif /* FORMATTER_H */

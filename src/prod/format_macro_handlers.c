@@ -17,7 +17,7 @@
 to the char buffers they write in.*/
 
 /* Writes src to dest and adds spaces until dest is target_len chars long. */
-static inline size_t
+static size_t
 __write_and_pad(char* dest, char* src, size_t target_len)
 {
 	strcpy(dest, src);

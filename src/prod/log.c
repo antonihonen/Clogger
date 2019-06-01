@@ -10,7 +10,7 @@
 #include "log.h"
 #include <assert.h>
 
-static inline log_t*
+static log_t*
 __log_malloc(char* dir_form, char* filename_form,
 	LOG_FILE_MODE file_mode, int buf_mode);
 
@@ -41,7 +41,7 @@ bool log_close(log_t* log)
 
 	if (log->_fh) { fh_close(log->_fh); }
 	if (log->_ef) { ef_close(log->_ef); }
-	__get_dealloc()(log);
+	_log_dealloc(log);
 	return true;
 }
 
@@ -167,7 +167,7 @@ log_current_fsize(log_t* log)
 	return 0;
 }
 
-extern bool
+bool
 log_set_entry_format(log_t* log, char* format)
 {
 	assert(log); assert(format);
@@ -175,7 +175,7 @@ log_set_entry_format(log_t* log, char* format)
 	return true;
 }
 
-extern bool
+bool
 log_write(log_t* log, LOG_LEVEL level, char* message)
 {
 	assert(log); assert(message);
@@ -237,7 +237,7 @@ log_t*
 __log_malloc(char* dir_form, char* filename_form,
 	LOG_FILE_MODE file_mode, int buf_mode)
 {
-	log_t* log = __get_alloc()(sizeof(log_t));
+	log_t* log = _log_alloc(sizeof(log_t));
 	if (!log) { return NULL; }
 
 	log->_fh = fh_init(dir_form, filename_form, __DEF_MAX_FSIZE,

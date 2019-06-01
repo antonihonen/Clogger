@@ -17,16 +17,7 @@
 
 int main()
 {
-	run_perftest("%(year)-%(month)-%(mday) %(hour):%(min):%(sec) %(LVL) %(MSG)\n",
-		"Hello! This is just a tiny little test message!",
-		65);
-	run_time_handler_tests("TIME HANDLER TESTS\n");
-	printf("\n");
-	run_formatter_tests("FORMATTER TESTS\n");
-	printf("\n");
-	run_file_handler_tests("FILE HANDLER TESTS\n");
-	printf("\nTests passed, press Enter to finish.\n");
-	char str[2];
+    char str[2];
 	fgets(str, 2, stdin);
 	return 0;
 }

@@ -10,28 +10,32 @@
 #include <assert.h>
 #include <malloc.h>
 
+ /* Determines whether a call to __register_alloc will be effective
+ or not. */
+static bool can_register_alloc = true;
+
 /* Pointers to the active allocator and deallocator functions. */
-static void* (*__ALLOC_FUN)(size_t) = malloc;
-static void (*__DEALLOC_FUN)(void*) = free;
+static void* (*alloc_fun)(size_t) = malloc;
+static void (*dealloc_fun)(void*) = free;
 
 bool
-__register_alloc(void* (*alloc)(size_t), void (*dealloc)(void*))
+log_register_allocator(void* (*alloc)(size_t), void (*dealloc)(void*))
 {
 	assert(alloc); assert(dealloc);
 
-	if (!__CAN_REGISTER_ALLOC) { return false; }
+	if (!can_register_alloc) { return false; }
 
-	__ALLOC_FUN = alloc;
-	__DEALLOC_FUN = dealloc;
+	alloc_fun = alloc;
+	dealloc_fun = dealloc;
 	return true;
 }
 
-void* (*__get_alloc())(size_t)
+void* _log_alloc(size_t size)
 {
-	return __ALLOC_FUN;
+	return alloc_fun(size);
 }
 
-void (*__get_dealloc())(void*)
+void _log_dealloc(void* ptr)
 {
-	return __DEALLOC_FUN;
+	dealloc_fun(ptr);
 }

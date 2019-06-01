@@ -53,82 +53,82 @@ log_init(char* dirn_format,
 /* Enables writing to the log. When writing is enabled,
 entries that exceed the active entry threshold will be
 accepted. */
-extern inline bool
+bool
 log_enable(log_t* log);
 
 /* Disables writing to the log. When writing is disabled,
 all entries will be ignored. */
-extern inline bool
+bool
 log_disable(log_t* log);
 
 /* Releases all resources occupied by the log object.
 Flushes log output buffer if any. */
-extern inline bool
+bool
 log_close(log_t* log);
 
 /* Sets a log level threshold which log entries will have
 to exceed in order to be accepted to be written into the log
 file. Accepted values are: TRACE < DEBUG < INFO < WARNING
 < ERROR < CRITICAL. */
-extern inline bool
+bool
 log_set_threshold(log_t* log, LOG_LEVEL threshold);
 
 /* Gets the active log entry threshold. */
-extern inline LOG_LEVEL
+LOG_LEVEL
 log_threshold(log_t* log);
 
-extern inline bool
+bool
 log_set_buf_mode(log_t* log, int mode);
 
-extern inline int
+int
 log_buf_mode(log_t* log);
 
-extern inline bool
+bool
 log_set_buf_size(log_t* log, size_t size);
 
 /* Sets the file mode for the log. The file mode
 determines what action is taken when the log file reaches
 its maximum size. */
-extern inline bool
+bool
 log_set_file_mode(log_t* log, LOG_FILE_MODE mode);
 
 /* Gets the active file mode. */
-extern inline LOG_FILE_MODE
+LOG_FILE_MODE
 log_file_mode(log_t* log);
 
-extern inline bool
+bool
 log_set_dirn_format(log_t* log, char* format);
 
 /* Gets the absolute path of the log file directory. */
-extern inline char*
+char*
 log_curr_dirname(log_t* log, char* dir);
 
 /* Sets the file name format for the log. */
-extern inline bool
+bool
 log_set_fname_format(log_t* log, char* format);
 
-extern inline char*
+char*
 log_curr_fname(log_t* log, char* filename);
 
 /* Returns the full path of the current log file. */
-extern inline char*
+char*
 log_curr_fpath(log_t* log, char* filepath);
 
 /* Sets the maximum size of a single log file in bytes. */
-extern inline bool
+bool
 log_set_max_fsize(log_t* log, size_t size);
 
 /* Gets the maximum size of a single log file in bytes. */
-extern inline size_t
+size_t
 log_max_fsize(log_t* log);
 
 /* Gets the current size of the current log file in bytes. */
-extern inline size_t
+size_t
 log_current_fsize(log_t* log);
 
 /* Sets the entry format that all new entries will be formatted
 after. */
-extern inline bool
+bool
 log_set_entry_format(log_t* log, char* format);
 
 /* Formats a log message according to the active entry
@@ -137,31 +137,31 @@ or directly to the log file if buffering is disabled. The
 message will be ignored if the logging level of the message
 doesn't exceed the active entry threshold of the log object.
 */
-extern inline bool
+bool
 log_write(log_t* log, LOG_LEVEL level, char* message);
 
 /* The same as log_write but with logging level implicitly set to TRACE. */
-extern inline bool
+bool
 log_trace(log_t* log, char* message);
 
 /* The same as log_write but with logging level implicitly set to DEBUG. */
-extern inline bool
+bool
 log_debug(log_t* log, char* message);
 
 /* The same as log_write but with logging level implicitly set to INFO. */
-extern inline bool
+bool
 log_info(log_t* log, char* message);
 
 /* The same as log_write but with logging level implicitly set to WARNING. */
-extern inline bool
+bool
 log_warning(log_t* log, char* message);
 
 /* The same as log_write but with logging level implicitly set to ERROR. */
-extern inline bool
+bool
 log_error(log_t* log, char* message);
 
 /* The same as log_write but with logging level implicitly set to CRITICAL. */
-extern inline bool
+bool
 log_critical(log_t* log, char* message);
 
 #endif /* LOG_H */

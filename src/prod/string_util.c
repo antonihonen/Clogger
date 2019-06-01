@@ -13,12 +13,12 @@
 
 #define __ASCII_CAP_AND_SMALL_DIFF 32
 
-static inline char __char_to_lower(char c)
+static char __char_to_lower(char c)
 {
 	return c + __ASCII_CAP_AND_SMALL_DIFF;
 }
 
-static inline bool __is_uppercase_c(char c)
+static bool __is_uppercase_c(char c)
 {
 	return c >= 'A' && c <= 'Z' ? true : false;
 }
