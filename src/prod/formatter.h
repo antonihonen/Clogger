@@ -47,11 +47,11 @@
 typedef struct {
     char        _format[_MAX_ENTRY_SIZE];
     thandler_t* _thandler;
-    uint8_t     _flags;
     struct tm   _time;
+    uint16_t    _flags;
 } format_t;
 
-format_t* format_init(const char* format, uint8_t flags);
+format_t* format_init(const char* format, uint16_t flags);
 
 bool format_set(format_t* formatter, const char* format);
 

@@ -13,24 +13,34 @@
 static log_t* _log_t_alloc(const char* dname_format,
                            const char* fname_format,
                            LOG_FILE_MODE file_mode,
-                           int buf_mode);
+                           int buf_mode,
+                           uint16_t flags);
 
 log_t* log_init(const char* dname_format,
                 const char* fname_format,
                 LOG_FILE_MODE file_mode,
-                int buf_mode)
+                int buf_mode,
+                uint16_t flags)
 {
     assert(file_mode == ROTATE || file_mode == REWRITE);
     assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
 
-    log_t* log = _log_t_alloc(dname_format, fname_format, file_mode, buf_mode);
+    log_t* log = _log_t_alloc(dname_format, fname_format, file_mode, buf_mode, flags);
     if (!log)
     {
         return NULL;
     }
 
-    log->_fh = fh_init(dname_format, fname_format, _DEF_MAX_FSIZE, file_mode,
-        buf_mode, BUFSIZ);
+    log->_flags = flags;
+    if (!(flags & _PRINT_ONLY))
+    {
+        log->_fh = fh_init(dname_format, fname_format, _DEF_MAX_FSIZE, file_mode,
+            buf_mode, BUFSIZ, flags);
+    }
+    else
+    {
+        log->_fh = NULL;
+    }
     log->_is_enabled = true;
     log->_threshold = _DEF_THRESHOLD;
 
@@ -39,7 +49,7 @@ log_t* log_init(const char* dname_format,
 
 bool log_close(log_t* log)
 {
-    if (log->_fh) { fh_close(log->_fh); }
+    if (log->_fh) { fh_free(log->_fh); }
     if (log->_ef) { format_free(log->_ef); }
     _log_dealloc(log);
     return true;
@@ -82,11 +92,19 @@ int log_buf_mode(log_t* log)
 
 bool log_set_buf_size(log_t* log, size_t buf_size)
 {
+    if (!(log->_flags & _PRINT_ONLY))
+    {
+        return false;
+    }
     return fh_set_buf_size(log->_fh, buf_size);
 }
 
 bool log_set_file_mode(log_t* log, LOG_FILE_MODE mode)
 {
+    if (!(log->_flags & _PRINT_ONLY))
+    {
+        return false;
+    }
     return fh_set_file_mode(log->_fh, mode);
 }
 
@@ -148,8 +166,13 @@ bool log_write(log_t* log, LOG_LEVEL level, const char* message)
 
     if (level >= log->_threshold && log->_is_enabled)
     {
+        if (log->_flags & _PRINT)
+        {
+            printf(formatted_msg);
+        }
         return fh_fwrite(log->_fh, formatted_msg);
     }
+
     return false;
 }
 
@@ -186,7 +209,8 @@ bool log_critical(log_t* log, const char* message)
 log_t* _log_t_alloc(const char* dname_format,
                     const char* fname_format,
                     LOG_FILE_MODE file_mode,
-                    int buf_mode)
+                    int buf_mode,
+                    uint16_t flags)
 {
     log_t* log = _log_alloc(sizeof(log_t));
     if (!log)
@@ -199,7 +223,8 @@ log_t* _log_t_alloc(const char* dname_format,
                        _DEF_MAX_FSIZE,
                        file_mode,
                        buf_mode,
-                       BUFSIZ);
+                       BUFSIZ,
+                       flags);
     log->_ef = format_init(_DEF_ENTRY_FORMAT, _FORMAT_ENTRIES);
     if (!log->_fh || !log->_ef)
     {

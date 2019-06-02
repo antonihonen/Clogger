@@ -65,7 +65,7 @@ static char* _get_lvl(LOG_LEVEL lvl,
 
 bool _formatter_is_valid_format(const format_t* formatter, const char* format);
 
-format_t* format_init(const char* format, uint8_t flags)
+format_t* format_init(const char* format, uint16_t flags)
 {
     if (!((flags & _FORMAT_PATHS) || (flags & _FORMAT_ENTRIES)))
     {
@@ -192,32 +192,32 @@ static char* _formatter_do_format(format_t* formatter,
 {
     _formatter_get_time(formatter);
 
-    char* fm_begin = strchr(formatter->_format, _FM_BEGIN_INDIC);
-    char* format_head = formatter->_format;
-    while (fm_begin != NULL)
+    char* src = formatter->_format;
+    char* src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
+    while (src_fm_begin != NULL)
     {
         /* TODO Optimize */
-        while (format_head != fm_begin)
+        while (src != src_fm_begin)
         {
-            *(dest++) = *(format_head++);
+            *(dest++) = *(src++);
         }
-        fm_info_t fm = _formatter_recognize_fm(formatter, fm_begin);
+        fm_info_t fm = _formatter_recognize_fm(formatter, src_fm_begin);
         if (fm.id != _FM_NO_MACRO)
         {
             dest += _formatter_expand_fm(formatter, dest, fm.id, msg, lvl);
-            format_head += fm.len;
+            src += fm.len;
         }
         else
         {
-            *(dest++) = *(format_head++);
+            *(dest++) = *(src++);
         }
-        fm_begin = strchr(format_head, _FM_BEGIN_INDIC);
+        src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
     }
-    while (*format_head != '\0')
+    while (*src != '\0')
     {
-        *(dest++) = *(format_head++);
+        *(dest++) = *(src++);
     }
-    *dest = *format_head;
+    *dest = *src;
     return dest;
 }
 

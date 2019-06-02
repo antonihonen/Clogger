@@ -99,6 +99,8 @@ typedef struct {
 
     /* Indicates the size of the current log file in bytes. */
     size_t _current_fsize;
+
+    uint16_t _flags;
 } fhandler_t;
 
 fhandler_t* fh_init(const char* dname_format,
@@ -106,9 +108,10 @@ fhandler_t* fh_init(const char* dname_format,
     size_t max_fsize,
     LOG_FILE_MODE fmode,
     int buf_mode,
-    size_t buf_size);
+    size_t buf_size,
+    uint16_t flags);
 
-void fh_close(fhandler_t* fh);
+void fh_free(fhandler_t* fh);
 
 bool fh_set_buf_mode(fhandler_t* fh, int mode);
 

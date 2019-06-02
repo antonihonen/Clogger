@@ -11,6 +11,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include "flags.h"
 #include "file_handler.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -40,12 +41,15 @@ typedef struct
     if not, all entries are ignored as if their level
     was lower than the entry threshold. */
     bool _is_enabled;
+
+    uint16_t _flags;
 } log_t;
 
 log_t* log_init(const char* dname_format,
                 const char* fname_format,
                 LOG_FILE_MODE file_mode,
-                int buf_mode);
+                int buf_mode,
+                uint16_t flags);
 
 bool log_close(log_t* log);
 

@@ -7,6 +7,7 @@
  */
 
 #include "alloc.h"
+#include "flags.h"
 #include "file_handler.h"
 #include "string_util.h"
 #include <assert.h>
@@ -48,7 +49,8 @@ fhandler_t* fh_init(const char* dname_format,
                     size_t max_fsize,
                     LOG_FILE_MODE fmode,
                     int buf_mode,
-                    size_t buf_size)
+                    size_t buf_size,
+                    uint16_t flags)
 {
     /* Assert parameter validity and/or correctness. */
     assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
@@ -81,6 +83,7 @@ fhandler_t* fh_init(const char* dname_format,
     fh->_is_file_creator = false;
     fh->_max_fsize = max_fsize;
     fh->_current_fsize = 0;
+    fh->_flags = flags;
     _clear_str(fh->_cur_fn);
     _clear_str(fh->_cur_dirn);
     _clear_str(fh->_cur_fp);
@@ -89,12 +92,12 @@ fhandler_t* fh_init(const char* dname_format,
 }
 
 /* Frees the memory reserved for fh and its sub-objects. */
-void fh_close(fhandler_t* fh)
+void fh_free(fhandler_t* fh)
 {
-    if (fh->_fstream)         { fclose(fh->_fstream); }
+    if (fh->_fstream)         { fclose(fh->_fstream);              }
     if (fh->_fname_formatter) { format_free(fh->_fname_formatter); }
     if (fh->_dname_formatter) { format_free(fh->_dname_formatter); }
-    if (fh->_buf)             { _log_dealloc(fh->_buf); }
+    if (fh->_buf)             { _log_dealloc(fh->_buf);            }
 
     _log_dealloc(fh);
 }
@@ -148,6 +151,10 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size)
     
     if (fh->_buf)
     {
+        if (fh->_fstream)
+        {
+            fclose(fh->_fstream);
+        }
         _log_dealloc(fh->_buf);
     }    
     fh->_buf = _log_alloc(size);
@@ -228,9 +235,8 @@ size_t fh_current_fsize(const fhandler_t* fh)
 
 bool fh_fwrite(fhandler_t* fh, const char* data_out)
 {
-    assert(!fh->_fstream);
-
     size_t data_size = strlen(data_out);
+    bool new_fstream = fh->_fstream ? false : true;
 
     /* Attempt to open the correct file. */
     if (!_fh_open_fstream(fh, data_size))
@@ -238,10 +244,11 @@ bool fh_fwrite(fhandler_t* fh, const char* data_out)
         return false;
     }
 
-    assert(fh->_fstream);
-
     /* Set output buffer if any. */
-    setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
+    if (new_fstream)
+    {
+        setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
+    }
 
     /* Write. */
     if (fputs(data_out, fh->_fstream) == EOF)
@@ -250,15 +257,9 @@ bool fh_fwrite(fhandler_t* fh, const char* data_out)
         fh->_fstream = NULL;
         return false;
     }
-    
-    if (fclose(fh->_fstream) == EOF)
-    {
-        fh->_fstream = NULL;
-    }
-    
+
     fh->_has_file_changed = true;
-    fh->_current_fsize += data_size;
-    fh->_fstream = NULL;
+    fh->_current_fsize += data_size;    
 
     return true;
 }
@@ -277,7 +278,7 @@ fhandler_t* _fh_alloc(const size_t buf_size)
     }
     if (!fh->_fname_formatter || !fh->_dname_formatter || (!fh->_buf && buf_size))
     {
-        fh_close(fh);
+        fh_free(fh);
         return NULL;
     }
     return fh;
@@ -285,6 +286,19 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 
 bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 {
+    if (fh->_fstream)
+    {
+        if (fh->_current_fsize > fh->_max_fsize - write_size)
+        {
+            fclose(fh->_fstream);
+            fh->_fstream = NULL;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     /* Attempt to open the correct file up to 3 times. */
     size_t opening_attempts = 0;
     while (!fh->_fstream && opening_attempts < _MAX_OPEN_ATTEMPTS)
