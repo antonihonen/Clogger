@@ -38,17 +38,16 @@
 
 #include "log_level.h"
 #include "macros.h"
-#include "time_handler.h"
 #include <stdint.h>
+#include <time.h>
 
 #define _FORMAT_PATHS 0x01
 #define _FORMAT_ENTRIES 0x02
 
 typedef struct {
-    char        _format[_MAX_ENTRY_SIZE];
-    thandler_t* _thandler;
-    struct tm   _time;
-    uint16_t    _flags;
+    char format[_MAX_ENTRY_SIZE];
+    struct tm time;
+    uint16_t flags;
 } format_t;
 
 format_t* format_init(const char* format, uint16_t flags);

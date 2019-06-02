@@ -10,7 +10,6 @@
 #include "fmacro.h"
 #include "formatter.h"
 #include "string_util.h"
-#include "time_handler.h"
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -73,12 +72,10 @@ format_t* format_init(const char* format, uint16_t flags)
     }
 
     format_t* formatter = _log_alloc(sizeof(format_t));
-    thandler_t* thandler = th_init();
 
-    if (formatter && thandler)
+    if (formatter)
     {
-        formatter->_flags = flags;
-        formatter->_thandler = thandler;
+        formatter->flags = flags;
         if (format_set(formatter, format))
         {
             return formatter;
@@ -91,16 +88,11 @@ format_t* format_init(const char* format, uint16_t flags)
     {
         _log_dealloc(formatter);
     }
-    if (thandler)
-    {
-        _log_dealloc(formatter);
-    }
     return NULL;
 }
 
 void format_free(format_t* formatter)
 {
-    th_free(formatter->_thandler);
     _log_dealloc(formatter);
 }
 
@@ -111,7 +103,7 @@ bool format_set(format_t* formatter, const char* format)
         return false;
     }
     
-    strcpy(formatter->_format, format);
+    strcpy(formatter->format, format);
 
     return true;
 }
@@ -121,21 +113,21 @@ char* format_entry(format_t* formatter,
                    const char* msg,
                    LOG_LEVEL lvl)
 {
-    assert(formatter->_flags & _FORMAT_ENTRIES);
+    assert(formatter->flags & _FORMAT_ENTRIES);
     return _formatter_do_format(formatter, dest, msg, lvl);
 }
 
 char* format_path(format_t* formatter, char* dest)
 {
-    assert(formatter->_flags & _FORMAT_PATHS);
-    return _formatter_do_format(formatter, dest, NULL, _L_NO_LEVEL);
+    assert(formatter->flags & _FORMAT_PATHS);
+    return _formatter_do_format(formatter, dest, NULL, L_NO_LEVEL);
 }
 
 static void _formatter_get_time(format_t* formatter)
 {
     time_t raw_time;
     time(&raw_time);
-    memcpy(&(formatter->_time), localtime(&raw_time), sizeof(struct tm));
+    memcpy(&(formatter->time), localtime(&raw_time), sizeof(struct tm));
 }
 
 size_t _formatter_fm_as_str(const format_t* formatter, char* dest, const char* src)
@@ -192,7 +184,7 @@ static char* _formatter_do_format(format_t* formatter,
 {
     _formatter_get_time(formatter);
 
-    char* src = formatter->_format;
+    char* src = formatter->format;
     char* src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
     while (src_fm_begin != NULL)
     {
@@ -234,17 +226,17 @@ size_t _formatter_expand_fm(const format_t* formatter,
     switch (fm)
     {
         case _FM_YEAR:
-            return sprintf(dest, format, 4, formatter->_time.tm_year + 1900);
+            return sprintf(dest, format, 4, formatter->time.tm_year + 1900);
         case _FM_MONTH:
-            return sprintf(dest, format, 2, formatter->_time.tm_mon + 1);
+            return sprintf(dest, format, 2, formatter->time.tm_mon + 1);
         case _FM_MDAY:
-            return sprintf(dest, format, 2, formatter->_time.tm_mday);
+            return sprintf(dest, format, 2, formatter->time.tm_mday);
         case _FM_HOUR:
-            return sprintf(dest, format, 2, formatter->_time.tm_hour);
+            return sprintf(dest, format, 2, formatter->time.tm_hour);
         case _FM_MIN:
-            return sprintf(dest, format, 2, formatter->_time.tm_min);
+            return sprintf(dest, format, 2, formatter->time.tm_min);
         case _FM_SEC:
-            return sprintf(dest, format, 2, formatter->_time.tm_sec);
+            return sprintf(dest, format, 2, formatter->time.tm_sec);
     }
 
     strcpy(format, "%.*s");
@@ -307,7 +299,7 @@ size_t _formatter_expand_fm(const format_t* formatter,
 
 char* _formatter_get_mname(const format_t* formatter, char* dest, char* decapitalize_from)
 {
-    strcpy(dest, MONTHS[formatter->_time.tm_mon]);
+    strcpy(dest, MONTHS[formatter->time.tm_mon]);
     if (decapitalize_from)
     {
         _ascii_str_to_lower(decapitalize_from);
@@ -317,7 +309,7 @@ char* _formatter_get_mname(const format_t* formatter, char* dest, char* decapita
 
 char* _formatter_get_wday(const format_t* formatter, char* dest, char* decapitalize_from)
 {
-    strcpy(dest, WEEKDAYS[formatter->_time.tm_wday]);
+    strcpy(dest, WEEKDAYS[formatter->time.tm_wday]);
     if (decapitalize_from)
     {
         _ascii_str_to_lower(decapitalize_from);
@@ -350,7 +342,7 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format)
             {
                 exp_macro_len = _FM_TABLE[fm.id].max_len;
             }
-            if (formatter->_flags & _FORMAT_PATHS)
+            if (formatter->flags & _FORMAT_PATHS)
             {
                 switch (fm.id)
                 {
@@ -368,12 +360,12 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format)
         max_len += exp_macro_len;
     }
 
-    if (formatter->_flags & _FORMAT_PATHS
+    if (formatter->flags & _FORMAT_PATHS
             && max_len < _MAX_FILENAME_SIZE - 1)
     {
         return true;
     }
-    else if (formatter->_flags & _FORMAT_ENTRIES
+    else if (formatter->flags & _FORMAT_ENTRIES
                  && max_len < _MAX_ENTRY_SIZE - 1)
     {
         return true;

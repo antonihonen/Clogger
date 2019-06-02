@@ -10,7 +10,6 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-
 #include <stdbool.h>
 #include <stddef.h>
 

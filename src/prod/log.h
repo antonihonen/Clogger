@@ -28,21 +28,21 @@ typedef struct
     directory and file naming etc. The log object doesn't need to
     know anything about any of that, it only passes the information
     to the file handler. */
-    fhandler_t* _fh;
+    fhandler_t* fh;
 
     /* Entry formatter. Required to expand format macros in log entries. */
-    format_t* _ef;
+    format_t* ef;
 
     /* The active threshold level. Any entry with a lower level
     than the threshold level will be ignored. */
-    LOG_LEVEL _threshold;
+    LOG_LEVEL threshold;
 
     /* Indicates whether the log object accepts any entries -
     if not, all entries are ignored as if their level
     was lower than the entry threshold. */
-    bool _is_enabled;
+    bool is_enabled;
 
-    uint16_t _flags;
+    uint16_t flags;
 } log_t;
 
 log_t* log_init(const char* dname_format,

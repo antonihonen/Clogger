@@ -50,66 +50,66 @@
 /* File handler. */
 typedef struct {
     /* The file stream used to write in files. */
-    FILE* _fstream;
+    FILE* fstream;
     
     /* File name formatter: required to support user macros
     in file names. */
-    format_t* _fname_formatter;
+    format_t* fname_formatter;
 
     /* Directory name formatter: required to support user macros
     in directory names. */
-    format_t* _dname_formatter;
+    format_t* dname_formatter;
 
     /* The name of the currently active file. */
-    char _cur_fn[_MAX_FILENAME_SIZE];
+    char curr_fname[_MAX_FILENAME_SIZE];
 
     /* The absolute filepath of the directory where the current
     log fill resides. */
-    char _cur_dirn[_MAX_FILENAME_SIZE];
+    char curr_dname[_MAX_FILENAME_SIZE];
 
     /* The absolute filepath of the currently active log file. */
-    char _cur_fp[_MAX_FILENAME_SIZE];
+    char curr_fpath[_MAX_FILENAME_SIZE];
 
     /* Output buffer. NULL if buffering mode is _IONBF. */
-    char* _buf;
+    char* buf;
 
     /* The capacity of the buffer in bytes. */
-    size_t _buf_cap;
+    size_t buf_size;
 
     /* Buffering mode. One of: _IONBF, _IOLBF, _IOFBF. */
-    int _buf_mode;
+    int buf_mode;
 
     /* File mode. One of: ROTATE, REWRITE. */
-    LOG_FILE_MODE _file_mode;
+    LOG_FILE_MODE file_mode;
 
     /* The maximum size of a log file in bytes. Log files are
     guaranteed to be smaller than this. */
-    size_t _max_fsize;
+    size_t max_fsize;
 
     /* Indicates whether the log directory was created by the
     file handler. */
-    bool _is_dir_creator;
+    bool is_dir_creator;
 
     /* Indicates whether the log file was created by the
     file handler. */
-    bool _is_file_creator;
+    bool is_file_creator;
     
     /* Indicates if the current log file has been written in. */
-    bool _has_file_changed;
+    bool has_file_changed;
 
     /* Indicates the size of the current log file in bytes. */
-    size_t _current_fsize;
+    size_t curr_fsize;
 
-    uint16_t _flags;
+    uint16_t flags;
 } fhandler_t;
 
 fhandler_t* fh_init(const char* dname_format,
-    const char* fname_format,
-    size_t max_fsize,
-    LOG_FILE_MODE fmode,
-    int buf_mode,
-    size_t buf_size,
-    uint16_t flags);
+                    const char* fname_format,
+                    size_t max_fsize,
+                    LOG_FILE_MODE fmode,
+                    int buf_mode,
+                    size_t buf_size,
+                    uint16_t flags);
 
 void fh_free(fhandler_t* fh);
 

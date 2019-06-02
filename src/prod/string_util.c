@@ -23,9 +23,9 @@ static bool _is_uppercase_c(char c)
     return c >= 'A' && c <= 'Z' ? true : false;
 }
 
-void _terminate_str(char* str, size_t i)
+void _terminate_str(char* str, size_t pos)
 {
-    str[i] = '\0';
+    str[pos] = '\0';
 }
 
 void _clear_str(char* str)
@@ -36,20 +36,6 @@ void _clear_str(char* str)
 bool _is_empty_str(char* str)
 {
     return *str == '\0';
-}
-
-void _two_digit_int_to_str(int i, char* str)
-{
-    char format[4];
-    if (i < 10)
-    {
-        strcpy(format, "0%d");
-    }
-    else
-    {
-        strcpy(format, "%d");
-    }
-    sprintf(str, format, i);
 }
 
 void _ascii_str_to_lower(char* str)

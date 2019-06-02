@@ -24,6 +24,7 @@ IGNORE_EXCESS: When the file gets full, no longer accept
 log writes until the file has been emptied by an external
 process. */
 typedef enum {
+    NO_FILE_MODE = 0,
     REWRITE = 1,
     ROTATE
 } LOG_FILE_MODE;

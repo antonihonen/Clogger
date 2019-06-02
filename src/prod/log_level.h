@@ -16,7 +16,7 @@
 #define LOG_LEVEL_H
 
 typedef enum {
-    _L_NO_LEVEL = -1, /* Only intended for internal use. */
+    L_NO_LEVEL = -1, /* Only intended for internal use. */
     L_TRACE = 0,
     L_DEBUG,
     L_INFO,

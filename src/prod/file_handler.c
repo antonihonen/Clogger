@@ -72,21 +72,21 @@ fhandler_t* fh_init(const char* dname_format,
     }
 
     /* Finish initialization. */
-    format_set(fh->_fname_formatter, fname_format);
-    format_set(fh->_dname_formatter, dname_format);
-    fh->_buf_mode = buf_mode;
-    fh->_fstream = NULL;
-    fh->_buf_cap = buf_size;
-    fh->_file_mode = fmode;
-    fh->_has_file_changed = false;
-    fh->_is_dir_creator = false;
-    fh->_is_file_creator = false;
-    fh->_max_fsize = max_fsize;
-    fh->_current_fsize = 0;
-    fh->_flags = flags;
-    _clear_str(fh->_cur_fn);
-    _clear_str(fh->_cur_dirn);
-    _clear_str(fh->_cur_fp);
+    format_set(fh->fname_formatter, fname_format);
+    format_set(fh->dname_formatter, dname_format);
+    fh->buf_mode = buf_mode;
+    fh->fstream = NULL;
+    fh->buf_size = buf_size;
+    fh->file_mode = fmode;
+    fh->has_file_changed = false;
+    fh->is_dir_creator = false;
+    fh->is_file_creator = false;
+    fh->max_fsize = max_fsize;
+    fh->curr_fsize = 0;
+    fh->flags = flags;
+    _clear_str(fh->curr_fname);
+    _clear_str(fh->curr_dname);
+    _clear_str(fh->curr_fpath);
 
     return fh;
 }
@@ -94,10 +94,10 @@ fhandler_t* fh_init(const char* dname_format,
 /* Frees the memory reserved for fh and its sub-objects. */
 void fh_free(fhandler_t* fh)
 {
-    if (fh->_fstream)         { fclose(fh->_fstream);              }
-    if (fh->_fname_formatter) { format_free(fh->_fname_formatter); }
-    if (fh->_dname_formatter) { format_free(fh->_dname_formatter); }
-    if (fh->_buf)             { _log_dealloc(fh->_buf);            }
+    if (fh->fstream)         { fclose(fh->fstream);              }
+    if (fh->fname_formatter) { format_free(fh->fname_formatter); }
+    if (fh->dname_formatter) { format_free(fh->dname_formatter); }
+    if (fh->buf)             { _log_dealloc(fh->buf);            }
 
     _log_dealloc(fh);
 }
@@ -106,41 +106,41 @@ bool fh_set_buf_mode(fhandler_t* fh, int mode)
 {
     assert(mode == _IONBF || mode == _IOLBF || mode == _IOFBF);
     
-    if (fh->_buf_mode == mode)
+    if (fh->buf_mode == mode)
     {
         return true;
     }
 
     if (mode == _IONBF)
     {
-        if (fh->_buf)
+        if (fh->buf)
         {
-            _log_dealloc(fh->_buf);
+            _log_dealloc(fh->buf);
         }
-        fh->_buf = NULL;
-        fh->_buf_cap = 0;
+        fh->buf = NULL;
+        fh->buf_size = 0;
     }
     else
     {
-        fh->_buf = _log_alloc(_DEF_BUF_SIZE);
-        if (!fh->_buf)
+        fh->buf = _log_alloc(_DEF_BUF_SIZE);
+        if (!fh->buf)
         {
             return false;
         }
     }
     
-    fh->_buf_mode = mode;
+    fh->buf_mode = mode;
     return true;
 }
 
 int fh_buf_mode(const fhandler_t* fh)
 {
-    return fh->_buf_mode;
+    return fh->buf_mode;
 }
 
 bool fh_set_buf_size(fhandler_t* fh, size_t size)
 {
-    if (fh->_buf_cap == size)
+    if (fh->buf_size == size)
     {
         return true;
     }
@@ -149,39 +149,39 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size)
         return fh_set_buf_mode(fh, _IONBF);
     }
     
-    if (fh->_buf)
+    if (fh->buf)
     {
-        if (fh->_fstream)
+        if (fh->fstream)
         {
-            fclose(fh->_fstream);
+            fclose(fh->fstream);
         }
-        _log_dealloc(fh->_buf);
+        _log_dealloc(fh->buf);
     }    
-    fh->_buf = _log_alloc(size);
-    fh->_buf_cap = size;
+    fh->buf = _log_alloc(size);
+    fh->buf_size = size;
     return true;
 }
 
 size_t fh_buf_size(const fhandler_t* fh)
 {
-    return fh->_buf_cap;
+    return fh->buf_size;
 }
 
 bool fh_set_file_mode(fhandler_t* fh, LOG_FILE_MODE mode)
 {
     assert(mode == ROTATE || mode == REWRITE);
-    fh->_file_mode = mode;
+    fh->file_mode = mode;
     return true;
 }
 
 LOG_FILE_MODE fh_file_mode(const fhandler_t* fh)
 {
-    return fh->_file_mode;
+    return fh->file_mode;
 }
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format)
 {
-    if (!format_set(fh->_fname_formatter, format))
+    if (!format_set(fh->fname_formatter, format))
     {
         return false;
     }
@@ -191,25 +191,25 @@ bool fh_set_fname_format(fhandler_t* fh, const char* format)
 
 char* fh_curr_fname(const fhandler_t* fh, char* dest)
 {
-    strcpy(dest, fh->_cur_fn);
+    strcpy(dest, fh->curr_fname);
     return dest;
 }
 
 char* fh_curr_dname(const fhandler_t* fh, char* dest)
 {
-    strcpy(dest, fh->_cur_dirn);
+    strcpy(dest, fh->curr_dname);
     return dest;
 }
 
 char* fh_curr_fpath(const fhandler_t* fh, char* dest)
 {
-    strcpy(dest, fh->_cur_fp);
+    strcpy(dest, fh->curr_fpath);
     return dest;
 }
 
 bool fh_set_dname_format(fhandler_t* fh, const char* format)
 {
-    if (!format_set(fh->_dname_formatter, format))
+    if (!format_set(fh->dname_formatter, format))
     {
         return false;
     }
@@ -219,24 +219,24 @@ bool fh_set_dname_format(fhandler_t* fh, const char* format)
 
 bool fh_set_max_fsize(fhandler_t* fh, size_t size)
 {
-    fh->_max_fsize = size;
+    fh->max_fsize = size;
     return true;
 }
 
 size_t fh_max_fsize(const fhandler_t* fh)
 {
-    return fh->_max_fsize;
+    return fh->max_fsize;
 }
 
 size_t fh_current_fsize(const fhandler_t* fh)
 {
-    return fh->_current_fsize;
+    return fh->curr_fsize;
 }
 
 bool fh_fwrite(fhandler_t* fh, const char* data_out)
 {
     size_t data_size = strlen(data_out);
-    bool new_fstream = fh->_fstream ? false : true;
+    bool new_fstream = fh->fstream ? false : true;
 
     /* Attempt to open the correct file. */
     if (!_fh_open_fstream(fh, data_size))
@@ -247,19 +247,19 @@ bool fh_fwrite(fhandler_t* fh, const char* data_out)
     /* Set output buffer if any. */
     if (new_fstream)
     {
-        setvbuf(fh->_fstream, fh->_buf, fh->_buf_mode, fh->_buf_cap);
+        setvbuf(fh->fstream, fh->buf, fh->buf_mode, fh->buf_size);
     }
 
     /* Write. */
-    if (fputs(data_out, fh->_fstream) == EOF)
+    if (fputs(data_out, fh->fstream) == EOF)
     {
-        fclose(fh->_fstream);
-        fh->_fstream = NULL;
+        fclose(fh->fstream);
+        fh->fstream = NULL;
         return false;
     }
 
-    fh->_has_file_changed = true;
-    fh->_current_fsize += data_size;    
+    fh->has_file_changed = true;
+    fh->curr_fsize += data_size;    
 
     return true;
 }
@@ -269,14 +269,14 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 {
     fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
     if (!fh) { return NULL; }
-    fh->_fname_formatter = format_init("", _FORMAT_PATHS);
-    fh->_dname_formatter = format_init("", _FORMAT_PATHS);
-    fh->_buf = NULL;
+    fh->fname_formatter = format_init("", _FORMAT_PATHS);
+    fh->dname_formatter = format_init("", _FORMAT_PATHS);
+    fh->buf = NULL;
     if (buf_size != 0)
     {
-        fh->_buf = _log_alloc(buf_size);
+        fh->buf = _log_alloc(buf_size);
     }
-    if (!fh->_fname_formatter || !fh->_dname_formatter || (!fh->_buf && buf_size))
+    if (!fh->fname_formatter || !fh->dname_formatter || (!fh->buf && buf_size))
     {
         fh_free(fh);
         return NULL;
@@ -286,12 +286,12 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 
 bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 {
-    if (fh->_fstream)
+    if (fh->fstream)
     {
-        if (fh->_current_fsize > fh->_max_fsize - write_size)
+        if (fh->curr_fsize > fh->max_fsize - write_size)
         {
-            fclose(fh->_fstream);
-            fh->_fstream = NULL;
+            fclose(fh->fstream);
+            fh->fstream = NULL;
         }
         else
         {
@@ -301,9 +301,9 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 
     /* Attempt to open the correct file up to 3 times. */
     size_t opening_attempts = 0;
-    while (!fh->_fstream && opening_attempts < _MAX_OPEN_ATTEMPTS)
+    while (!fh->fstream && opening_attempts < _MAX_OPEN_ATTEMPTS)
     {
-        if (_is_empty_str(fh->_cur_fp))
+        if (_is_empty_str(fh->curr_fpath))
         {
             /* A new file needs to be created. Get the new filepath. */
             _fh_refresh_path(fh);
@@ -313,49 +313,49 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
         directory not existing, create if so. */
         if (opening_attempts > 0)
         {
-            if (!_does_dir_exist(fh->_cur_dirn))
+            if (!_does_dir_exist(fh->curr_dname))
             {
-                if (!_create_dir(fh->_cur_dirn))
+                if (!_create_dir(fh->curr_dname))
                 {
                     return false;
                 }
-                fh->_is_dir_creator = true;
+                fh->is_dir_creator = true;
             }
         }
 
         /* Open the file. This creates a new file if one doesn't exist,
         but won't discard a pre-existing file with the same name. */
-        fh->_fstream = fopen(fh->_cur_fp, "a");
+        fh->fstream = fopen(fh->curr_fpath, "a");
 
-        if (fh->_fstream)
+        if (fh->fstream)
         {
             /* Get the current file size. */
             fpos_t file_size = 0;
-            if (!_file_size(fh->_fstream, &file_size))
+            if (!_file_size(fh->fstream, &file_size))
             {
-                fclose(fh->_fstream);
-                fh->_fstream = NULL;
+                fclose(fh->fstream);
+                fh->fstream = NULL;
                 return false;
             }
             /* Check if file size cap will be hit. */
-            if (file_size + write_size >= fh->_max_fsize - 1)
+            if (file_size + write_size >= fh->max_fsize - 1)
             {
                 /* Close the stream and get the name for the new file. */
-                if (fclose(fh->_fstream) == EOF)
+                if (fclose(fh->fstream) == EOF)
                 {
                     return false;
                 }
-                fh->_fstream = NULL;
+                fh->fstream = NULL;
                 _fh_refresh_path(fh);
-                fh->_current_fsize = 0;
+                fh->curr_fsize = 0;
 
                 /* Rotate the pre-existing files if rotate mode. */
-                if (fh->_file_mode == ROTATE)
+                if (fh->file_mode == ROTATE)
                 {
-                    _rotate_files(fh->_cur_fp);
+                    _rotate_files(fh->curr_fpath);
                 }
                 /* This will discard an old file with the same name. */
-                else { fopen(fh->_cur_fp, "w"); }
+                else { fopen(fh->curr_fpath, "w"); }
             }
             /* File size cap won't be hit, good to go. */
             else { break; }
@@ -364,24 +364,23 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
         ++opening_attempts;
     }
 
-    return fh->_fstream != NULL;
+    return fh->fstream != NULL;
 }
 
 /* Updates the active filepath. The fhandler will attempt to write in
 that file. */
 void _fh_refresh_path(fhandler_t* fh)
 {
-    /* TODO Add the length of the expanded fn to fn_format_t. */
-    _clear_str(fh->_cur_dirn);
-    _clear_str(fh->_cur_fn);
-    _clear_str(fh->_cur_fp);
-    format_path(fh->_dname_formatter, fh->_cur_dirn);
-    format_path(fh->_fname_formatter, fh->_cur_fn);
-    strcpy(fh->_cur_fp, fh->_cur_dirn);
+    _clear_str(fh->curr_dname);
+    _clear_str(fh->curr_fname);
+    _clear_str(fh->curr_fpath);
+    format_path(fh->dname_formatter, fh->curr_dname);
+    format_path(fh->fname_formatter, fh->curr_fname);
+    strcpy(fh->curr_fpath, fh->curr_dname);
 #ifdef _USE_WINAPI
-    strcat(fh->_cur_fp, _WIN_PATH_DELIM_STR);
+    strcat(fh->curr_fpath, _WIN_PATH_DELIM_STR);
 #endif
-    strcat(fh->_cur_fp, fh->_cur_fn);
+    strcat(fh->curr_fpath, fh->curr_fname);
 }
 
 bool _rotate_files(const char* abs_path)

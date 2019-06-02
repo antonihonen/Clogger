@@ -27,8 +27,8 @@
 #define _FM_MIN_EXP_SIZE 3
 #define _FM_SEC_EXP_SIZE 3
 #define _FM_MNAME_S_EXP_SIZE 3
-#define _MAX_FM_MNAME_L_EXP_SIZE 10 // "september" + null terminator
+#define _MAX_FM_MNAME_L_EXP_SIZE 10 /* "september" + null terminator */
 #define _FM_WDAY_S_EXP_SIZE 3
-#define _MAX_FM_WDAY_L_EXP_SIZE 10 // "wednesday" + null terminator
+#define _MAX_FM_WDAY_L_EXP_SIZE 10 /* "wednesday" + null terminator */
 
 #endif /* MACROS_H */
