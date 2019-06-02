@@ -36,23 +36,24 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
-#include "format_macro.h"
+#include "log_level.h"
 #include "macros.h"
 #include "time_handler.h"
 #include <stdint.h>
 
-#define FORMAT_PATHS 0x01
-#define FORMAT_ENTRIES 0x02
+#define _FORMAT_PATHS 0x01
+#define _FORMAT_ENTRIES 0x02
 
 typedef struct {
-    char        _format[_MAX_EXP_FORMAT_SIZE];
+    char        _format[_MAX_ENTRY_SIZE];
     thandler_t* _thandler;
     uint8_t     _flags;
+    struct tm   _time;
 } format_t;
 
 format_t* format_init(const char* format, uint8_t flags);
 
-bool format_set(format_t* const fnf, const char* format);
+bool format_set(format_t* formatter, const char* format);
 
 char* format_path(format_t* formatter, char* dest);
 
@@ -61,6 +62,6 @@ char* format_entry(format_t* formatter,
                    const char* msg,
                    LOG_LEVEL level);
 
-void format_free(format_t* fnf);
+void format_free(format_t* formatter);
 
 #endif /* FORMATTER_H */

@@ -17,6 +17,7 @@
 
 int main()
 {
+    run_perftest("%(Wday_s) %(Mname_l) %(year)-%(month)-%(mday) %(LVL) %(MSG)\n", "Hello world!", 15);
     char str[2];
     fgets(str, 2, stdin);
     return 0;

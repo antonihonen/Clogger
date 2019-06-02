@@ -200,7 +200,7 @@ log_t* _log_t_alloc(const char* dname_format,
                        file_mode,
                        buf_mode,
                        BUFSIZ);
-    log->_ef = format_init(_DEF_ENTRY_FORMAT, FORMAT_ENTRIES);
+    log->_ef = format_init(_DEF_ENTRY_FORMAT, _FORMAT_ENTRIES);
     if (!log->_fh || !log->_ef)
     {
         log_close(log);

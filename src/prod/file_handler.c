@@ -268,8 +268,8 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 {
     fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
     if (!fh) { return NULL; }
-    fh->_fname_formatter = format_init("", FORMAT_PATHS);
-    fh->_dname_formatter = format_init("", FORMAT_PATHS);
+    fh->_fname_formatter = format_init("", _FORMAT_PATHS);
+    fh->_dname_formatter = format_init("", _FORMAT_PATHS);
     fh->_buf = NULL;
     if (buf_size != 0)
     {

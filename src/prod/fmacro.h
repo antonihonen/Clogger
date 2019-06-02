@@ -1,5 +1,5 @@
 /*
- * File: format_macro.h
+ * File: fmacro.h
  * Project: logger
  * Author: Anton Ihonen, anton.ihonen@gmail.com
  *
@@ -23,8 +23,8 @@
 #ifndef FORMAT_MACRO_H
 #define FORMAT_MACRO_H
 
-#include "format_macro_handlers.h"
 #include "macros.h"
+#include <stddef.h>
 
 typedef enum
 {
@@ -76,7 +76,6 @@ typedef struct
 {
     char*       str;
     size_t      max_len;
-    _FM_HANDLER handler;
 } _fm_info_t;
 
 const _fm_info_t _FM_TABLE[_FM_COUNT];

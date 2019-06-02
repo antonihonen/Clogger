@@ -50,7 +50,7 @@ static void fhandler_write_test()
 {
     fh = fh_init("D:\\logs\\%(year)%(month)%(mday)", "log.log", 100, ROTATE, _IOLBF, 256);
     format_t* ef = format_init("%(year)-%(month)-%(mday)  %(hour):%(min):%(sec)  %(LVL)  %(MSG)\n",
-        FORMAT_ENTRIES);
+        _FORMAT_ENTRIES);
     char fmsg[512];
     format_entry(ef, fmsg, "Hello world!", L_CRITICAL);
     fh_fwrite(fh, fmsg);

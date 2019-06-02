@@ -7,26 +7,67 @@
  */
 
 #include "alloc.h"
-#include "fm_parser.h"
+#include "fmacro.h"
 #include "formatter.h"
 #include "string_util.h"
 #include "time_handler.h"
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
-char* _format_str(const char* format,
-                  char* dest,
-                  thandler_t* th,
-                  const char* msg,
-                  LOG_LEVEL lvl);
+typedef struct
+{
+    _FM_ID id;
+    size_t len;
+} fm_info_t;
 
-static bool _is_valid_path_format(const char* format);
+static const char* const MONTHS[12] =
+{ "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+  "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
 
-static bool _is_valid_entry_format(const char* format);
+/* Starts from Sunday because in the struct tm returned by localtime()
+tm_day value of 0 equals Sunday. */
+static const char* const WEEKDAYS[7] =
+{ "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY",
+  "THURSDAY", "FRIDAY", "SATURDAY" };
+
+static size_t _formatter_expand_fm(const format_t* formatter,
+                                   char* dest,
+                                   _FM_ID fm,
+                                   const char* msg,
+                                   LOG_LEVEL lvl);
+
+static void _formatter_get_time(format_t* formatter);
+
+static size_t _formatter_fm_as_str(const format_t* formatter,
+                                   char* dest,
+                                   const char* src);
+
+static fm_info_t _formatter_recognize_fm(const format_t* formatter,
+                                         const char* src);
+
+static char* _formatter_do_format(format_t* formatter,
+                                  char* dest,
+                                  const char* msg,
+                                  LOG_LEVEL lvl);
+
+static char* _formatter_get_mname(const format_t* formatter,
+                                  char* dest,
+                                  char* decapitalize_from);
+
+static char* _formatter_get_wday(const format_t* formatter,
+                                 char* dest,
+                                 char* decapitalize_from);
+
+static char* _get_lvl(LOG_LEVEL lvl,
+                      char* dest,
+                      char* decapitalize_from);
+
+bool _formatter_is_valid_format(const format_t* formatter, const char* format);
 
 format_t* format_init(const char* format, uint8_t flags)
 {
-    if (!((flags & FORMAT_PATHS) || (flags & FORMAT_ENTRIES)))
+    if (!((flags & _FORMAT_PATHS) || (flags & _FORMAT_ENTRIES)))
     {
         return NULL;
     }
@@ -65,13 +106,7 @@ void format_free(format_t* formatter)
 
 bool format_set(format_t* formatter, const char* format)
 {
-    if (formatter->_flags & FORMAT_PATHS
-            && !_is_valid_path_format(format))
-    {
-        return false;
-    }
-    else if (formatter->_flags & FORMAT_ENTRIES
-                 && !_is_valid_entry_format(format))
+    if (!_formatter_is_valid_format(formatter, format))
     {
         return false;
     }
@@ -84,94 +119,223 @@ bool format_set(format_t* formatter, const char* format)
 char* format_entry(format_t* formatter,
                    char* dest,
                    const char* msg,
-                   LOG_LEVEL level)
+                   LOG_LEVEL lvl)
 {
-    assert(formatter->_flags & FORMAT_ENTRIES);
-
-    return _format_str(formatter->_format,
-                       dest,
-                       formatter->_thandler,
-                       msg,
-                       level);
+    assert(formatter->_flags & _FORMAT_ENTRIES);
+    return _formatter_do_format(formatter, dest, msg, lvl);
 }
 
 char* format_path(format_t* formatter, char* dest)
 {
-    assert(formatter->_flags & FORMAT_PATHS);
-
-    _format_str(formatter->_format,
-                dest,
-                formatter->_thandler,
-                NULL,
-                _L_NO_LEVEL);
-    return dest;
+    assert(formatter->_flags & _FORMAT_PATHS);
+    return _formatter_do_format(formatter, dest, NULL, _L_NO_LEVEL);
 }
 
-/* Helper functions. */
-
-/* Expands all format macros starting from format, writing the expanded
-string to dest. Th will be used to expand time-related macros.
-Msg contains the log message entered by the user, if any.
-Lvl contains the log level of the message, if any.
-Msg and lvl may be omitted when this function is used to
-format a file name, since they are meaningless in that context. */
-char* _format_str(const char* format,
-                  char* dest,
-                  thandler_t* th,
-                  const char* msg,
-                  LOG_LEVEL lvl)
+static void _formatter_get_time(format_t* formatter)
 {
-    /* If message is given, logging level must also be given (this function
-    was called by the entry formatter) - if not, logging level must not be
-    given either (called by filename formatter). */
-    assert((msg && lvl != _L_NO_LEVEL) || (!msg && lvl == _L_NO_LEVEL));
+    time_t raw_time;
+    time(&raw_time);
+    memcpy(&(formatter->_time), localtime(&raw_time), sizeof(struct tm));
+}
 
-    /* Fetch the local time for time-related macros so they all
-    refer to the same point in time. */
-    th_fetch_ltime(th);
+size_t _formatter_fm_as_str(const format_t* formatter, char* dest, const char* src)
+{
+    size_t fm_len = 0;
 
-    while (*format != '\0')
+    assert(*src == _FM_BEGIN_INDIC);
+    char* left_delim = strchr(src, _FM_LEFT_DELIM);
+    char* right_delim = strchr(src, _FM_RIGHT_DELIM);
+
+    if (left_delim && right_delim && left_delim == src + 1)
     {
-        if (*format != _FM_BEGIN_INDIC)
+        if (left_delim < right_delim)
         {
-            /* No macro begin encountered. */
-            *dest = *format;
-            ++dest;
-            ++format;
+            /* The length of the fm body. */
+            fm_len = right_delim - src - 2;
+            strncpy(dest, left_delim + 1, fm_len);
+            dest[fm_len] = '\0';
+            /* Add the length of the begin indicator and delimiters. */
+            fm_len += 3;
+        }
+    }
+    return fm_len;
+}
+
+static fm_info_t _formatter_recognize_fm(const format_t* formatter, const char* src)
+{
+    char fm_str[_MAX_FM_S_LEN];
+
+    fm_info_t fm = { _FM_NO_MACRO, 0 };
+    if (*src != _FM_BEGIN_INDIC)
+    {
+        return fm;
+    }
+
+    fm.len = _formatter_fm_as_str(formatter, fm_str, src);
+    if (fm.len != 0)
+    {
+        for (size_t i = 0; i < _FM_COUNT; ++i)
+        {
+            if (strcmp(fm_str, _FM_TABLE[i].str) == 0)
+            {
+                fm.id = i + 1;
+            }
+        }
+    }
+    return fm;
+}
+
+static char* _formatter_do_format(format_t* formatter,
+                                  char* dest,
+                                  const char* msg,
+                                  LOG_LEVEL lvl)
+{
+    _formatter_get_time(formatter);
+
+    char* fm_begin = strchr(formatter->_format, _FM_BEGIN_INDIC);
+    char* format_head = formatter->_format;
+    while (fm_begin != NULL)
+    {
+        /* TODO Optimize */
+        while (format_head != fm_begin)
+        {
+            *(dest++) = *(format_head++);
+        }
+        fm_info_t fm = _formatter_recognize_fm(formatter, fm_begin);
+        if (fm.id != _FM_NO_MACRO)
+        {
+            dest += _formatter_expand_fm(formatter, dest, fm.id, msg, lvl);
+            format_head += fm.len;
         }
         else
         {
-            /* Macro begin encountered. */
-
-            /* Unexpanded macro length. */
-            size_t macro_len = 0;
-            /* Expanded macro length. */
-            size_t exp_macro_len = 0;
-            /* Expand the macro. */
-            _expand_fm(format, dest, th, msg, lvl, &macro_len, &exp_macro_len);
-
-            if (macro_len == 0 && exp_macro_len == 0)
-            {
-                /* False alarm, no valid macro found. */
-                *dest = *format;
-                macro_len = 1;
-                exp_macro_len = 1;
-            }
-            format += macro_len;
-            dest += exp_macro_len;
+            *(dest++) = *(format_head++);
         }
+        fm_begin = strchr(format_head, _FM_BEGIN_INDIC);
     }
-    /* Add the null terminator which was excluded in the
-    while loop. */
-    assert(*format == '\0');
-    *dest = *format;
+    while (*format_head != '\0')
+    {
+        *(dest++) = *(format_head++);
+    }
+    *dest = *format_head;
     return dest;
 }
 
-/* Returns true if format is valid, i.e. contains no illegal
-macros and has a maximum length < _MAX_FILENAME_SIZE - 1
-when expanded. */
-bool _is_valid_path_format(const char* format)
+size_t _formatter_expand_fm(const format_t* formatter,
+                            char* dest,
+                            _FM_ID fm,
+                            const char* msg,
+                            LOG_LEVEL lvl)
+{
+    assert(fm != _FM_NO_MACRO);
+
+    char format[8] = "%0*d";
+
+    switch (fm)
+    {
+        case _FM_YEAR:
+            return sprintf(dest, format, 4, formatter->_time.tm_year + 1900);
+        case _FM_MONTH:
+            return sprintf(dest, format, 2, formatter->_time.tm_mon + 1);
+        case _FM_MDAY:
+            return sprintf(dest, format, 2, formatter->_time.tm_mday);
+        case _FM_HOUR:
+            return sprintf(dest, format, 2, formatter->_time.tm_hour);
+        case _FM_MIN:
+            return sprintf(dest, format, 2, formatter->_time.tm_min);
+        case _FM_SEC:
+            return sprintf(dest, format, 2, formatter->_time.tm_sec);
+    }
+
+    strcpy(format, "%.*s");
+    char source[32];
+    size_t copy_amount = 0;
+    switch (fm)
+    {
+        case _FM_MNAME_S_F:
+            _formatter_get_mname(formatter, source, source + 1);
+            copy_amount = _FM_MNAME_S_EXP_SIZE;
+            break;
+        case _FM_MNAME_S_A:
+            _formatter_get_mname(formatter, source, NULL);
+            copy_amount = _FM_MNAME_S_EXP_SIZE;
+            break;
+        case _FM_MNAME_L_F:
+            _formatter_get_mname(formatter, source, source + 1);
+            copy_amount = _MAX_FM_MNAME_L_EXP_SIZE;
+            break;
+        case _FM_MNAME_L_A:
+            _formatter_get_mname(formatter, source, NULL);
+            copy_amount = _MAX_FM_MNAME_L_EXP_SIZE;
+            break;
+        case _FM_WDAY_S_F:
+            _formatter_get_wday(formatter, source, source + 1);
+            copy_amount = _FM_WDAY_S_EXP_SIZE;
+            break;
+        case _FM_WDAY_S_A:
+            _formatter_get_wday(formatter, source, NULL);
+            copy_amount = _FM_WDAY_S_EXP_SIZE;
+            break;
+        case _FM_WDAY_L_F:
+            _formatter_get_wday(formatter, source, source + 1);
+            copy_amount = _MAX_FM_WDAY_L_EXP_SIZE;
+            break;
+        case _FM_WDAY_L_A:
+            _formatter_get_wday(formatter, source, NULL);
+            copy_amount = _MAX_FM_WDAY_L_EXP_SIZE;
+            break;
+        case _FM_LVL_N:
+            _get_lvl(lvl, source, source);
+            copy_amount = _FM_LVL_MAX_LEN;
+            break;
+        case _FM_LVL_F:
+            _get_lvl(lvl, source, source + 1);
+            copy_amount = _FM_LVL_MAX_LEN;
+            break;
+        case _FM_LVL_A:
+            _get_lvl(lvl, source, NULL);
+            copy_amount = _FM_LVL_MAX_LEN;
+            break;
+        case _FM_MSG:
+            return sprintf(dest, format, _MAX_MSG_SIZE, msg);
+        default:
+            assert(0);
+    }
+    copy_amount = sprintf(dest, format, copy_amount, source);
+    return copy_amount;
+}
+
+char* _formatter_get_mname(const format_t* formatter, char* dest, char* decapitalize_from)
+{
+    strcpy(dest, MONTHS[formatter->_time.tm_mon]);
+    if (decapitalize_from)
+    {
+        _ascii_str_to_lower(decapitalize_from);
+    }
+    return dest;
+}
+
+char* _formatter_get_wday(const format_t* formatter, char* dest, char* decapitalize_from)
+{
+    strcpy(dest, WEEKDAYS[formatter->_time.tm_wday]);
+    if (decapitalize_from)
+    {
+        _ascii_str_to_lower(decapitalize_from);
+    }
+    return dest;
+}
+
+char* _get_lvl(LOG_LEVEL lvl, char* dest, char* decapitalize_from)
+{
+    strcpy(dest, _LOG_LEVEL_STRS[lvl]);
+    if (decapitalize_from)
+    {
+        _ascii_str_to_lower(decapitalize_from);
+    }
+    return dest;
+}
+
+bool _formatter_is_valid_format(const format_t* formatter, const char* format)
 {
     size_t max_len = 0;
 
@@ -181,57 +345,36 @@ bool _is_valid_path_format(const char* format)
         size_t exp_macro_len = 1;
         if (*format == _FM_BEGIN_INDIC)
         {
-            _FM_ID id = _identify_fm(format, &macro_len);
-            if (id != _FM_NO_MACRO)
+            fm_info_t fm = _formatter_recognize_fm(formatter, format);
+            if (fm.id != _FM_NO_MACRO)
             {
-                exp_macro_len = _FM_TABLE[id].max_len;
+                exp_macro_len = _FM_TABLE[fm.id].max_len;
             }
-            switch (id)
+            if (formatter->_flags & _FORMAT_PATHS)
             {
-                case _FM_MSG:
-                case _FM_LVL_N:
-                case _FM_LVL_F:
-                case _FM_LVL_A:
-                    return false;
-                default:
-                    break;
+                switch (fm.id)
+                {
+                    case _FM_MSG:
+                    case _FM_LVL_N:
+                    case _FM_LVL_F:
+                    case _FM_LVL_A:
+                        return false;
+                    default:
+                        break;
+                }
             }
         }
         format += macro_len;
         max_len += exp_macro_len;
     }
 
-    if (max_len < _MAX_FILENAME_SIZE - 1)
+    if (formatter->_flags & _FORMAT_PATHS
+            && max_len < _MAX_FILENAME_SIZE - 1)
     {
         return true;
     }
-
-    return false;
-}
-
-/* Returns true if format is valid, i.e. contains no illegal macros and
-has a maximum length < _MAX_ENTRY_SIZE - 1 when expanded. */
-bool _is_valid_entry_format(const char* format)
-{
-    size_t max_len = 0;
-
-    while (*format != '\0')
-    {
-        size_t macro_len = 1;
-        size_t exp_macro_len = 1;
-        if (*format == _FM_BEGIN_INDIC)
-        {
-            _FM_ID id = _identify_fm(format, &macro_len);
-            if (id != _FM_NO_MACRO)
-            {
-                exp_macro_len = _FM_TABLE[id].max_len;
-            }
-        }
-        format += macro_len;
-        max_len += exp_macro_len;
-    }
-
-    if (max_len < _MAX_ENTRY_SIZE - 1)
+    else if (formatter->_flags & _FORMAT_ENTRIES
+                 && max_len < _MAX_ENTRY_SIZE - 1)
     {
         return true;
     }
