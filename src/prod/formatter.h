@@ -54,6 +54,8 @@ format_t* format_init(const char* format, uint16_t flags);
 
 bool format_set(format_t* formatter, const char* format);
 
+char* format_get(format_t* formatter, char* dest);
+
 char* format_path(format_t* formatter, char* dest);
 
 char* format_entry(format_t* formatter,

@@ -76,6 +76,7 @@ format_t* format_init(const char* format, uint16_t flags)
     if (formatter)
     {
         formatter->flags = flags;
+        memset(&(formatter->time), 0x00, sizeof(struct tm));
         if (format_set(formatter, format))
         {
             return formatter;
@@ -106,6 +107,12 @@ bool format_set(format_t* formatter, const char* format)
     strcpy(formatter->format, format);
 
     return true;
+}
+
+char* format_get(format_t* formatter, char* dest)
+{
+    strcpy(dest, formatter->format);
+    return dest;
 }
 
 char* format_entry(format_t* formatter,
@@ -184,6 +191,7 @@ static char* _formatter_do_format(format_t* formatter,
 {
     _formatter_get_time(formatter);
 
+    char* orig_dest = dest;
     char* src = formatter->format;
     char* src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
     while (src_fm_begin != NULL)
@@ -210,7 +218,7 @@ static char* _formatter_do_format(format_t* formatter,
         *(dest++) = *(src++);
     }
     *dest = *src;
-    return dest;
+    return orig_dest;
 }
 
 size_t _formatter_expand_fm(const format_t* formatter,

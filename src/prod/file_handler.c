@@ -189,6 +189,12 @@ bool fh_set_fname_format(fhandler_t* fh, const char* format)
     return true;
 }
 
+char* fh_fname_format(fhandler_t* fh, char* src)
+{
+    format_get(fh->fname_formatter, src);
+    return src;
+}
+
 char* fh_curr_fname(const fhandler_t* fh, char* dest)
 {
     strcpy(dest, fh->curr_fname);
@@ -215,6 +221,12 @@ bool fh_set_dname_format(fhandler_t* fh, const char* format)
     }
     _fh_refresh_path(fh);
     return true;
+}
+
+char* fh_dname_format(fhandler_t* fh, char* src)
+{
+    format_get(fh->dname_formatter, src);
+    return src;
 }
 
 bool fh_set_max_fsize(fhandler_t* fh, size_t size)

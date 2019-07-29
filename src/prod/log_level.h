@@ -20,11 +20,14 @@ typedef enum {
     L_TRACE = 0,
     L_DEBUG,
     L_INFO,
+    L_NOTICE,
     L_WARNING,
     L_ERROR,
-    L_CRITICAL
+    L_CRITICAL,
+    L_ALERT,
+    L_EMERGENCY
 } LOG_LEVEL;
-#define _VALID_LVL_COUNT (L_CRITICAL + 1)
+#define _VALID_LVL_COUNT (L_EMERGENCY + 1)
 
 const LOG_LEVEL _VALID_LOG_LEVELS[_VALID_LVL_COUNT];
 const char* const _LOG_LEVEL_STRS[_VALID_LVL_COUNT];

@@ -108,7 +108,7 @@ const _fm_info_t _FM_TABLE[_FM_COUNT];
 #define _FM_LVL_N_S "lvl"
 #define _FM_LVL_F_S "Lvl"
 #define _FM_LVL_A_S "LVL"
-#define _FM_LVL_MAX_LEN 8 /* strlen("CRITICAL") */
+#define _FM_LVL_MAX_LEN 8 /* strlen("EMERGENCY") */
 #define _FM_MSG_S "MSG"
 #define _FM_MSG_MAX_LEN _MAX_MSG_SIZE
 

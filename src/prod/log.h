@@ -13,6 +13,7 @@
 
 #include "flags.h"
 #include "file_handler.h"
+#include "log_level.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -24,14 +25,14 @@
 /* Log. */
 typedef struct
 {
-    /* The file handler object that will take care of file writes,
-    directory and file naming etc. The log object doesn't need to
-    know anything about any of that, it only passes the information
-    to the file handler. */
-    fhandler_t* fh;
+    /* File handlers. Required to write in files. Also takes care of
+    file and directory name-related things. */
+    fhandler_t* def_fhandler;
+    fhandler_t* fhandlers[_VALID_LVL_COUNT];
 
-    /* Entry formatter. Required to expand format macros in log entries. */
-    format_t* ef;
+    /* Entry formatters. Required to expand format macros in log entries. */
+    format_t* def_formatter;
+    format_t* formatters[_VALID_LVL_COUNT];
 
     /* The active threshold level. Any entry with a lower level
     than the threshold level will be ignored. */
@@ -61,46 +62,52 @@ bool log_set_threshold(log_t* log, LOG_LEVEL threshold);
 
 LOG_LEVEL log_threshold(log_t* log);
 
-bool log_set_buf_mode(log_t* log, int mode);
+bool log_set_buf_mode(log_t* log, LOG_LEVEL level, int mode);
 
-int log_buf_mode(log_t* log);
+int log_buf_mode(log_t* log, LOG_LEVEL level);
 
-bool log_set_buf_size(log_t* log, size_t buf_size);
+bool log_set_buf_size(log_t* log, LOG_LEVEL level, size_t buf_size);
 
-bool log_set_file_mode(log_t* log, LOG_FILE_MODE mode);
+bool log_set_file_mode(log_t* log, LOG_LEVEL level, LOG_FILE_MODE mode);
 
-LOG_FILE_MODE log_file_mode(log_t* log);
+LOG_FILE_MODE log_file_mode(log_t* log, LOG_LEVEL level);
 
-bool log_set_dname_format(log_t* log, const char* format);
+bool log_set_dname_format(log_t* log, LOG_LEVEL level, const char* format);
 
-char* log_curr_dname(log_t* log, char* dest);
+char* log_curr_dname(log_t* log, LOG_LEVEL level, char* dest);
 
-bool log_set_fname_format(log_t* log, const char* format);
+bool log_set_fname_format(log_t* log, LOG_LEVEL level, const char* format);
 
-char* log_curr_fname(log_t* log, char* dest);
+char* log_curr_fname(log_t* log, LOG_LEVEL level, char* dest);
 
-char* log_curr_fpath(log_t* log, char* dest);
+char* log_curr_fpath(log_t* log, LOG_LEVEL level, char* dest);
 
-bool log_set_max_fsize(log_t* log, size_t size);
+bool log_set_max_fsize(log_t* log, LOG_LEVEL level, size_t size);
 
-size_t log_max_fsize(log_t* log);
+size_t log_max_fsize(log_t* log, LOG_LEVEL level);
 
-size_t log_current_fsize(log_t* log);
+size_t log_current_fsize(log_t* log, LOG_LEVEL level);
 
-bool log_set_entry_format(log_t* log, const char* format);
+bool log_set_entry_format(log_t* log, LOG_LEVEL level, const char* format);
 
-bool log_write(log_t* log, LOG_LEVEL level, const char* msg);
+bool log_write(log_t* log, LOG_LEVEL level, const char* message);
 
-bool log_trace(log_t* log, const char* msg);
+bool log_trace(log_t* log, const char* message);
 
-bool log_debug(log_t* log, const char* msg);
+bool log_debug(log_t* log, const char* message);
 
-bool log_info(log_t* log, const char* msg);
+bool log_info(log_t* log, const char* message);
 
-bool log_warning(log_t* log, const char* msg);
+bool log_notice(log_t* log, const char* message);
 
-bool log_error(log_t* log, const char* msg);
+bool log_warning(log_t* log, const char* message);
 
-bool log_critical(log_t* log, const char* msg);
+bool log_error(log_t* log, const char* message);
+
+bool log_critical(log_t* log, const char* message);
+
+bool log_alert(log_t* log, const char* message);
+
+bool log_emergency(log_t* log, const char* message);
 
 #endif /* LOG_H */

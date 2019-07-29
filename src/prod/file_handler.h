@@ -127,6 +127,8 @@ LOG_FILE_MODE fh_file_mode(const fhandler_t* fh);
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format);
 
+char* fh_fname_format(fhandler_t* fh, char* src);
+
 char* fh_curr_fname(const fhandler_t* fh, char* dest);
 
 char* fh_curr_dname(const fhandler_t* fh, char* dest);
@@ -134,6 +136,8 @@ char* fh_curr_dname(const fhandler_t* fh, char* dest);
 char* fh_curr_fpath(const fhandler_t* fh, char* dest);
 
 bool fh_set_dname_format(fhandler_t* fh, const char* format);
+
+char* fh_dname_format(fhandler_t* fh, char* src);
 
 bool fh_set_max_fsize(fhandler_t* fh, size_t size);
 
