@@ -10,9 +10,9 @@
 #include <assert.h>
 #include <malloc.h>
 
- /* Determines whether a call to _register_alloc will be effective
+ /* Determines whether a call to log_register_allocator will be effective
  or not. */
-static bool can_register_alloc = true;
+static bool can_register_allocator = true;
 
 /* Pointers to the active allocator and deallocator functions. */
 static void* (*alloc_fun)(size_t) = malloc;
@@ -20,7 +20,7 @@ static void (*dealloc_fun)(void*) = free;
 
 bool log_register_allocator(void* (*alloc)(size_t), void (*dealloc)(void*))
 {
-    if (!can_register_alloc)
+    if (!can_register_allocator)
     {
         return false;
     }

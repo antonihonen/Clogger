@@ -18,7 +18,7 @@ static char _char_to_lower(char c)
     return c + _ASCII_CAP_AND_SMALL_DIFF;
 }
 
-static bool _is_uppercase_c(char c)
+static bool _is_uppercase_char(char c)
 {
     return c >= 'A' && c <= 'Z' ? true : false;
 }
@@ -38,11 +38,11 @@ bool _is_empty_str(char* str)
     return *str == '\0';
 }
 
-void _ascii_str_to_lower(char* str)
+void _str_to_lower(char* str)
 {
     while (*str != '\0')
     {
-        if (_is_uppercase_c(*str))
+        if (_is_uppercase_char(*str))
         {
             *str = _char_to_lower(*str);
         }
