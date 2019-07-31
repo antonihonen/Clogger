@@ -310,7 +310,7 @@ char* _formatter_get_mname(const format_t* formatter, char* dest, char* decapita
     strcpy(dest, MONTHS[formatter->time.tm_mon]);
     if (decapitalize_from)
     {
-        _ascii_str_to_lower(decapitalize_from);
+        _str_to_lower(decapitalize_from);
     }
     return dest;
 }
@@ -320,7 +320,7 @@ char* _formatter_get_wday(const format_t* formatter, char* dest, char* decapital
     strcpy(dest, WEEKDAYS[formatter->time.tm_wday]);
     if (decapitalize_from)
     {
-        _ascii_str_to_lower(decapitalize_from);
+        _str_to_lower(decapitalize_from);
     }
     return dest;
 }
@@ -330,7 +330,7 @@ char* _get_lvl(LOG_LEVEL lvl, char* dest, char* decapitalize_from)
     strcpy(dest, _LOG_LEVEL_STRS[lvl]);
     if (decapitalize_from)
     {
-        _ascii_str_to_lower(decapitalize_from);
+        _str_to_lower(decapitalize_from);
     }
     return dest;
 }

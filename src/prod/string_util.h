@@ -25,6 +25,6 @@ void _clear_str(char* str);
 bool _is_empty_str(char* str);
 
 /* Converts alphabetical characters in str to lowercase. */
-void _ascii_str_to_lower(char* str);
+void _str_to_lower(char* str);
 
 #endif /* STRING_UTIL_H */
