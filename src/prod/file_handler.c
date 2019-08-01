@@ -97,9 +97,9 @@ void fh_free(fhandler_t* fh)
     if (fh->fstream)         { fclose(fh->fstream);              }
     if (fh->fname_formatter) { format_free(fh->fname_formatter); }
     if (fh->dname_formatter) { format_free(fh->dname_formatter); }
-    if (fh->buf)             { _log_dealloc(fh->buf);            }
+    if (fh->buf)             { LG_dealloc(fh->buf);            }
 
-    _log_dealloc(fh);
+    LG_dealloc(fh);
 }
 
 bool fh_set_buf_mode(fhandler_t* fh, int mode)
@@ -115,14 +115,14 @@ bool fh_set_buf_mode(fhandler_t* fh, int mode)
     {
         if (fh->buf)
         {
-            _log_dealloc(fh->buf);
+            LG_dealloc(fh->buf);
         }
         fh->buf = NULL;
         fh->buf_size = 0;
     }
     else
     {
-        fh->buf = _log_alloc(LG_DEF_BUF_SIZE);
+        fh->buf = LG_alloc(LG_DEF_BUF_SIZE);
         if (!fh->buf)
         {
             return false;
@@ -155,9 +155,9 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size)
         {
             fclose(fh->fstream);
         }
-        _log_dealloc(fh->buf);
+        LG_dealloc(fh->buf);
     }    
-    fh->buf = _log_alloc(size);
+    fh->buf = LG_alloc(size);
     fh->buf_size = size;
     return true;
 }
@@ -279,14 +279,14 @@ bool fh_fwrite(fhandler_t* fh, const char* data_out)
 /* Allocates memory for the fhandler object and its sub-objects. */
 fhandler_t* _fh_alloc(const size_t buf_size)
 {
-    fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
+    fhandler_t* fh = LG_alloc(sizeof(fhandler_t));
     if (!fh) { return NULL; }
     fh->fname_formatter = format_init("", LG_FORMAT_PATHS);
     fh->dname_formatter = format_init("", LG_FORMAT_PATHS);
     fh->buf = NULL;
     if (buf_size != 0)
     {
-        fh->buf = _log_alloc(buf_size);
+        fh->buf = LG_alloc(buf_size);
     }
     if (!fh->fname_formatter || !fh->dname_formatter || (!fh->buf && buf_size))
     {

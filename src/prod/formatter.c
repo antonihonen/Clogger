@@ -14,12 +14,6 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef struct
-{
-    LG_FM_ID id;
-    size_t len;
-} fm_info_t;
-
 static const char* const MONTHS[12] =
 { "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
   "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER" };
@@ -71,7 +65,7 @@ format_t* format_init(const char* format, uint16_t flags)
         return NULL;
     }
 
-    format_t* formatter = _log_alloc(sizeof(format_t));
+    format_t* formatter = LG_alloc(sizeof(format_t));
 
     if (formatter)
     {
@@ -87,14 +81,14 @@ format_t* format_init(const char* format, uint16_t flags)
     and return NULL. */
     if (formatter)
     {
-        _log_dealloc(formatter);
+        LG_dealloc(formatter);
     }
     return NULL;
 }
 
 void format_free(format_t* formatter)
 {
-    _log_dealloc(formatter);
+    LG_dealloc(formatter);
 }
 
 bool format_set(format_t* formatter, const char* format)
@@ -127,7 +121,7 @@ char* format_entry(format_t* formatter,
 char* format_path(format_t* formatter, char* dest)
 {
     assert(formatter->flags & LG_FORMAT_PATHS);
-    return _formatter_do_format(formatter, dest, NULL, LG_L_NO_LEVEL);
+    return _formatter_do_format(formatter, dest, NULL, LG_NO_LEVEL);
 }
 
 static void _formatter_get_time(format_t* formatter)
@@ -164,7 +158,7 @@ static fm_info_t _formatter_recognize_fm(const format_t* formatter, const char* 
 {
     char fm_str[LG_MAX_FM_S_LEN];
 
-    fm_info_t fm = { LG_FM_NO_MACRO, 0 };
+    fm_info_t fm = { "", 0, LG_FM_NO_MACRO };
     if (*src != LG_FM_BEGIN_INDIC)
     {
         return fm;
@@ -327,7 +321,7 @@ char* _formatter_get_wday(const format_t* formatter, char* dest, char* decapital
 
 char* _get_lvl(LG_LEVEL lvl, char* dest, char* decapitalize_from)
 {
-    strcpy(dest, LG_LOG_LEVEL_STRS[lvl]);
+    strcpy(dest, LG_LEVEL_STRS[lvl]);
     if (decapitalize_from)
     {
         LG_str_to_lower(decapitalize_from);
@@ -348,7 +342,7 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format)
             fm_info_t fm = _formatter_recognize_fm(formatter, format);
             if (fm.id != LG_FM_NO_MACRO)
             {
-                exp_macro_len = _FM_TABLE[fm.id].max_len;
+                exp_macro_len = _FM_TABLE[fm.id].len;
             }
             if (formatter->flags & LG_FORMAT_PATHS)
             {

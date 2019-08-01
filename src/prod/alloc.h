@@ -20,10 +20,10 @@
 instead of malloc and free to reserve and free memory within the
 library. This function must be called prior to calling any
 other functions in the library in order to be effective. */
-bool log_register_allocator(void* (*alloc)(size_t), void (*dealloc)(void*));
+bool LG_register_allocator(void* (*alloc)(size_t), void (*dealloc)(void*));
 
-void* _log_alloc(size_t size);
+void* LG_alloc(size_t size);
 
-void _log_dealloc(void* ptr);
+void LG_dealloc(void* ptr);
 
 #endif /* LG_ALLOC_H */

@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #define LG_DEF_MAX_FSIZE 1048576 /* 1 MiB */
-#define LG_DEF_THRESHOLD LG_L_TRACE
+#define LG_DEF_THRESHOLD LG_TRACE
 #define LG_DEF_ENTRY_FORMAT "%(MSG)\n"
 
 /* Log. */
@@ -28,13 +28,13 @@ typedef struct
     fhandler_t* def_fhandler;
     fhandler_t* fhandlers[LG_VALID_LVL_COUNT];
 
-    format_t* def_formatter;
-    format_t* formatters[LG_VALID_LVL_COUNT];
+    format_t*   def_formatter;
+    format_t*   formatters[LG_VALID_LVL_COUNT];
 
-    LG_LEVEL threshold;
-    bool is_enabled;
-    uint16_t flags;
-    LG_ERRNO last_error;
+    LG_LEVEL    threshold;
+    bool        is_enabled;
+    uint16_t    flags;
+    LG_ERRNO    last_error;
 } log_t;
 
 log_t* log_init(const char* dname_format,

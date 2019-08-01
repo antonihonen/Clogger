@@ -75,7 +75,8 @@ and must be preceded by the macro body
 typedef struct
 {
     char*       str;
-    size_t      max_len;
+    size_t      len;
+    LG_FM_ID    id;
 } fm_info_t;
 
 const fm_info_t _FM_TABLE[LG_FM_COUNT];

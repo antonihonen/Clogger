@@ -38,6 +38,7 @@
 
 #include "log_level.h"
 #include "macros.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -45,9 +46,9 @@
 #define LG_FORMAT_ENTRIES 0x02
 
 typedef struct {
-    char format[LG_MAX_ENTRY_SIZE];
+    char      format[LG_MAX_ENTRY_SIZE];
     struct tm time;
-    uint16_t flags;
+    uint16_t  flags;
 } format_t;
 
 format_t* format_init(const char* format, uint16_t flags);
