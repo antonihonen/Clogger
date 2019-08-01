@@ -16,13 +16,6 @@
 #ifndef LG_POLICY_H
 #define LG_POLICY_H
 
-/* REWRITE: Only use one log file and whenever it gets full,
-erase all data in the file and keep writing in the same file.
-ROTATE: When the log file gets full, append a sequential
-number to the file name.
-IGNORE_EXCESS: When the file gets full, no longer accept
-log writes until the file has been emptied by an external
-process. */
 typedef enum {
     LG_FMODE_NONE = 0,
     LG_FMODE_REWRITE = 1,
@@ -31,8 +24,6 @@ typedef enum {
 #define LG_VALID_FMODE_COUNT LG_FMODE_ROTATE
 const LG_FMODE LG_VALID_FMODES[LG_VALID_FMODE_COUNT];
 
-/* These three buffering modes correspond 1:1 with the buffering modes
-explained in the documentation of the setvbuf function(stdio.h).*/
 typedef enum {
     LG_NBF = 1,
     LG_LBF,

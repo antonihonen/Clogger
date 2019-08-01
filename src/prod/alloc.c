@@ -24,7 +24,6 @@ bool LG_register_allocator(void* (*alloc)(size_t), void (*dealloc)(void*))
     {
         return false;
     }
-
     LG_alloc_fun = alloc;
     LG_dealloc_fun = dealloc;
     return true;

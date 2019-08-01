@@ -42,8 +42,8 @@
 #include <stdint.h>
 #include <time.h>
 
-#define LG_FORMAT_PATHS 0x01
-#define LG_FORMAT_ENTRIES 0x02
+#define LG_FORMAT_PATHS (1 << 0)
+#define LG_FORMAT_ENTRIES (1 << 1)
 
 typedef struct {
     char      format[LG_MAX_ENTRY_SIZE];

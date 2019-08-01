@@ -18,10 +18,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define LG_DEF_MAX_FSIZE 1048576 /* 1 MiB */
-#define LG_DEF_THRESHOLD LG_TRACE
-#define LG_DEF_ENTRY_FORMAT "%(MSG)\n"
-
 /* Log. */
 typedef struct
 {
