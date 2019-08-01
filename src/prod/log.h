@@ -25,25 +25,16 @@
 /* Log. */
 typedef struct
 {
-    /* File handlers. Required to write in files. Also takes care of
-    file and directory name-related things. */
     fhandler_t* def_fhandler;
     fhandler_t* fhandlers[_VALID_LVL_COUNT];
 
-    /* Entry formatters. Required to expand format macros in log entries. */
     format_t* def_formatter;
     format_t* formatters[_VALID_LVL_COUNT];
 
-    /* The active threshold level. Any entry with a lower level
-    than the threshold level will be ignored. */
     LOG_LEVEL threshold;
-
-    /* Indicates whether the log object accepts any entries -
-    if not, all entries are ignored as if their level
-    was lower than the entry threshold. */
     bool is_enabled;
-
     uint16_t flags;
+    LOG_ERROR last_error;
 } log_t;
 
 log_t* log_init(const char* dname_format,
@@ -57,6 +48,14 @@ bool log_close(log_t* log);
 bool log_enable(log_t* log);
 
 bool log_disable(log_t* log);
+
+void _log_set_error(log_t* log, LOG_ERROR error);
+
+LOG_ERROR log_last_error(log_t* log);
+
+void log_clear_error(log_t* log);
+
+bool log_has_error(log_t* log);
 
 bool log_set_threshold(log_t* log, LOG_LEVEL threshold);
 

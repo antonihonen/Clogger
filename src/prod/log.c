@@ -155,6 +155,29 @@ bool log_disable(log_t* log)
     return true;
 }
 
+void _log_set_error(log_t* log, LOG_ERROR error)
+{
+    log->last_error = error;
+}
+
+LOG_ERROR log_last_error(log_t* log)
+{
+    return log->last_error;
+}
+
+void log_clear_error(log_t* log)
+{
+    log->last_error = E_NO_ERROR;
+}
+
+bool log_has_error(log_t* log)
+{
+    if (log->last_error != E_NO_ERROR)
+    {
+        return true;
+    }
+}
+
 bool log_set_threshold(log_t* log, LOG_LEVEL threshold)
 {
     assert(log);
