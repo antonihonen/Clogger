@@ -13,8 +13,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#ifndef _ALLOC_H
-#define _ALLOC_H
+#ifndef LG_ALLOC_H
+#define LG_ALLOC_H
 
 /* Registers a custom allocator and deallocator that will be used
 instead of malloc and free to reserve and free memory within the
@@ -26,4 +26,4 @@ void* _log_alloc(size_t size);
 
 void _log_dealloc(void* ptr);
 
-#endif /* _ALLOC_H */
+#endif /* LG_ALLOC_H */

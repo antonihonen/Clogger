@@ -16,20 +16,20 @@
 #define LOG_LEVEL_H
 
 typedef enum {
-    L_NO_LEVEL = -1, /* Only intended for internal use. */
-    L_TRACE = 0,
-    L_DEBUG,
-    L_INFO,
-    L_NOTICE,
-    L_WARNING,
-    L_ERROR,
-    L_CRITICAL,
-    L_ALERT,
-    L_EMERGENCY
-} LOG_LEVEL;
-#define _VALID_LVL_COUNT (L_EMERGENCY + 1)
+    LG_L_NO_LEVEL = -1, /* Only intended for internal use. */
+    LG_L_TRACE = 0,
+    LG_L_DEBUG,
+    LG_L_INFO,
+    LG_L_NOTICE,
+    LG_L_WARNING,
+    LG_L_ERROR,
+    LG_L_CRITICAL,
+    LG_L_ALERT,
+    LG_L_EMERGENCY
+} LG_LEVEL;
+#define LG_VALID_LVL_COUNT (LG_L_EMERGENCY + 1)
 
-const LOG_LEVEL _VALID_LOG_LEVELS[_VALID_LVL_COUNT];
-const char* const _LOG_LEVEL_STRS[_VALID_LVL_COUNT];
+const LG_LEVEL LG_VALID_LOG_LEVELS[LG_VALID_LVL_COUNT];
+const char* const LG_LOG_LEVEL_STRS[LG_VALID_LVL_COUNT];
 
 #endif /* LOG_LEVEL_H */

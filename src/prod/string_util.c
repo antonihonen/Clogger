@@ -11,40 +11,40 @@
 #include <stdio.h>
 #include <string.h>
 
-#define _ASCII_CAP_AND_SMALL_DIFF 32
+#define LG_ASCII_CAP_AND_SMALL_DIFF 32
 
-static char _char_to_lower(char c)
+static char LG_char_to_lower(char c)
 {
-    return c + _ASCII_CAP_AND_SMALL_DIFF;
+    return c + LG_ASCII_CAP_AND_SMALL_DIFF;
 }
 
-static bool _is_uppercase_char(char c)
+static bool LG_is_uppercase_char(char c)
 {
     return c >= 'A' && c <= 'Z' ? true : false;
 }
 
-void _terminate_str(char* str, size_t pos)
+void LG_terminate_str(char* str, size_t pos)
 {
     str[pos] = '\0';
 }
 
-void _clear_str(char* str)
+void LG_clear_str(char* str)
 {
-    _terminate_str(str, 0);
+    LG_terminate_str(str, 0);
 }
 
-bool _is_empty_str(char* str)
+bool LG_is_empty_str(char* str)
 {
     return *str == '\0';
 }
 
-void _str_to_lower(char* str)
+void LG_str_to_lower(char* str)
 {
     while (*str != '\0')
     {
-        if (_is_uppercase_char(*str))
+        if (LG_is_uppercase_char(*str))
         {
-            *str = _char_to_lower(*str);
+            *str = LG_char_to_lower(*str);
         }
         ++str;
     }

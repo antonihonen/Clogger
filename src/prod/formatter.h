@@ -22,7 +22,7 @@
  *
  *   e_formatter_t* ef = ef_init("%(hour):%(min):%(sec) %(LVL) %(msg)");
  *   char expanded_entry[128];
- *   ef_format(ef, expanded_entry, " test message \n", _L_TRACE);
+ *   ef_format(ef, expanded_entry, " test message \n", LG_L_TRACE);
  *   // Expanded_entry now contains, for example,
  *   // "01:52:01 TRACE     test message \n";
  *   ef_close(ef);
@@ -33,19 +33,19 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#ifndef FORMATTER_H
-#define FORMATTER_H
+#ifndef LG_FORMATTER_H
+#define LG_FORMATTER_H
 
 #include "log_level.h"
 #include "macros.h"
 #include <stdint.h>
 #include <time.h>
 
-#define _FORMAT_PATHS 0x01
-#define _FORMAT_ENTRIES 0x02
+#define LG_FORMAT_PATHS 0x01
+#define LG_FORMAT_ENTRIES 0x02
 
 typedef struct {
-    char format[_MAX_ENTRY_SIZE];
+    char format[LG_MAX_ENTRY_SIZE];
     struct tm time;
     uint16_t flags;
 } format_t;
@@ -61,8 +61,8 @@ char* format_path(format_t* formatter, char* dest);
 char* format_entry(format_t* formatter,
                    char* dest,
                    const char* msg,
-                   LOG_LEVEL level);
+                   LG_LEVEL level);
 
 void format_free(format_t* formatter);
 
-#endif /* FORMATTER_H */
+#endif /* LG_FORMATTER_H */

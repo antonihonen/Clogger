@@ -10,11 +10,11 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef LG_ERROR_H
+#define LG_ERROR_H
 
 typedef enum {
-    E_NO_ERROR = 0
-} LOG_ERROR;
+    LG_E_NO_ERROR = 0
+} LG_ERRNO;
 
-#endif /* ERROR_H */
+#endif /* LG_ERROR_H */

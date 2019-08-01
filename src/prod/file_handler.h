@@ -34,8 +34,8 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#ifndef FILE_HANDLER_H
-#define FILE_HANDLER_H
+#ifndef LG_FILE_HANDLER_H
+#define LG_FILE_HANDLER_H
 
 #include "error.h"
 #include "formatter.h"
@@ -45,7 +45,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define _DEF_BUF_SIZE BUFSIZ
+#define LG_DEF_BUF_SIZE BUFSIZ
 
 /* File handler. */
 typedef struct {
@@ -61,14 +61,14 @@ typedef struct {
     format_t* dname_formatter;
 
     /* The name of the currently active file. */
-    char curr_fname[_MAX_FILENAME_SIZE];
+    char curr_fname[LG_MAX_FNAME_SIZE];
 
     /* The absolute filepath of the directory where the current
     log fill resides. */
-    char curr_dname[_MAX_FILENAME_SIZE];
+    char curr_dname[LG_MAX_FNAME_SIZE];
 
     /* The absolute filepath of the currently active log file. */
-    char curr_fpath[_MAX_FILENAME_SIZE];
+    char curr_fpath[LG_MAX_FNAME_SIZE];
 
     /* Output buffer. NULL if buffering mode is _IONBF. */
     char* buf;
@@ -80,7 +80,7 @@ typedef struct {
     int buf_mode;
 
     /* File mode. One of: ROTATE, REWRITE. */
-    LOG_FILE_MODE file_mode;
+    LG_FMODE file_mode;
 
     /* The maximum size of a log file in bytes. Log files are
     guaranteed to be smaller than this. */
@@ -106,7 +106,7 @@ typedef struct {
 fhandler_t* fh_init(const char* dname_format,
                     const char* fname_format,
                     size_t max_fsize,
-                    LOG_FILE_MODE fmode,
+                    LG_FMODE fmode,
                     int buf_mode,
                     size_t buf_size,
                     uint16_t flags);
@@ -121,9 +121,9 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size);
 
 size_t fh_buf_size(const fhandler_t* fh);
 
-bool fh_set_file_mode(fhandler_t* fh, LOG_FILE_MODE mode);
+bool fh_set_file_mode(fhandler_t* fh, LG_FMODE mode);
 
-LOG_FILE_MODE fh_file_mode(const fhandler_t* fh);
+LG_FMODE fh_file_mode(const fhandler_t* fh);
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format);
 
@@ -147,4 +147,4 @@ size_t fh_current_fsize(const fhandler_t* fh);
 
 bool fh_fwrite(fhandler_t* fh, const char* data_out);
 
-#endif /* FILE_HANDLER_H */
+#endif /* LG_FILE_HANDLER_H */

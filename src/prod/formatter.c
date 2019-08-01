@@ -16,7 +16,7 @@
 
 typedef struct
 {
-    _FM_ID id;
+    LG_FM_ID id;
     size_t len;
 } fm_info_t;
 
@@ -32,9 +32,9 @@ static const char* const WEEKDAYS[7] =
 
 static size_t _formatter_expand_fm(const format_t* formatter,
                                    char* dest,
-                                   _FM_ID fm,
+                                   LG_FM_ID fm,
                                    const char* msg,
-                                   LOG_LEVEL lvl);
+                                   LG_LEVEL lvl);
 
 static void _formatter_get_time(format_t* formatter);
 
@@ -48,7 +48,7 @@ static fm_info_t _formatter_recognize_fm(const format_t* formatter,
 static char* _formatter_do_format(format_t* formatter,
                                   char* dest,
                                   const char* msg,
-                                  LOG_LEVEL lvl);
+                                  LG_LEVEL lvl);
 
 static char* _formatter_get_mname(const format_t* formatter,
                                   char* dest,
@@ -58,7 +58,7 @@ static char* _formatter_get_wday(const format_t* formatter,
                                  char* dest,
                                  char* decapitalize_from);
 
-static char* _get_lvl(LOG_LEVEL lvl,
+static char* _get_lvl(LG_LEVEL lvl,
                       char* dest,
                       char* decapitalize_from);
 
@@ -66,7 +66,7 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format);
 
 format_t* format_init(const char* format, uint16_t flags)
 {
-    if (!((flags & _FORMAT_PATHS) || (flags & _FORMAT_ENTRIES)))
+    if (!((flags & LG_FORMAT_PATHS) || (flags & LG_FORMAT_ENTRIES)))
     {
         return NULL;
     }
@@ -118,16 +118,16 @@ char* format_get(format_t* formatter, char* dest)
 char* format_entry(format_t* formatter,
                    char* dest,
                    const char* msg,
-                   LOG_LEVEL lvl)
+                   LG_LEVEL lvl)
 {
-    assert(formatter->flags & _FORMAT_ENTRIES);
+    assert(formatter->flags & LG_FORMAT_ENTRIES);
     return _formatter_do_format(formatter, dest, msg, lvl);
 }
 
 char* format_path(format_t* formatter, char* dest)
 {
-    assert(formatter->flags & _FORMAT_PATHS);
-    return _formatter_do_format(formatter, dest, NULL, L_NO_LEVEL);
+    assert(formatter->flags & LG_FORMAT_PATHS);
+    return _formatter_do_format(formatter, dest, NULL, LG_L_NO_LEVEL);
 }
 
 static void _formatter_get_time(format_t* formatter)
@@ -141,9 +141,9 @@ size_t _formatter_fm_as_str(const format_t* formatter, char* dest, const char* s
 {
     size_t fm_len = 0;
 
-    assert(*src == _FM_BEGIN_INDIC);
-    char* left_delim = strchr(src, _FM_LEFT_DELIM);
-    char* right_delim = strchr(src, _FM_RIGHT_DELIM);
+    assert(*src == LG_FM_BEGIN_INDIC);
+    char* left_delim = strchr(src, LG_FM_LEFT_DELIM);
+    char* right_delim = strchr(src, LG_FM_RIGHT_DELIM);
 
     if (left_delim && right_delim && left_delim == src + 1)
     {
@@ -162,10 +162,10 @@ size_t _formatter_fm_as_str(const format_t* formatter, char* dest, const char* s
 
 static fm_info_t _formatter_recognize_fm(const format_t* formatter, const char* src)
 {
-    char fm_str[_MAX_FM_S_LEN];
+    char fm_str[LG_MAX_FM_S_LEN];
 
-    fm_info_t fm = { _FM_NO_MACRO, 0 };
-    if (*src != _FM_BEGIN_INDIC)
+    fm_info_t fm = { LG_FM_NO_MACRO, 0 };
+    if (*src != LG_FM_BEGIN_INDIC)
     {
         return fm;
     }
@@ -173,7 +173,7 @@ static fm_info_t _formatter_recognize_fm(const format_t* formatter, const char* 
     fm.len = _formatter_fm_as_str(formatter, fm_str, src);
     if (fm.len != 0)
     {
-        for (size_t i = 0; i < _FM_COUNT; ++i)
+        for (size_t i = 0; i < LG_FM_COUNT; ++i)
         {
             if (strcmp(fm_str, _FM_TABLE[i].str) == 0)
             {
@@ -187,13 +187,13 @@ static fm_info_t _formatter_recognize_fm(const format_t* formatter, const char* 
 static char* _formatter_do_format(format_t* formatter,
                                   char* dest,
                                   const char* msg,
-                                  LOG_LEVEL lvl)
+                                  LG_LEVEL lvl)
 {
     _formatter_get_time(formatter);
 
     char* orig_dest = dest;
     char* src = formatter->format;
-    char* src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
+    char* src_fm_begin = strchr(src, LG_FM_BEGIN_INDIC);
     while (src_fm_begin != NULL)
     {
         /* TODO Optimize */
@@ -202,7 +202,7 @@ static char* _formatter_do_format(format_t* formatter,
             *(dest++) = *(src++);
         }
         fm_info_t fm = _formatter_recognize_fm(formatter, src_fm_begin);
-        if (fm.id != _FM_NO_MACRO)
+        if (fm.id != LG_FM_NO_MACRO)
         {
             dest += _formatter_expand_fm(formatter, dest, fm.id, msg, lvl);
             src += fm.len;
@@ -211,7 +211,7 @@ static char* _formatter_do_format(format_t* formatter,
         {
             *(dest++) = *(src++);
         }
-        src_fm_begin = strchr(src, _FM_BEGIN_INDIC);
+        src_fm_begin = strchr(src, LG_FM_BEGIN_INDIC);
     }
     while (*src != '\0')
     {
@@ -223,27 +223,27 @@ static char* _formatter_do_format(format_t* formatter,
 
 size_t _formatter_expand_fm(const format_t* formatter,
                             char* dest,
-                            _FM_ID fm,
+                            LG_FM_ID fm,
                             const char* msg,
-                            LOG_LEVEL lvl)
+                            LG_LEVEL lvl)
 {
-    assert(fm != _FM_NO_MACRO);
+    assert(fm != LG_FM_NO_MACRO);
 
     char format[8] = "%0*d";
 
     switch (fm)
     {
-        case _FM_YEAR:
+        case LG_FM_YEAR:
             return sprintf(dest, format, 4, formatter->time.tm_year + 1900);
-        case _FM_MONTH:
+        case LG_FM_MONTH:
             return sprintf(dest, format, 2, formatter->time.tm_mon + 1);
-        case _FM_MDAY:
+        case LG_FM_MDAY:
             return sprintf(dest, format, 2, formatter->time.tm_mday);
-        case _FM_HOUR:
+        case LG_FM_HOUR:
             return sprintf(dest, format, 2, formatter->time.tm_hour);
-        case _FM_MIN:
+        case LG_FM_MIN:
             return sprintf(dest, format, 2, formatter->time.tm_min);
-        case _FM_SEC:
+        case LG_FM_SEC:
             return sprintf(dest, format, 2, formatter->time.tm_sec);
     }
 
@@ -252,52 +252,52 @@ size_t _formatter_expand_fm(const format_t* formatter,
     size_t copy_amount = 0;
     switch (fm)
     {
-        case _FM_MNAME_S_F:
+        case LG_FM_MNAME_S_F:
             _formatter_get_mname(formatter, source, source + 1);
-            copy_amount = _FM_MNAME_S_EXP_SIZE;
+            copy_amount = LG_FM_MNAME_S_EXP_SIZE;
             break;
-        case _FM_MNAME_S_A:
+        case LG_FM_MNAME_S_A:
             _formatter_get_mname(formatter, source, NULL);
-            copy_amount = _FM_MNAME_S_EXP_SIZE;
+            copy_amount = LG_FM_MNAME_S_EXP_SIZE;
             break;
-        case _FM_MNAME_L_F:
+        case LG_FM_MNAME_L_F:
             _formatter_get_mname(formatter, source, source + 1);
-            copy_amount = _MAX_FM_MNAME_L_EXP_SIZE;
+            copy_amount = LG_MAX_FM_MNAME_L_EXP_SIZE;
             break;
-        case _FM_MNAME_L_A:
+        case LG_FM_MNAME_L_A:
             _formatter_get_mname(formatter, source, NULL);
-            copy_amount = _MAX_FM_MNAME_L_EXP_SIZE;
+            copy_amount = LG_MAX_FM_MNAME_L_EXP_SIZE;
             break;
-        case _FM_WDAY_S_F:
+        case LG_FM_WDAY_S_F:
             _formatter_get_wday(formatter, source, source + 1);
-            copy_amount = _FM_WDAY_S_EXP_SIZE;
+            copy_amount = LG_FM_WDAY_S_EXP_SIZE;
             break;
-        case _FM_WDAY_S_A:
+        case LG_FM_WDAY_S_A:
             _formatter_get_wday(formatter, source, NULL);
-            copy_amount = _FM_WDAY_S_EXP_SIZE;
+            copy_amount = LG_FM_WDAY_S_EXP_SIZE;
             break;
-        case _FM_WDAY_L_F:
+        case LG_FM_WDAY_L_F:
             _formatter_get_wday(formatter, source, source + 1);
-            copy_amount = _MAX_FM_WDAY_L_EXP_SIZE;
+            copy_amount = LG_MAX_FM_WDAY_L_EXP_SIZE;
             break;
-        case _FM_WDAY_L_A:
+        case LG_FM_WDAY_L_A:
             _formatter_get_wday(formatter, source, NULL);
-            copy_amount = _MAX_FM_WDAY_L_EXP_SIZE;
+            copy_amount = LG_MAX_FM_WDAY_L_EXP_SIZE;
             break;
-        case _FM_LVL_N:
+        case LG_FM_LVL_N:
             _get_lvl(lvl, source, source);
-            copy_amount = _FM_LVL_MAX_LEN;
+            copy_amount = LG_FM_LVL_MAX_LEN;
             break;
-        case _FM_LVL_F:
+        case LG_FM_LVL_F:
             _get_lvl(lvl, source, source + 1);
-            copy_amount = _FM_LVL_MAX_LEN;
+            copy_amount = LG_FM_LVL_MAX_LEN;
             break;
-        case _FM_LVL_A:
+        case LG_FM_LVL_A:
             _get_lvl(lvl, source, NULL);
-            copy_amount = _FM_LVL_MAX_LEN;
+            copy_amount = LG_FM_LVL_MAX_LEN;
             break;
-        case _FM_MSG:
-            return sprintf(dest, format, _MAX_MSG_SIZE, msg);
+        case LG_FM_MSG:
+            return sprintf(dest, format, LG_MAX_MSG_SIZE, msg);
         default:
             assert(0);
     }
@@ -310,7 +310,7 @@ char* _formatter_get_mname(const format_t* formatter, char* dest, char* decapita
     strcpy(dest, MONTHS[formatter->time.tm_mon]);
     if (decapitalize_from)
     {
-        _str_to_lower(decapitalize_from);
+        LG_str_to_lower(decapitalize_from);
     }
     return dest;
 }
@@ -320,17 +320,17 @@ char* _formatter_get_wday(const format_t* formatter, char* dest, char* decapital
     strcpy(dest, WEEKDAYS[formatter->time.tm_wday]);
     if (decapitalize_from)
     {
-        _str_to_lower(decapitalize_from);
+        LG_str_to_lower(decapitalize_from);
     }
     return dest;
 }
 
-char* _get_lvl(LOG_LEVEL lvl, char* dest, char* decapitalize_from)
+char* _get_lvl(LG_LEVEL lvl, char* dest, char* decapitalize_from)
 {
-    strcpy(dest, _LOG_LEVEL_STRS[lvl]);
+    strcpy(dest, LG_LOG_LEVEL_STRS[lvl]);
     if (decapitalize_from)
     {
-        _str_to_lower(decapitalize_from);
+        LG_str_to_lower(decapitalize_from);
     }
     return dest;
 }
@@ -343,21 +343,21 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format)
     {
         size_t macro_len = 1;
         size_t exp_macro_len = 1;
-        if (*format == _FM_BEGIN_INDIC)
+        if (*format == LG_FM_BEGIN_INDIC)
         {
             fm_info_t fm = _formatter_recognize_fm(formatter, format);
-            if (fm.id != _FM_NO_MACRO)
+            if (fm.id != LG_FM_NO_MACRO)
             {
                 exp_macro_len = _FM_TABLE[fm.id].max_len;
             }
-            if (formatter->flags & _FORMAT_PATHS)
+            if (formatter->flags & LG_FORMAT_PATHS)
             {
                 switch (fm.id)
                 {
-                    case _FM_MSG:
-                    case _FM_LVL_N:
-                    case _FM_LVL_F:
-                    case _FM_LVL_A:
+                    case LG_FM_MSG:
+                    case LG_FM_LVL_N:
+                    case LG_FM_LVL_F:
+                    case LG_FM_LVL_A:
                         return false;
                     default:
                         break;
@@ -368,13 +368,13 @@ bool _formatter_is_valid_format(const format_t* formatter, const char* format)
         max_len += exp_macro_len;
     }
 
-    if (formatter->flags & _FORMAT_PATHS
-            && max_len < _MAX_FILENAME_SIZE - 1)
+    if (formatter->flags & LG_FORMAT_PATHS
+            && max_len < LG_MAX_FNAME_SIZE - 1)
     {
         return true;
     }
-    else if (formatter->flags & _FORMAT_ENTRIES
-                 && max_len < _MAX_ENTRY_SIZE - 1)
+    else if (formatter->flags & LG_FORMAT_ENTRIES
+                 && max_len < LG_MAX_ENTRY_SIZE - 1)
     {
         return true;
     }

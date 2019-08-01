@@ -13,8 +13,8 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#ifndef POLICY_H
-#define POLICY_H
+#ifndef LG_POLICY_H
+#define LG_POLICY_H
 
 /* REWRITE: Only use one log file and whenever it gets full,
 erase all data in the file and keep writing in the same file.
@@ -24,21 +24,21 @@ IGNORE_EXCESS: When the file gets full, no longer accept
 log writes until the file has been emptied by an external
 process. */
 typedef enum {
-    NO_FILE_MODE = 0,
-    REWRITE = 1,
-    ROTATE
-} LOG_FILE_MODE;
-#define _VALID_FILEPOL_COUNT ROTATE
-const LOG_FILE_MODE _VALID_FILE_POLICIES[_VALID_FILEPOL_COUNT];
+    LG_FMODE_NONE = 0,
+    LG_FMODE_REWRITE = 1,
+    LG_FMODE_ROTATE
+} LG_FMODE;
+#define LG_VALID_FMODE_COUNT LG_FMODE_ROTATE
+const LG_FMODE LG_VALID_FMODES[LG_VALID_FMODE_COUNT];
 
 /* These three buffering modes correspond 1:1 with the buffering modes
 explained in the documentation of the setvbuf function(stdio.h).*/
 typedef enum {
-    NO_BUFFERING = 1,
-    LINE_BUFFERING,
-    FULL_BUFFERING
-} LOG_BUF_MODE;
-#define _VALID_BUFPOL_COUNT FULL_BUFFERING
-const LOG_BUF_MODE _VALID_BUF_POLICIES[_VALID_BUFPOL_COUNT];
+    LG_NBF = 1,
+    LG_LBF,
+    LG_FBF
+} LG_BMODE;
+#define LG_VALID_BMODE_COUNT LG_FBF
+const LG_BMODE LG_VALID_BMODES[LG_VALID_BMODE_COUNT];
 
-#endif /* POLICY_H */
+#endif /* LG_POLICY_H */

@@ -8,8 +8,8 @@
  * Copyright (C) 2019. Anton Ihonen
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef LG_LOG_H
+#define LG_LOG_H
 
 #include "flags.h"
 #include "file_handler.h"
@@ -18,28 +18,28 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define _DEF_MAX_FSIZE 102400 /* 100 kiB */
-#define _DEF_THRESHOLD L_TRACE
-#define _DEF_ENTRY_FORMAT "%(MSG)\n"
+#define LG_DEF_MAX_FSIZE 1048576 /* 1 MiB */
+#define LG_DEF_THRESHOLD LG_L_TRACE
+#define LG_DEF_ENTRY_FORMAT "%(MSG)\n"
 
 /* Log. */
 typedef struct
 {
     fhandler_t* def_fhandler;
-    fhandler_t* fhandlers[_VALID_LVL_COUNT];
+    fhandler_t* fhandlers[LG_VALID_LVL_COUNT];
 
     format_t* def_formatter;
-    format_t* formatters[_VALID_LVL_COUNT];
+    format_t* formatters[LG_VALID_LVL_COUNT];
 
-    LOG_LEVEL threshold;
+    LG_LEVEL threshold;
     bool is_enabled;
     uint16_t flags;
-    LOG_ERROR last_error;
+    LG_ERRNO last_error;
 } log_t;
 
 log_t* log_init(const char* dname_format,
                 const char* fname_format,
-                LOG_FILE_MODE file_mode,
+                LG_FMODE file_mode,
                 int buf_mode,
                 uint16_t flags);
 
@@ -49,47 +49,47 @@ bool log_enable(log_t* log);
 
 bool log_disable(log_t* log);
 
-void _log_set_error(log_t* log, LOG_ERROR error);
+void _log_set_error(log_t* log, LG_ERRNO error);
 
-LOG_ERROR log_last_error(log_t* log);
+LG_ERRNO log_last_error(log_t* log);
 
 void log_clear_error(log_t* log);
 
 bool log_has_error(log_t* log);
 
-bool log_set_threshold(log_t* log, LOG_LEVEL threshold);
+bool log_set_threshold(log_t* log, LG_LEVEL threshold);
 
-LOG_LEVEL log_threshold(log_t* log);
+LG_LEVEL log_threshold(log_t* log);
 
-bool log_set_buf_mode(log_t* log, LOG_LEVEL level, int mode);
+bool log_set_buf_mode(log_t* log, LG_LEVEL level, int mode);
 
-int log_buf_mode(log_t* log, LOG_LEVEL level);
+int log_buf_mode(log_t* log, LG_LEVEL level);
 
-bool log_set_buf_size(log_t* log, LOG_LEVEL level, size_t buf_size);
+bool log_set_buf_size(log_t* log, LG_LEVEL level, size_t buf_size);
 
-bool log_set_file_mode(log_t* log, LOG_LEVEL level, LOG_FILE_MODE mode);
+bool log_set_file_mode(log_t* log, LG_LEVEL level, LG_FMODE mode);
 
-LOG_FILE_MODE log_file_mode(log_t* log, LOG_LEVEL level);
+LG_FMODE log_file_mode(log_t* log, LG_LEVEL level);
 
-bool log_set_dname_format(log_t* log, LOG_LEVEL level, const char* format);
+bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format);
 
-char* log_curr_dname(log_t* log, LOG_LEVEL level, char* dest);
+char* log_curr_dname(log_t* log, LG_LEVEL level, char* dest);
 
-bool log_set_fname_format(log_t* log, LOG_LEVEL level, const char* format);
+bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format);
 
-char* log_curr_fname(log_t* log, LOG_LEVEL level, char* dest);
+char* log_curr_fname(log_t* log, LG_LEVEL level, char* dest);
 
-char* log_curr_fpath(log_t* log, LOG_LEVEL level, char* dest);
+char* log_curr_fpath(log_t* log, LG_LEVEL level, char* dest);
 
-bool log_set_max_fsize(log_t* log, LOG_LEVEL level, size_t size);
+bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size);
 
-size_t log_max_fsize(log_t* log, LOG_LEVEL level);
+size_t log_max_fsize(log_t* log, LG_LEVEL level);
 
-size_t log_current_fsize(log_t* log, LOG_LEVEL level);
+size_t log_current_fsize(log_t* log, LG_LEVEL level);
 
-bool log_set_entry_format(log_t* log, LOG_LEVEL level, const char* format);
+bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format);
 
-bool log_write(log_t* log, LOG_LEVEL level, const char* message);
+bool log_write(log_t* log, LG_LEVEL level, const char* message);
 
 bool log_trace(log_t* log, const char* message);
 
@@ -109,4 +109,4 @@ bool log_alert(log_t* log, const char* message);
 
 bool log_emergency(log_t* log, const char* message);
 
-#endif /* LOG_H */
+#endif /* LG_LOG_H */

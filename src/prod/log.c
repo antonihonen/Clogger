@@ -13,14 +13,14 @@
 
 /* A macro that implements the common part of those setter functions that
 make use of the file handler setters. */
-#define APPLY_FH_SETTING(log,                                                 \
-                         lvl,                                                 \
-                         setting_func,                                        \
-                         val_type,                                            \
-                         setting_val,                                         \
-                         success)                                             \
+#define LG_APPLY_FH_SETTING(log,                                              \
+                            lvl,                                              \
+                            setting_func,                                     \
+                            val_type,                                         \
+                            setting_val,                                      \
+                            success)                                          \
 {                                                                             \
-    if (log->flags & _PRINT_ONLY)                                             \
+    if (log->flags & LG_STDOUT_ONLY)                                          \
     {                                                                         \
         success = false;                                                      \
     }                                                                         \
@@ -38,25 +38,25 @@ make use of the file handler setters. */
     }                                                                         \
 }
 
-static bool _log_create_formatter_if_none(log_t* log, LOG_LEVEL level);
+static bool _log_create_formatter_if_none(log_t* log, LG_LEVEL level);
 
-static bool _log_create_fhandler_if_none(log_t* log, LOG_LEVEL level);
+static bool _log_create_fhandler_if_none(log_t* log, LG_LEVEL level);
 
-static bool _log_create_formatter(log_t* log, LOG_LEVEL level);
+static bool _log_create_formatter(log_t* log, LG_LEVEL level);
 
-static bool _log_create_fhandler(log_t* log, LOG_LEVEL level);
+static bool _log_create_fhandler(log_t* log, LG_LEVEL level);
 
-static inline bool _is_valid_level(LOG_LEVEL level);
+static inline bool _is_valid_level(LG_LEVEL level);
 
 static inline bool _is_valid_buf_mode(int mode);
 
-static inline bool _is_valid_file_mode(LOG_FILE_MODE mode);
+static inline bool _is_valid_file_mode(LG_FMODE mode);
 
 
 
 log_t* log_init(const char* dname_format,
                 const char* fname_format,
-                LOG_FILE_MODE file_mode,
+                LG_FMODE file_mode,
                 int buf_mode,
                 uint16_t flags)
 {
@@ -69,13 +69,13 @@ log_t* log_init(const char* dname_format,
         return NULL;
     }
 
-    if (!(flags & _PRINT_ONLY))
+    if (!(flags & LG_STDOUT_ONLY))
     {
         /* Create the default file handler. This will be used for all
         request levels until he user asks us to do otherwise. */
         log->def_fhandler = fh_init(dname_format ? dname_format : "",
                                     fname_format ? fname_format : "",
-                                    _DEF_MAX_FSIZE,
+                                    LG_DEF_MAX_FSIZE,
                                     file_mode,
                                     buf_mode,
                                     BUFSIZ,
@@ -86,11 +86,11 @@ log_t* log_init(const char* dname_format,
         log->def_fhandler = NULL;
     }
 
-    log->def_formatter = format_init(_DEF_ENTRY_FORMAT, _FORMAT_ENTRIES);
+    log->def_formatter = format_init(LG_DEF_ENTRY_FORMAT, LG_FORMAT_ENTRIES);
 
     /* Memory allocation for either the default file handler or the
     entry formatter failed. Release memory. */
-    if ((!log->def_fhandler && (flags & _PRINT_ONLY))
+    if ((!log->def_fhandler && (flags & LG_STDOUT_ONLY))
          || !log->def_formatter)
     {
         log_close(log);
@@ -99,7 +99,7 @@ log_t* log_init(const char* dname_format,
 
     /* Tie each logging level to the default file handler and formatter
     at first. */
-    for (size_t i = 0; i < _VALID_LVL_COUNT; ++i)
+    for (size_t i = 0; i < LG_VALID_LVL_COUNT; ++i)
     {
         log->fhandlers[i] = log->def_fhandler;
         log->formatters[i] = log->def_formatter;
@@ -107,7 +107,7 @@ log_t* log_init(const char* dname_format,
 
     log->flags = flags;
     log->is_enabled = true;
-    log->threshold = _DEF_THRESHOLD;
+    log->threshold = LG_DEF_THRESHOLD;
 
     return log;
 }
@@ -121,7 +121,7 @@ bool log_close(log_t* log)
         fh_free(log->def_fhandler);
     }
 
-    for (size_t i = 0; i < _VALID_LVL_COUNT; ++i)
+    for (size_t i = 0; i < LG_VALID_LVL_COUNT; ++i)
     {
         if (log->fhandlers[i] != NULL
             && log->fhandlers[i] != log->def_fhandler)
@@ -155,30 +155,30 @@ bool log_disable(log_t* log)
     return true;
 }
 
-void _log_set_error(log_t* log, LOG_ERROR error)
+void _log_set_error(log_t* log, LG_ERRNO error)
 {
     log->last_error = error;
 }
 
-LOG_ERROR log_last_error(log_t* log)
+LG_ERRNO log_last_error(log_t* log)
 {
     return log->last_error;
 }
 
 void log_clear_error(log_t* log)
 {
-    log->last_error = E_NO_ERROR;
+    log->last_error = LG_E_NO_ERROR;
 }
 
 bool log_has_error(log_t* log)
 {
-    if (log->last_error != E_NO_ERROR)
+    if (log->last_error != LG_E_NO_ERROR)
     {
         return true;
     }
 }
 
-bool log_set_threshold(log_t* log, LOG_LEVEL threshold)
+bool log_set_threshold(log_t* log, LG_LEVEL threshold)
 {
     assert(log);
     assert(_is_valid_level(threshold));
@@ -187,24 +187,24 @@ bool log_set_threshold(log_t* log, LOG_LEVEL threshold)
     return true;
 }
 
-LOG_LEVEL log_threshold(log_t* log)
+LG_LEVEL log_threshold(log_t* log)
 {
     assert(log);
     return log->threshold;
 }
 
-bool log_set_buf_mode(log_t* log, LOG_LEVEL level, int mode)
+bool log_set_buf_mode(log_t* log, LG_LEVEL level, int mode)
 {
     assert(log);
     assert(_is_valid_level(level));
     assert(_is_valid_buf_mode(level));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_buf_mode, int, mode, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_buf_mode, int, mode, success);
     return success;
 }
 
-int log_buf_mode(log_t* log, LOG_LEVEL level)
+int log_buf_mode(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(_is_valid_level(level));
@@ -217,52 +217,52 @@ int log_buf_mode(log_t* log, LOG_LEVEL level)
     return fh_buf_mode(log->fhandlers[level]);
 }
 
-bool log_set_buf_size(log_t* log, LOG_LEVEL level, size_t buf_size)
+bool log_set_buf_size(log_t* log, LG_LEVEL level, size_t buf_size)
 {
     assert(log);
     assert(_is_valid_level(level));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_buf_size, size_t, buf_size, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_buf_size, size_t, buf_size, success);
     return success;
 }
 
-bool log_set_file_mode(log_t* log, LOG_LEVEL level, LOG_FILE_MODE mode)
+bool log_set_file_mode(log_t* log, LG_LEVEL level, LG_FMODE mode)
 {
     assert(log);
     assert(_is_valid_level(level));
     assert(_is_valid_file_mode(mode));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_file_mode, LOG_FILE_MODE, mode, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_file_mode, LG_FMODE, mode, success);
     return success;
 }
 
-LOG_FILE_MODE log_file_mode(log_t* log, LOG_LEVEL level)
+LG_FMODE log_file_mode(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(_is_valid_level(level));
 
     if (!log->def_fhandler)
     {
-        return NO_FILE_MODE;
+        return LG_FMODE_NONE;
     }
 
     return fh_file_mode(log->fhandlers[level]);
 }
 
-bool log_set_dname_format(log_t* log, LOG_LEVEL level, const char* format)
+bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
     assert(_is_valid_level(level));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_dname_format, const char*, format, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_dname_format, const char*, format, success);
     return success;
 }
 
-char* log_curr_dname(log_t* log, LOG_LEVEL level, char* dest)
+char* log_curr_dname(log_t* log, LG_LEVEL level, char* dest)
 {
     assert(log);
     assert(dest);
@@ -275,18 +275,18 @@ char* log_curr_dname(log_t* log, LOG_LEVEL level, char* dest)
     return fh_curr_dname(log->fhandlers[level], dest);
 }
 
-bool log_set_fname_format(log_t* log, LOG_LEVEL level, const char* format)
+bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
     assert(_is_valid_level(level));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_fname_format, const char*, format, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_fname_format, const char*, format, success);
     return success;
 }
 
-char* log_curr_fname(log_t* log, LOG_LEVEL level, char* dest)
+char* log_curr_fname(log_t* log, LG_LEVEL level, char* dest)
 {
     assert(log);
     assert(dest);
@@ -295,7 +295,7 @@ char* log_curr_fname(log_t* log, LOG_LEVEL level, char* dest)
     return fh_curr_fname(log->fhandlers[level], dest);
 }
 
-char* log_curr_fpath(log_t* log, LOG_LEVEL level, char* dest)
+char* log_curr_fpath(log_t* log, LG_LEVEL level, char* dest)
 {
     assert(log);
     assert(_is_valid_level(level));
@@ -304,17 +304,17 @@ char* log_curr_fpath(log_t* log, LOG_LEVEL level, char* dest)
     return fh_curr_fpath(log->fhandlers[level], dest);
 }
 
-bool log_set_max_fsize(log_t* log, LOG_LEVEL level, size_t size)
+bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size)
 {
     assert(log);
     assert(_is_valid_level(level));
 
     bool success = false;
-    APPLY_FH_SETTING(log, level, fh_set_max_fsize, size_t, size, success);
+    LG_APPLY_FH_SETTING(log, level, fh_set_max_fsize, size_t, size, success);
     return success;
 }
 
-size_t log_max_fsize(log_t* log, LOG_LEVEL level)
+size_t log_max_fsize(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(_is_valid_level(level));
@@ -322,7 +322,7 @@ size_t log_max_fsize(log_t* log, LOG_LEVEL level)
     return fh_max_fsize(log->fhandlers[level]);
 }
 
-size_t log_current_fsize(log_t* log, LOG_LEVEL level)
+size_t log_current_fsize(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(_is_valid_level(level));
@@ -330,7 +330,7 @@ size_t log_current_fsize(log_t* log, LOG_LEVEL level)
     return fh_current_fsize(log->fhandlers[level]);
 }
 
-bool log_set_entry_format(log_t* log, LOG_LEVEL level, const char* format)
+bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
@@ -339,18 +339,18 @@ bool log_set_entry_format(log_t* log, LOG_LEVEL level, const char* format)
     return format_set(log->formatters[level], format);
 }
 
-bool log_write(log_t* log, LOG_LEVEL level, const char* message)
+bool log_write(log_t* log, LG_LEVEL level, const char* message)
 {
     assert(log);
     assert(message);
     assert(_is_valid_level(level));
 
-    char formatted_message[_MAX_MSG_SIZE];
+    char formatted_message[LG_MAX_MSG_SIZE];
     format_entry(log->formatters[level], formatted_message, message, level);
 
     if (level >= log->threshold && log->is_enabled)
     {
-        if (log->flags & _PRINT || log->flags & _PRINT_ONLY)
+        if (log->flags & LG_STDOUT || log->flags & LG_STDOUT_ONLY)
         {
             printf(formatted_message);
         }
@@ -368,7 +368,7 @@ bool log_trace(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_TRACE, message);
+    return log_write(log, LG_L_TRACE, message);
 }
 
 bool log_debug(log_t* log, const char* message)
@@ -376,7 +376,7 @@ bool log_debug(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_DEBUG, message);
+    return log_write(log, LG_L_DEBUG, message);
 }
 
 bool log_info(log_t* log, const char* message)
@@ -384,7 +384,7 @@ bool log_info(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_INFO, message);
+    return log_write(log, LG_L_INFO, message);
 }
 
 bool log_notice(log_t* log, const char* message)
@@ -392,7 +392,7 @@ bool log_notice(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_NOTICE, message);
+    return log_write(log, LG_L_NOTICE, message);
 }
 
 bool log_warning(log_t* log, const char* message)
@@ -400,7 +400,7 @@ bool log_warning(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_WARNING, message);
+    return log_write(log, LG_L_WARNING, message);
 }
 
 bool log_error(log_t* log, const char* message)
@@ -408,7 +408,7 @@ bool log_error(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_ERROR, message);
+    return log_write(log, LG_L_ERROR, message);
 }
 
 bool log_critical(log_t* log, const char* message)
@@ -416,7 +416,7 @@ bool log_critical(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_CRITICAL, message);
+    return log_write(log, LG_L_CRITICAL, message);
 }
 
 bool log_alert(log_t* log, const char* message)
@@ -424,7 +424,7 @@ bool log_alert(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_ALERT, message);
+    return log_write(log, LG_L_ALERT, message);
 }
 
 bool log_emergency(log_t* log, const char* message)
@@ -432,13 +432,13 @@ bool log_emergency(log_t* log, const char* message)
     assert(log);
     assert(message);
 
-    return log_write(log, L_EMERGENCY, message);
+    return log_write(log, LG_L_EMERGENCY, message);
 }
 
 
 /* A helper function that creates a separate formatter
 for the request level indicated by lvl if it doesn't have one already. */
-bool _log_create_formatter_if_none(log_t* log, LOG_LEVEL level)
+bool _log_create_formatter_if_none(log_t* log, LG_LEVEL level)
 {
     if (log->formatters[level] == log->def_formatter)
     {
@@ -449,9 +449,9 @@ bool _log_create_formatter_if_none(log_t* log, LOG_LEVEL level)
 
 /* A helper function that creates a separate formatter
 for the request level indicated by lvl. */
-bool _log_create_formatter(log_t* log, LOG_LEVEL level)
+bool _log_create_formatter(log_t* log, LG_LEVEL level)
 {
-    char format[_MAX_E_FORMAT_SIZE];
+    char format[LG_MAX_E_FORMAT_SIZE];
     log->formatters[level] = format_init(format_get(log->def_formatter,
                                                   format),
                                                   log->flags);
@@ -465,7 +465,7 @@ bool _log_create_formatter(log_t* log, LOG_LEVEL level)
 
 /* A helper function that creates a separate file handler
 for the request level indicated by lvl if it doesn't have one already. */
-bool _log_create_fhandler_if_none(log_t* log, LOG_LEVEL level)
+bool _log_create_fhandler_if_none(log_t* log, LG_LEVEL level)
 {
     if (log->fhandlers[level] == log->def_fhandler)
     {
@@ -476,10 +476,10 @@ bool _log_create_fhandler_if_none(log_t* log, LOG_LEVEL level)
 
 /* A helper function that creates a separate file handler
 for the request level indicated by lvl. */
-bool _log_create_fhandler(log_t* log, LOG_LEVEL level)
+bool _log_create_fhandler(log_t* log, LG_LEVEL level)
 {
-    char fname_format[_MAX_FILENAME_SIZE];
-    char dname_format[_MAX_FILENAME_SIZE];
+    char fname_format[LG_MAX_FNAME_SIZE];
+    char dname_format[LG_MAX_FNAME_SIZE];
 
     /* Create a copy of the default file handler. */
     log->fhandlers[level] = fh_init(fh_dname_format(log->def_fhandler, dname_format),
@@ -499,14 +499,14 @@ bool _log_create_fhandler(log_t* log, LOG_LEVEL level)
     return true;
 }
 
-bool _is_valid_level(LOG_LEVEL level)
+bool _is_valid_level(LG_LEVEL level)
 {
-    return (level >= 0) && (level <= _VALID_LVL_COUNT - 1);
+    return (level >= 0) && (level <= LG_VALID_LVL_COUNT - 1);
 }
 
-bool _is_valid_file_mode(LOG_FILE_MODE mode)
+bool _is_valid_file_mode(LG_FMODE mode)
 {
-    return mode == REWRITE || mode == ROTATE;
+    return mode == LG_FMODE_REWRITE || mode == LG_FMODE_ROTATE;
 }
 
 bool _is_valid_buf_mode(int mode)

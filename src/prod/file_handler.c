@@ -16,13 +16,13 @@
 #include <string.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN32) && !defined(_CYGWIN_)
-#define _USE_WINAPI
+#define LG_USE_WINAPI
 #include <windows.h>
-#define _WIN_PATH_DELIM_CHAR '\\'
-#define _WIN_PATH_DELIM_STR "\\"
+#define LG_WIN_PATH_DELIM_CHAR '\\'
+#define LG_WIN_PATH_DELIM_STR "\\"
 #endif
 
-#define _MAX_OPEN_ATTEMPTS 3
+#define LG_MAX_OPEN_ATTEMPTS 3
 
 static fhandler_t* _fh_alloc(const size_t bufsize);
 
@@ -47,21 +47,21 @@ a pointer to it. */
 fhandler_t* fh_init(const char* dname_format,
                     const char* fname_format,
                     size_t max_fsize,
-                    LOG_FILE_MODE fmode,
+                    LG_FMODE fmode,
                     int buf_mode,
                     size_t buf_size,
                     uint16_t flags)
 {
     /* Assert parameter validity and/or correctness. */
     assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
-    assert(fmode > 0 && fmode <= _VALID_FILEPOL_COUNT);
+    assert(fmode > 0 && fmode <= LG_VALID_FMODE_COUNT);
     if (buf_mode == _IONBF)
     {
         buf_size = 0;
     }
     else if (buf_size == 0)
     {
-        buf_size = _DEF_BUF_SIZE;
+        buf_size = LG_DEF_BUF_SIZE;
     }
 
     /* Allocate memory. */
@@ -84,9 +84,9 @@ fhandler_t* fh_init(const char* dname_format,
     fh->max_fsize = max_fsize;
     fh->curr_fsize = 0;
     fh->flags = flags;
-    _clear_str(fh->curr_fname);
-    _clear_str(fh->curr_dname);
-    _clear_str(fh->curr_fpath);
+    LG_clear_str(fh->curr_fname);
+    LG_clear_str(fh->curr_dname);
+    LG_clear_str(fh->curr_fpath);
 
     return fh;
 }
@@ -122,7 +122,7 @@ bool fh_set_buf_mode(fhandler_t* fh, int mode)
     }
     else
     {
-        fh->buf = _log_alloc(_DEF_BUF_SIZE);
+        fh->buf = _log_alloc(LG_DEF_BUF_SIZE);
         if (!fh->buf)
         {
             return false;
@@ -167,14 +167,14 @@ size_t fh_buf_size(const fhandler_t* fh)
     return fh->buf_size;
 }
 
-bool fh_set_file_mode(fhandler_t* fh, LOG_FILE_MODE mode)
+bool fh_set_file_mode(fhandler_t* fh, LG_FMODE mode)
 {
-    assert(mode == ROTATE || mode == REWRITE);
+    assert(mode == LG_FMODE_ROTATE || mode == LG_FMODE_REWRITE);
     fh->file_mode = mode;
     return true;
 }
 
-LOG_FILE_MODE fh_file_mode(const fhandler_t* fh)
+LG_FMODE fh_file_mode(const fhandler_t* fh)
 {
     return fh->file_mode;
 }
@@ -281,8 +281,8 @@ fhandler_t* _fh_alloc(const size_t buf_size)
 {
     fhandler_t* fh = _log_alloc(sizeof(fhandler_t));
     if (!fh) { return NULL; }
-    fh->fname_formatter = format_init("", _FORMAT_PATHS);
-    fh->dname_formatter = format_init("", _FORMAT_PATHS);
+    fh->fname_formatter = format_init("", LG_FORMAT_PATHS);
+    fh->dname_formatter = format_init("", LG_FORMAT_PATHS);
     fh->buf = NULL;
     if (buf_size != 0)
     {
@@ -313,9 +313,9 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 
     /* Attempt to open the correct file up to 3 times. */
     size_t opening_attempts = 0;
-    while (!fh->fstream && opening_attempts < _MAX_OPEN_ATTEMPTS)
+    while (!fh->fstream && opening_attempts < LG_MAX_OPEN_ATTEMPTS)
     {
-        if (_is_empty_str(fh->curr_fpath))
+        if (LG_is_empty_str(fh->curr_fpath))
         {
             /* A new file needs to be created. Get the new filepath. */
             _fh_refresh_path(fh);
@@ -362,7 +362,7 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
                 fh->curr_fsize = 0;
 
                 /* Rotate the pre-existing files if rotate mode. */
-                if (fh->file_mode == ROTATE)
+                if (fh->file_mode == LG_FMODE_ROTATE)
                 {
                     _rotate_files(fh->curr_fpath);
                 }
@@ -383,22 +383,22 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 that file. */
 void _fh_refresh_path(fhandler_t* fh)
 {
-    _clear_str(fh->curr_dname);
-    _clear_str(fh->curr_fname);
-    _clear_str(fh->curr_fpath);
+    LG_clear_str(fh->curr_dname);
+    LG_clear_str(fh->curr_fname);
+    LG_clear_str(fh->curr_fpath);
     format_path(fh->dname_formatter, fh->curr_dname);
     format_path(fh->fname_formatter, fh->curr_fname);
     strcpy(fh->curr_fpath, fh->curr_dname);
-#ifdef _USE_WINAPI
-    strcat(fh->curr_fpath, _WIN_PATH_DELIM_STR);
+#ifdef LG_USE_WINAPI
+    strcat(fh->curr_fpath, LG_WIN_PATH_DELIM_STR);
 #endif
     strcat(fh->curr_fpath, fh->curr_fname);
 }
 
 bool _rotate_files(const char* abs_path)
 {
-    char file_to_rename[_MAX_FILENAME_SIZE];
-    char new_filename[_MAX_FILENAME_SIZE];
+    char file_to_rename[LG_MAX_FNAME_SIZE];
+    char new_filename[LG_MAX_FNAME_SIZE];
     size_t i = 0;
 
     /* Rename old file to old_filename.0 to simplify logic
@@ -451,7 +451,7 @@ bool _file_size(FILE* fstream, fpos_t* size)
 /* Returns true if dir_path points to an existing directory. */
 bool _does_dir_exist(const char* abs_path)
 {
-#ifdef _USE_WINAPI
+#ifdef LG_USE_WINAPI
     DWORD ftyp = GetFileAttributesA(abs_path);
     if (ftyp == INVALID_FILE_ATTRIBUTES)
     {
@@ -468,7 +468,7 @@ bool _does_dir_exist(const char* abs_path)
 /* Creates the directory in dir_path and returns true if successful. */
 bool _create_dir(const char* abs_path)
 {
-#ifdef _USE_WINAPI
+#ifdef LG_USE_WINAPI
     /* TODO: Recursive folder creation, i.e. create parent folder(s) */
     return CreateDirectoryA(abs_path, NULL) != 0;
 #endif
@@ -476,7 +476,7 @@ bool _create_dir(const char* abs_path)
 
 bool _remove_dir(const char* abs_path)
 {
-#ifdef _USE_WINAPI
+#ifdef LG_USE_WINAPI
     return RemoveDirectoryA(abs_path) == 0;
 #endif
         return false;
