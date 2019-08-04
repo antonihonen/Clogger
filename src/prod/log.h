@@ -29,7 +29,7 @@ typedef struct
 
     LG_LEVEL    threshold;
     bool        is_enabled;
-    uint16_t    flags;
+    uint64_t    flags;
     LG_ERRNO    last_error;
 } log_t;
 
@@ -37,7 +37,7 @@ log_t* log_init(const char* dname_format,
                 const char* fname_format,
                 LG_FMODE file_mode,
                 int buf_mode,
-                uint16_t flags);
+                uint64_t flags);
 
 bool log_close(log_t* log);
 
@@ -45,33 +45,33 @@ bool log_enable(log_t* log);
 
 bool log_disable(log_t* log);
 
-void _log_set_error(log_t* log, LG_ERRNO error);
+void log_set_error(log_t* log, LG_ERRNO error);
 
-LG_ERRNO log_last_error(log_t* log);
-
-void log_clear_error(log_t* log);
+LG_ERRNO log_get_error(log_t* log);
 
 bool log_has_error(log_t* log);
 
-bool log_set_threshold(log_t* log, LG_LEVEL threshold);
+void log_clear_error(log_t* log);
+
+bool log_set_threshold(log_t* log, LG_LEVEL level);
 
 LG_LEVEL log_threshold(log_t* log);
 
-bool log_set_buf_mode(log_t* log, LG_LEVEL level, int mode);
+bool log_set_bmode(log_t* log, LG_LEVEL level, int mode);
 
-int log_buf_mode(log_t* log, LG_LEVEL level);
+int log_bmode(log_t* log, LG_LEVEL level);
 
-bool log_set_buf_size(log_t* log, LG_LEVEL level, size_t buf_size);
+bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size);
 
-bool log_set_file_mode(log_t* log, LG_LEVEL level, LG_FMODE mode);
+bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode);
 
-LG_FMODE log_file_mode(log_t* log, LG_LEVEL level);
+LG_FMODE log_fmode(log_t* log, LG_LEVEL level);
 
-bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format);
+bool log_set_dname(log_t* log, LG_LEVEL level, const char* format);
 
 char* log_curr_dname(log_t* log, LG_LEVEL level, char* dest);
 
-bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format);
+bool log_set_fname(log_t* log, LG_LEVEL level, const char* format);
 
 char* log_curr_fname(log_t* log, LG_LEVEL level, char* dest);
 
@@ -81,9 +81,9 @@ bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size);
 
 size_t log_max_fsize(log_t* log, LG_LEVEL level);
 
-size_t log_current_fsize(log_t* log, LG_LEVEL level);
+size_t log_curr_fsize(log_t* log, LG_LEVEL level);
 
-bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format);
+bool log_set_format(log_t* log, LG_LEVEL level, const char* format);
 
 bool log_write(log_t* log, LG_LEVEL level, const char* message);
 

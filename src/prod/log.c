@@ -58,7 +58,7 @@ log_t* log_init(const char* dname_format,
                 const char* fname_format,
                 LG_FMODE file_mode,
                 int buf_mode,
-                uint16_t flags)
+                uint64_t flags)
 {
     assert(LG_is_valid_fmode(file_mode));
     assert(LG_is_valid_bmode(buf_mode));
@@ -155,12 +155,12 @@ bool log_disable(log_t* log)
     return true;
 }
 
-void _log_set_error(log_t* log, LG_ERRNO error)
+void log_set_error(log_t* log, LG_ERRNO error)
 {
     log->last_error = error;
 }
 
-LG_ERRNO log_last_error(log_t* log)
+LG_ERRNO log_get_error(log_t* log)
 {
     return log->last_error;
 }
@@ -194,7 +194,7 @@ LG_LEVEL log_threshold(log_t* log)
     return log->threshold;
 }
 
-bool log_set_buf_mode(log_t* log, LG_LEVEL level, int mode)
+bool log_set_bmode(log_t* log, LG_LEVEL level, int mode)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -205,7 +205,7 @@ bool log_set_buf_mode(log_t* log, LG_LEVEL level, int mode)
     return success;
 }
 
-int log_buf_mode(log_t* log, LG_LEVEL level)
+int log_bmode(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -218,7 +218,7 @@ int log_buf_mode(log_t* log, LG_LEVEL level)
     return fh_buf_mode(log->fhandlers[level]);
 }
 
-bool log_set_buf_size(log_t* log, LG_LEVEL level, size_t buf_size)
+bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -228,7 +228,7 @@ bool log_set_buf_size(log_t* log, LG_LEVEL level, size_t buf_size)
     return success;
 }
 
-bool log_set_file_mode(log_t* log, LG_LEVEL level, LG_FMODE mode)
+bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -239,7 +239,7 @@ bool log_set_file_mode(log_t* log, LG_LEVEL level, LG_FMODE mode)
     return success;
 }
 
-LG_FMODE log_file_mode(log_t* log, LG_LEVEL level)
+LG_FMODE log_fmode(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -252,7 +252,7 @@ LG_FMODE log_file_mode(log_t* log, LG_LEVEL level)
     return fh_file_mode(log->fhandlers[level]);
 }
 
-bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format)
+bool log_set_dname(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
@@ -276,7 +276,7 @@ char* log_curr_dname(log_t* log, LG_LEVEL level, char* dest)
     return fh_curr_dname(log->fhandlers[level], dest);
 }
 
-bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
+bool log_set_fname(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
@@ -323,7 +323,7 @@ size_t log_max_fsize(log_t* log, LG_LEVEL level)
     return fh_max_fsize(log->fhandlers[level]);
 }
 
-size_t log_current_fsize(log_t* log, LG_LEVEL level)
+size_t log_curr_fsize(log_t* log, LG_LEVEL level)
 {
     assert(log);
     assert(LG_is_valid_level(level));
@@ -331,7 +331,7 @@ size_t log_current_fsize(log_t* log, LG_LEVEL level)
     return fh_current_fsize(log->fhandlers[level]);
 }
 
-bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format)
+bool log_set_format(log_t* log, LG_LEVEL level, const char* format)
 {
     assert(log);
     assert(format);
