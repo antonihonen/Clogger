@@ -105,4 +105,6 @@ bool log_alert(log_t* log, const char* message);
 
 bool log_emergency(log_t* log, const char* message);
 
+bool log_fatal(log_t* log, const char* message);
+
 #endif /* LG_LOG_H */

@@ -436,6 +436,14 @@ bool log_emergency(log_t* log, const char* message)
     return log_write(log, LG_EMERGENCY, message);
 }
 
+bool log_fatal(log_t* log, const char* message)
+{
+    assert(log);
+    assert(message);
+
+    return log_write(log, LG_FATAL, message);
+}
+
 
 /* A helper function that creates a separate formatter
 for the request level indicated by lvl if it doesn't have one already. */

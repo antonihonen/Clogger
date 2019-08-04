@@ -21,6 +21,7 @@ void run_perftest(char* e_format, char* msg, time_t duration)
     log_set_format(log, LG_CRITICAL, e_format);
     log_set_format(log, LG_ALERT, e_format);
     log_set_format(log, LG_EMERGENCY , e_format);
+    log_set_format(log, LG_FATAL, e_format);
     log_set_max_fsize(log, LG_TRACE, 1024 * 8);
     log_set_max_fsize(log, LG_DEBUG, 1024 * 8);
     log_set_max_fsize(log, LG_INFO, 1024 * 8);
@@ -30,6 +31,7 @@ void run_perftest(char* e_format, char* msg, time_t duration)
     log_set_max_fsize(log, LG_CRITICAL, 1024 * 8);
     log_set_max_fsize(log, LG_ALERT, 1024 * 8);
     log_set_max_fsize(log, LG_EMERGENCY, 1024 * 8);
+    log_set_max_fsize(log, LG_FATAL, 1024 * 8);
     log_set_fname(log, LG_TRACE, "trace_log.log");
     log_set_fname(log, LG_DEBUG, "debug_log.log");
     log_set_fname(log, LG_INFO, "info_log.log");
@@ -39,6 +41,7 @@ void run_perftest(char* e_format, char* msg, time_t duration)
     log_set_fname(log, LG_CRITICAL, "critical_log.log");
     log_set_fname(log, LG_ALERT, "alert_log.log");
     log_set_fname(log, LG_EMERGENCY, "emergency_log.log");
+    log_set_fname(log, LG_FATAL, "fatal_log.log");
     size_t entries = 0;
     while ((end_time - begin_time) < duration)
     {
@@ -51,6 +54,7 @@ void run_perftest(char* e_format, char* msg, time_t duration)
         log_write(log, LG_CRITICAL, msg);
         log_write(log, LG_ALERT, msg);
         log_write(log, LG_EMERGENCY, msg);
+        log_write(log, LG_FATAL, msg);
 
         time(&end_time);
         ++entries;
