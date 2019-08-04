@@ -31,6 +31,7 @@ typedef struct
     bool        is_enabled;
     uint64_t    flags;
     LG_ERRNO    last_error;
+    char        error_msg[LG_MAX_ERR_MSG_SIZE];
 } log_t;
 
 log_t* log_init(const char* dname_format,
@@ -45,7 +46,7 @@ bool log_enable(log_t* log);
 
 bool log_disable(log_t* log);
 
-void log_set_error(log_t* log, LG_ERRNO error);
+void log_set_error(log_t* log, LG_ERRNO error, const char* message);
 
 LG_ERRNO log_get_error(log_t* log);
 

@@ -22,6 +22,7 @@
 #define LG_MAX_EXP_FORMAT_SIZE 256
 #define LG_MAX_E_FORMAT_SIZE 256
 #define LG_MAX_ENTRY_SIZE 1024
+#define LG_MAX_ERR_MSG_SIZE 256
 
 /* The sizes of expanded format macros. */
 #define LG_FM_YEAR_EXP_SIZE 5

@@ -155,9 +155,10 @@ bool log_disable(log_t* log)
     return true;
 }
 
-void log_set_error(log_t* log, LG_ERRNO error)
+void log_set_error(log_t* log, LG_ERRNO error, const char* message)
 {
     log->last_error = error;
+    strcpy(log->error_msg, message);
 }
 
 LG_ERRNO log_get_error(log_t* log)
