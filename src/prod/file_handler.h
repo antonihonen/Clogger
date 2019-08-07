@@ -1,7 +1,7 @@
 /*
  * File: file_handler.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module contains a file handler that the log
  * uses to write in a log file: the file handler is responsible
@@ -45,7 +45,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define LG_DEF_BUF_SIZE BUFSIZ
+#define LG_DEF_BSIZE BUFSIZ
 
 /* File handler. */
 typedef struct {
@@ -54,11 +54,11 @@ typedef struct {
     
     /* File name formatter: required to support user macros
     in file names. */
-    format_t* fname_formatter;
+    formatter_t* fname_formatter;
 
     /* Directory name formatter: required to support user macros
     in directory names. */
-    format_t* dname_formatter;
+    formatter_t* dname_formatter;
 
     /* The name of the currently active file. */
     char curr_fname[LG_MAX_FNAME_SIZE];
@@ -101,33 +101,51 @@ typedef struct {
     size_t curr_fsize;
 
     uint16_t flags;
+
+    LG_LEVEL level;
+    bool is_file_enabled;
+    bool is_stdout_enabled;
+    bool is_stderr_enabled;
+
+    char* file_buf;
+    char* stdout_buf;
+    char* stderr_buf;
+
+    bool is_dynamic;
 } fhandler_t;
 
-fhandler_t* fh_init(const char* dname_format,
-                    const char* fname_format,
-                    size_t max_fsize,
-                    LG_FMODE fmode,
-                    int buf_mode,
-                    size_t buf_size,
-                    uint16_t flags);
+fhandler_t* fh_init(fhandler_t* buffer, LG_LEVEL level);
 
 void fh_free(fhandler_t* fh);
 
-bool fh_set_buf_mode(fhandler_t* fh, int mode);
+void fh_enable_file(fhandler_t* fh);
+void fh_disable_file(fhandler_t* fh);
+bool fh_file_enabled(fhandler_t* fh);
 
-int fh_buf_mode(const fhandler_t* fh);
+void fh_enable_stdout(fhandler_t* fh);
+void fh_disable_stdout(fhandler_t* fh);
+bool fh_stdout_enabled(fhandler_t* fh);
 
-bool fh_set_buf_size(fhandler_t* fh, size_t size);
+void fh_enable_stderr(fhandler_t* fh);
+void fh_disable_stderr(fhandler_t* fh);
+bool fh_stderr_enabled(fhandler_t* fh);
 
-size_t fh_buf_size(const fhandler_t* fh);
 
-bool fh_set_file_mode(fhandler_t* fh, LG_FMODE mode);
+bool fh_set_bmode(fhandler_t* fh, int mode);
 
-LG_FMODE fh_file_mode(const fhandler_t* fh);
+int fh_bmode(const fhandler_t* fh);
+
+bool fh_set_bsize(fhandler_t* fh, size_t size);
+
+size_t fh_bsize(const fhandler_t* fh);
+
+bool fh_set_fmode(fhandler_t* fh, LG_FMODE mode);
+
+LG_FMODE fh_fmode(const fhandler_t* fh);
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format);
 
-char* fh_fname_format(fhandler_t* fh, char* src);
+char* fh_fname_format(fhandler_t* fh, char* dest);
 
 char* fh_curr_fname(const fhandler_t* fh, char* dest);
 
@@ -137,7 +155,7 @@ char* fh_curr_fpath(const fhandler_t* fh, char* dest);
 
 bool fh_set_dname_format(fhandler_t* fh, const char* format);
 
-char* fh_dname_format(fhandler_t* fh, char* src);
+char* fh_dname_format(fhandler_t* fh, char* dest);
 
 bool fh_set_max_fsize(fhandler_t* fh, size_t size);
 

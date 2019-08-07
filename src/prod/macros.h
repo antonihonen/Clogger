@@ -1,7 +1,7 @@
 /*
  * File: macros.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module defines macros that multiple
  * modules in the project share.
@@ -12,12 +12,23 @@
 #ifndef LG_MACROS_H
 #define LG_MACROS_H
 
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN32) && !defined(_CYGWIN_)
+#define LG_USE_WINAPI
+#include <windows.h>
+#define LG_PATH_DELIM_CHAR '\\'
+#define LG_PATH_DELIM_STR "\\"
+#else
+#define LG_PATH_DELIM_CHAR '/'
+#define LG_PATH_DELIM_STR "/"
+#endif
+
 #define LG_DEF_MAX_FSIZE 1048576 /* 1 MiB */
 #define LG_DEF_THRESHOLD LG_TRACE
 #define LG_DEF_ENTRY_FORMAT "%(MSG)\n"
 
-#define LG_MAX_DIR_SIZE 512
-#define LG_MAX_FNAME_SIZE 512
+#define LG_MAX_DNAME_SIZE 512
+#define LG_MAX_FNAME_SIZE 128
+#define LG_MAX_FPATH_SIZE LG_MAX_DNAME_SIZE + LG_MAX_FNAME_SIZE + 1
 #define LG_MAX_MSG_SIZE 512
 #define LG_MAX_EXP_FORMAT_SIZE 256
 #define LG_MAX_E_FORMAT_SIZE 256

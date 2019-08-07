@@ -1,7 +1,7 @@
 /*
  * File: log_level.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module defines items related to log levels.
  * Log level indicates the importance of the
@@ -16,7 +16,8 @@
 #define LOG_LEVEL_H
 
 typedef enum {
-    LG_NO_LEVEL = -1, /* Only intended for internal use. */
+    LG_NO_LEVEL = -2, /* Only intended for internal use. */
+    LG_ALL_LEVELS = -1, /* Only intended for internal use. */
     LG_TRACE = 0,
     LG_DEBUG,
     LG_INFO,

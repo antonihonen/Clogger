@@ -1,7 +1,7 @@
 /*
  * File: error.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module defines error codes used in the project.
  * These error codes may be returned to the user of

@@ -1,7 +1,7 @@
 /*
  * File: run_tests.c
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This file contains the main function that automatically
  * runs tests for the project.

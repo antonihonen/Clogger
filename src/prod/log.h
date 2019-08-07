@@ -1,7 +1,7 @@
 /*
  * File: log.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module contains the top-level log class of the library.
  * 
@@ -21,30 +21,54 @@
 /* Log. */
 typedef struct
 {
-    fhandler_t* def_fhandler;
-    fhandler_t* fhandlers[LG_VALID_LVL_COUNT];
+    fhandler_t  fhandlers[LG_VALID_LVL_COUNT];
+    formatter_t formatters[LG_VALID_LVL_COUNT];
 
-    format_t*   def_formatter;
-    format_t*   formatters[LG_VALID_LVL_COUNT];
-
+    bool        is_enabled[LG_VALID_LVL_COUNT];
     LG_LEVEL    threshold;
-    bool        is_enabled;
     uint64_t    flags;
     LG_ERRNO    last_error;
     char        error_msg[LG_MAX_ERR_MSG_SIZE];
+
+    bool        is_dynamic;
 } log_t;
 
-log_t* log_init(const char* dname_format,
-                const char* fname_format,
-                LG_FMODE file_mode,
-                int buf_mode,
-                uint64_t flags);
+log_t* log_init(log_t* buffer);
 
-bool log_close(log_t* log);
+bool log_free(log_t* log);
 
-bool log_enable(log_t* log);
+bool log_enable(log_t* log, LG_LEVEL level);
 
-bool log_disable(log_t* log);
+bool log_disable(log_t* log, LG_LEVEL level);
+
+bool log_enabled(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_enable_flock(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_disable_flock(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_flock_enabled(log_t* log, LG_LEVEL level);
+
+bool log_enable_stdout(log_t* log, LG_LEVEL level);
+
+bool log_disable_stdout(log_t* log, LG_LEVEL level);
+
+bool log_stdout_enabled(log_t* log, LG_LEVEL level);
+
+bool log_enable_stderr(log_t* log, LG_LEVEL level);
+
+bool log_disable_stderr(log_t* log, LG_LEVEL level);
+
+bool log_stderr_enabled(log_t* log, LG_LEVEL level);
+
+bool log_enable_file(log_t* log, LG_LEVEL level);
+
+bool log_disable_file(log_t* log, LG_LEVEL level);
+
+bool log_file_enabled(log_t* log, LG_LEVEL level);
 
 void log_set_error(log_t* log, LG_ERRNO error, const char* message);
 
@@ -64,19 +88,33 @@ int log_bmode(log_t* log, LG_LEVEL level);
 
 bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size);
 
+size_t log_bsize(log_t* log, LG_LEVEL level);
+
 bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode);
 
 LG_FMODE log_fmode(log_t* log, LG_LEVEL level);
 
-bool log_set_dname(log_t* log, LG_LEVEL level, const char* format);
+bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* dname_format);
 
-char* log_curr_dname(log_t* log, LG_LEVEL level, char* dest);
+/* TODO */
+bool log_set_static_dname(log_t* log, LG_LEVEL level, const char* dname);
 
-bool log_set_fname(log_t* log, LG_LEVEL level, const char* format);
+char* log_dname_format(log_t* log, LG_LEVEL level, char* dest);
 
-char* log_curr_fname(log_t* log, LG_LEVEL level, char* dest);
+char* log_dname(log_t* log, LG_LEVEL level, char* dest);
 
-char* log_curr_fpath(log_t* log, LG_LEVEL level, char* dest);
+bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* fname_format);
+
+/* TODO */
+bool log_set_static_fname(log_t* log, LG_LEVEL level, const char* fname);
+
+char* log_fname_format(log_t* log, LG_LEVEL level, char* dest);
+
+char* log_fname(log_t* log, LG_LEVEL level, char* dest);
+
+char* log_fpath_format(log_t* log, LG_LEVEL level, char* dest);
+
+char* log_fpath(log_t* log, LG_LEVEL level, char* dest);
 
 bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size);
 
@@ -84,9 +122,16 @@ size_t log_max_fsize(log_t* log, LG_LEVEL level);
 
 size_t log_curr_fsize(log_t* log, LG_LEVEL level);
 
-bool log_set_format(log_t* log, LG_LEVEL level, const char* format);
+bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format);
+
+/* TODO */
+bool log_set_static_entry_format(log_t* log, LG_LEVEL level, const char* format);
+
+char* log_entry_format(log_t* log, LG_LEVEL level, const char* dest);
 
 bool log_write(log_t* log, LG_LEVEL level, const char* message);
+
+bool log_fwrite(log_t* log, LG_LEVEL level, const char* message);
 
 bool log_trace(log_t* log, const char* message);
 

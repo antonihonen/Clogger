@@ -1,7 +1,7 @@
 /*
  * File: alloc.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module contains utilities related to memory
  * allocation and deallocation: custom allocators

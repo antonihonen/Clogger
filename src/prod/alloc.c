@@ -1,7 +1,7 @@
 /*
  * File: alloc.c
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * Copyright (C) 2019. Anton Ihonen
  */

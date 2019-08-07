@@ -1,7 +1,7 @@
 /*
  * File: formatter.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This file defines two formatter classes that are responsible
  * for formatting file names and log entries respectively.
@@ -49,21 +49,21 @@ typedef struct {
     char      format[LG_MAX_ENTRY_SIZE];
     struct tm time;
     uint16_t  flags;
-} format_t;
+} formatter_t;
 
-format_t* format_init(const char* format, uint16_t flags);
+formatter_t* formatter_init(formatter_t* buffer, const char* format, uint16_t flags);
 
-bool format_set(format_t* formatter, const char* format);
+bool formatter_set(formatter_t* formatter, const char* format);
 
-char* format_get(format_t* formatter, char* dest);
+char* formatter_get(formatter_t* formatter, char* dest);
 
-char* format_path(format_t* formatter, char* dest);
+char* formatter_path(formatter_t* formatter, char* dest);
 
-char* format_entry(format_t* formatter,
-                   char* dest,
-                   const char* msg,
-                   LG_LEVEL level);
+char* formatter_entry(formatter_t* formatter,
+                      char* dest,
+                      const char* msg,
+                      LG_LEVEL level);
 
-void format_free(format_t* formatter);
+void formatter_free(formatter_t* formatter);
 
 #endif /* LG_FORMATTER_H */

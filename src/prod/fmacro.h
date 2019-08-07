@@ -1,7 +1,7 @@
 /*
  * File: fmacro.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module contains items related to format
  * macros. Format macros can be used
@@ -109,7 +109,7 @@ const fm_info_t _FM_TABLE[LG_FM_COUNT];
 #define LG_FM_LVL_N_S "lvl"
 #define LG_FM_LVL_F_S "Lvl"
 #define LG_FM_LVL_A_S "LVL"
-#define LG_FM_LVL_MAX_LEN 8 /* strlen("EMERGENCY") */
+#define LG_FM_LVL_MAX_LEN 9 /* strlen("EMERGENCY") */
 #define LG_FM_MSG_S "MSG"
 #define LG_FM_MSG_MAX_LEN LG_MAX_MSG_SIZE
 

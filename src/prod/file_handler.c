@@ -1,7 +1,7 @@
 /*
  * File: file_handler.c
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * Copyright (C) 2019. Anton Ihonen
  */
@@ -9,20 +9,14 @@
 #include "alloc.h"
 #include "flags.h"
 #include "file_handler.h"
+#include "macros.h"
 #include "string_util.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN32) && !defined(_CYGWIN_)
-#define LG_USE_WINAPI
-#include <windows.h>
-#define LG_WIN_PATH_DELIM_CHAR '\\'
-#define LG_WIN_PATH_DELIM_STR "\\"
-#endif
-
-#define LG_MAX_OPEN_ATTEMPTS 3
+#define LG_MAX_FOPEN_ATTEMPTS 3
 
 static fhandler_t* _fh_alloc(const size_t bufsize);
 
@@ -44,46 +38,54 @@ static bool _does_file_exist(const char* const abs_filepath);
 
 /* Allocates and initializes a new fhandler_t object and returns
 a pointer to it. */
-fhandler_t* fh_init(const char* dname_format,
-                    const char* fname_format,
-                    size_t max_fsize,
-                    LG_FMODE fmode,
-                    int buf_mode,
-                    size_t buf_size,
-                    uint16_t flags)
+fhandler_t* fh_init(fhandler_t* buffer, LG_LEVEL level)
 {
-    /* Assert parameter validity and/or correctness. */
-    assert(buf_mode == _IONBF || buf_mode == _IOLBF || buf_mode == _IOFBF);
-    assert(fmode > 0 && fmode <= LG_VALID_FMODE_COUNT);
-    if (buf_mode == _IONBF)
-    {
-        buf_size = 0;
-    }
-    else if (buf_size == 0)
-    {
-        buf_size = LG_DEF_BUF_SIZE;
-    }
-
-    /* Allocate memory. */
-    fhandler_t* fh = _fh_alloc(buf_size);
+    fhandler_t* fh = buffer;
     if (!fh)
     {
+        /* Allocate memory. */
+        fh = fh = LG_alloc(sizeof(fhandler_t));
+        if (!fh)
+        {
+            return NULL;
+        }
+        fh->is_dynamic = true;
+    }
+    else
+    {
+        fh->is_dynamic = false;
+    }
+
+    fh->buf = LG_alloc(LG_DEF_BSIZE);
+    if (!fh->buf)
+    {
+        if (fh->is_dynamic)
+        {
+            LG_dealloc(fh);
+        }
         return NULL;
     }
 
     /* Finish initialization. */
-    format_set(fh->fname_formatter, fname_format);
-    format_set(fh->dname_formatter, dname_format);
-    fh->buf_mode = buf_mode;
+    fh->fname_formatter = formatter_init(NULL, "", LG_FORMAT_PATHS);
+    fh->dname_formatter = formatter_init(NULL, "", LG_FORMAT_PATHS);
+
+    fh->buf_mode = _IOFBF;
     fh->fstream = NULL;
-    fh->buf_size = buf_size;
-    fh->file_mode = fmode;
+    fh->buf_size = LG_DEF_BSIZE;
+    fh->file_mode = LG_FMODE_NONE;
     fh->has_file_changed = false;
     fh->is_dir_creator = false;
     fh->is_file_creator = false;
-    fh->max_fsize = max_fsize;
+    fh->max_fsize = LG_DEF_MAX_FSIZE;
     fh->curr_fsize = 0;
-    fh->flags = flags;
+    fh->flags = 0;
+    fh->is_file_enabled = false;
+    fh->is_stdout_enabled = false;
+    fh->is_stderr_enabled = false;
+    fh->file_buf = NULL;
+    fh->stdout_buf = NULL;
+    fh->stderr_buf = NULL;
     LG_clear_str(fh->curr_fname);
     LG_clear_str(fh->curr_dname);
     LG_clear_str(fh->curr_fpath);
@@ -91,18 +93,86 @@ fhandler_t* fh_init(const char* dname_format,
     return fh;
 }
 
+/* Allocates memory for the fhandler object and its sub-objects. */
+fhandler_t* _fh_alloc(const size_t buf_size)
+{
+    fhandler_t* fh = LG_alloc(sizeof(fhandler_t));
+    if (!fh) { return NULL; }
+    formatter_init(fh->fname_formatter, "", LG_FORMAT_PATHS);
+    formatter_init(fh->dname_formatter, "", LG_FORMAT_PATHS);
+    fh->buf = NULL;
+    if (buf_size != 0)
+    {
+        fh->buf = LG_alloc(buf_size);
+    }
+    if (!fh->fname_formatter || !fh->dname_formatter || (!fh->buf && buf_size))
+    {
+        fh_free(fh);
+        return NULL;
+    }
+    return fh;
+}
+
 /* Frees the memory reserved for fh and its sub-objects. */
 void fh_free(fhandler_t* fh)
 {
-    if (fh->fstream)         { fclose(fh->fstream);              }
-    if (fh->fname_formatter) { format_free(fh->fname_formatter); }
-    if (fh->dname_formatter) { format_free(fh->dname_formatter); }
-    if (fh->buf)             { LG_dealloc(fh->buf);            }
+    if (fh->fstream)         { fclose(fh->fstream); }
+    if (fh->fname_formatter) { formatter_free(fh->fname_formatter); }
+    if (fh->dname_formatter) { formatter_free(fh->dname_formatter); }
+    if (fh->buf)             { LG_dealloc(fh->buf); }
 
-    LG_dealloc(fh);
+    if (fh->is_dynamic)
+    {
+        LG_dealloc(fh);
+    }
 }
 
-bool fh_set_buf_mode(fhandler_t* fh, int mode)
+void fh_enable_file(fhandler_t* fh)
+{
+    fh->is_file_enabled = true;
+}
+
+void fh_disable_file(fhandler_t* fh)
+{
+    fh->is_file_enabled = false;
+}
+
+bool fh_file_enabled(fhandler_t* fh)
+{
+    return fh->is_file_enabled;
+}
+
+void fh_enable_stdout(fhandler_t* fh)
+{
+    fh->is_stdout_enabled = true;
+}
+
+void fh_disable_stdout(fhandler_t* fh)
+{
+    fh->is_stdout_enabled = false;
+}
+
+bool fh_stdout_enabled(fhandler_t* fh)
+{
+    return fh->is_stdout_enabled;
+}
+
+void fh_enable_stderr(fhandler_t* fh)
+{
+    return fh->is_stderr_enabled = true;
+}
+
+void fh_disable_stderr(fhandler_t* fh)
+{
+    return fh->is_stderr_enabled = false;
+}
+
+bool fh_stderr_enabled(fhandler_t* fh)
+{
+    return fh->is_stderr_enabled;
+}
+
+bool fh_set_bmode(fhandler_t* fh, int mode)
 {
     assert(mode == _IONBF || mode == _IOLBF || mode == _IOFBF);
     
@@ -122,7 +192,7 @@ bool fh_set_buf_mode(fhandler_t* fh, int mode)
     }
     else
     {
-        fh->buf = LG_alloc(LG_DEF_BUF_SIZE);
+        fh->buf = LG_alloc(LG_DEF_BSIZE);
         if (!fh->buf)
         {
             return false;
@@ -133,12 +203,12 @@ bool fh_set_buf_mode(fhandler_t* fh, int mode)
     return true;
 }
 
-int fh_buf_mode(const fhandler_t* fh)
+int fh_bmode(const fhandler_t* fh)
 {
     return fh->buf_mode;
 }
 
-bool fh_set_buf_size(fhandler_t* fh, size_t size)
+bool fh_set_bsize(fhandler_t* fh, size_t size)
 {
     if (fh->buf_size == size)
     {
@@ -146,7 +216,7 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size)
     }
     else if (size == 0)
     {
-        return fh_set_buf_mode(fh, _IONBF);
+        return fh_set_bmode(fh, _IONBF);
     }
     
     if (fh->buf)
@@ -162,26 +232,26 @@ bool fh_set_buf_size(fhandler_t* fh, size_t size)
     return true;
 }
 
-size_t fh_buf_size(const fhandler_t* fh)
+size_t fh_bsize(const fhandler_t* fh)
 {
     return fh->buf_size;
 }
 
-bool fh_set_file_mode(fhandler_t* fh, LG_FMODE mode)
+bool fh_set_fmode(fhandler_t* fh, LG_FMODE mode)
 {
     assert(mode == LG_FMODE_ROTATE || mode == LG_FMODE_REWRITE);
     fh->file_mode = mode;
     return true;
 }
 
-LG_FMODE fh_file_mode(const fhandler_t* fh)
+LG_FMODE fh_fmode(const fhandler_t* fh)
 {
     return fh->file_mode;
 }
 
 bool fh_set_fname_format(fhandler_t* fh, const char* format)
 {
-    if (!format_set(fh->fname_formatter, format))
+    if (!formatter_set(fh->fname_formatter, format))
     {
         return false;
     }
@@ -189,10 +259,10 @@ bool fh_set_fname_format(fhandler_t* fh, const char* format)
     return true;
 }
 
-char* fh_fname_format(fhandler_t* fh, char* src)
+char* fh_fname_format(fhandler_t* fh, char* dest)
 {
-    format_get(fh->fname_formatter, src);
-    return src;
+    formatter_get(fh->fname_formatter, dest);
+    return dest;
 }
 
 char* fh_curr_fname(const fhandler_t* fh, char* dest)
@@ -215,7 +285,7 @@ char* fh_curr_fpath(const fhandler_t* fh, char* dest)
 
 bool fh_set_dname_format(fhandler_t* fh, const char* format)
 {
-    if (!format_set(fh->dname_formatter, format))
+    if (!formatter_set(fh->dname_formatter, format))
     {
         return false;
     }
@@ -223,10 +293,10 @@ bool fh_set_dname_format(fhandler_t* fh, const char* format)
     return true;
 }
 
-char* fh_dname_format(fhandler_t* fh, char* src)
+char* fh_dname_format(fhandler_t* fh, char* dest)
 {
-    format_get(fh->dname_formatter, src);
-    return src;
+    formatter_get(fh->dname_formatter, dest);
+    return dest;
 }
 
 bool fh_set_max_fsize(fhandler_t* fh, size_t size)
@@ -247,6 +317,11 @@ size_t fh_current_fsize(const fhandler_t* fh)
 
 bool fh_fwrite(fhandler_t* fh, const char* data_out)
 {
+    if (!fh->is_file_enabled)
+    {
+        return false;
+    }
+
     size_t data_size = strlen(data_out);
     bool new_fstream = fh->fstream ? false : true;
 
@@ -271,29 +346,9 @@ bool fh_fwrite(fhandler_t* fh, const char* data_out)
     }
 
     fh->has_file_changed = true;
-    fh->curr_fsize += data_size;    
+    fh->curr_fsize += data_size;
 
     return true;
-}
-
-/* Allocates memory for the fhandler object and its sub-objects. */
-fhandler_t* _fh_alloc(const size_t buf_size)
-{
-    fhandler_t* fh = LG_alloc(sizeof(fhandler_t));
-    if (!fh) { return NULL; }
-    fh->fname_formatter = format_init("", LG_FORMAT_PATHS);
-    fh->dname_formatter = format_init("", LG_FORMAT_PATHS);
-    fh->buf = NULL;
-    if (buf_size != 0)
-    {
-        fh->buf = LG_alloc(buf_size);
-    }
-    if (!fh->fname_formatter || !fh->dname_formatter || (!fh->buf && buf_size))
-    {
-        fh_free(fh);
-        return NULL;
-    }
-    return fh;
 }
 
 bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
@@ -313,7 +368,7 @@ bool _fh_open_fstream(fhandler_t* fh, size_t write_size)
 
     /* Attempt to open the correct file up to 3 times. */
     size_t opening_attempts = 0;
-    while (!fh->fstream && opening_attempts < LG_MAX_OPEN_ATTEMPTS)
+    while (!fh->fstream && opening_attempts < LG_MAX_FOPEN_ATTEMPTS)
     {
         if (LG_is_empty_str(fh->curr_fpath))
         {
@@ -386,12 +441,10 @@ void _fh_refresh_path(fhandler_t* fh)
     LG_clear_str(fh->curr_dname);
     LG_clear_str(fh->curr_fname);
     LG_clear_str(fh->curr_fpath);
-    format_path(fh->dname_formatter, fh->curr_dname);
-    format_path(fh->fname_formatter, fh->curr_fname);
+    formatter_path(fh->dname_formatter, fh->curr_dname);
+    formatter_path(fh->fname_formatter, fh->curr_fname);
     strcpy(fh->curr_fpath, fh->curr_dname);
-#ifdef LG_USE_WINAPI
-    strcat(fh->curr_fpath, LG_WIN_PATH_DELIM_STR);
-#endif
+    strcat(fh->curr_fpath, LG_PATH_DELIM_STR);
     strcat(fh->curr_fpath, fh->curr_fname);
 }
 

@@ -1,7 +1,7 @@
 /*
  * File: string_util.h
  * Project: logger
- * Author: Anton Ihonen, anton.ihonen@gmail.com
+ * Author: Anton Ihonen, anton@ihonen.net
  *
  * This module contains utilities that make handling
  * strings easier.
