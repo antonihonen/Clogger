@@ -31,7 +31,7 @@ log_t * log_init(log_t* buffer)
 
     for (size_t level = 0; level < LG_VALID_LVL_COUNT; ++level)
     {
-        fh_init(&log->fhandlers[level], level);
+        handler_init(&log->handlers[level], level);
         formatter_init(&log->formatters[level], LG_DEF_ENTRY_FORMAT, LG_FORMAT_ENTRIES);
         log->is_enabled[level] = true;
     }
@@ -48,7 +48,7 @@ bool log_free(log_t* log)
 {
     for (size_t level = 0; level < LG_VALID_LVL_COUNT; ++level)
     {
-        fh_free(&log->fhandlers[level]);
+        handler_free(&log->handlers[level]);
         formatter_free(&log->formatters[level]);
     }
 
@@ -111,7 +111,7 @@ bool log_enabled(log_t* log, LG_LEVEL level)
     return true;
 }
 
-bool log_enable_stdout(log_t* log, LG_LEVEL level)
+bool log_set_user_output(log_t* log, LG_LEVEL level, bool(*user_output)(const char*))
 {
     bool success = false;
     bool failed = false;
@@ -120,17 +120,94 @@ bool log_enable_stdout(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_enable_stdout(&log->fhandlers[level]);
+            handler_user_output_register(&log->handlers[level], user_output);
         }
     }
     else
     {
-        fh_enable_stdout(&log->fhandlers[level]);
+        handler_user_output_register(&log->handlers[level], user_output);
+    }
+
+    return true;
+}
+
+bool log_user_output_enable(log_t* log, LG_LEVEL level)
+{
+    bool success = false;
+    bool failed = false;
+    if (level == LG_ALL_LEVELS)
+    {
+        success = true;
+        for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
+        {
+            handler_user_output_enable(&log->handlers[level]);
+        }
+    }
+    else
+    {
+        handler_user_output_enable(&log->handlers[level]);
+    }
+
+    return true;
+}
+
+bool log_user_output_disable(log_t* log, LG_LEVEL level)
+{
+    bool success = false;
+    bool failed = false;
+    if (level == LG_ALL_LEVELS)
+    {
+        success = true;
+        for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
+        {
+            handler_user_output_disable(&log->handlers[level]);
+        }
+    }
+    else
+    {
+        handler_user_output_disable(&log->handlers[level]);
+    }
+
+    return true;
+}
+
+bool log_user_output_enabled(log_t* log, LG_LEVEL level)
+{
+    if (level == LG_ALL_LEVELS)
+    {
+        for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
+        {
+            if (!handler_user_output_enabled(&log->handlers[level]))
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        return handler_user_output_enabled(&log->handlers[level]);
     }
     return true;
 }
 
-bool log_disable_stdout(log_t* log, LG_LEVEL level)
+bool log_strict_fsize_enable(log_t* log, LG_LEVEL level)
+{
+    handler_strict_fsize_enable(&log->handlers[level]);
+    return true;
+}
+
+bool log_strict_fsize_disable(log_t* log, LG_LEVEL level)
+{
+    handler_strict_fsize_disable(&log->handlers[level]);
+    return true;
+}
+
+bool log_strict_fsize_enabled(log_t* log, LG_LEVEL level)
+{
+    return handler_strict_fsize_enabled(&log->handlers[level]);;
+}
+
+bool log_stdout_enable(log_t* log, LG_LEVEL level)
 {
     bool success = false;
     bool failed = false;
@@ -139,22 +216,41 @@ bool log_disable_stdout(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_disable_stdout(&log->fhandlers[level]);
+            handler_stdout_enable(&log->handlers[level]);
         }
     }
     else
     {
-        fh_disable_stdout(&log->fhandlers[level]);
+        handler_stdout_enable(&log->handlers[level]);
+    }
+    return true;
+}
+
+bool log_stdout_disable(log_t* log, LG_LEVEL level)
+{
+    bool success = false;
+    bool failed = false;
+    if (level == LG_ALL_LEVELS)
+    {
+        success = true;
+        for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
+        {
+            handler_stdout_disable(&log->handlers[level]);
+        }
+    }
+    else
+    {
+        handler_stdout_disable(&log->handlers[level]);
     }
     return true;
 }
 
 bool log_stdout_enabled(log_t* log, LG_LEVEL level)
 {
-    return fh_stdout_enabled(&log->fhandlers[level]);
+    return handler_stdout_enabled(&log->handlers[level]);
 }
 
-bool log_enable_stderr(log_t* log, LG_LEVEL level)
+bool log_stderr_enable(log_t* log, LG_LEVEL level)
 {
     bool success = false;
     bool failed = false;
@@ -163,17 +259,17 @@ bool log_enable_stderr(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_enable_stderr(&log->fhandlers[level]);
+            handler_stderr_enable(&log->handlers[level]);
         }
     }
     else
     {
-        fh_enable_stderr(&log->fhandlers[level]);
+        handler_stderr_enable(&log->handlers[level]);
     }
     return true;
 }
 
-bool log_disable_stderr(log_t* log, LG_LEVEL level)
+bool log_stderr_disable(log_t* log, LG_LEVEL level)
 {
     bool success = false;
     bool failed = false;
@@ -182,23 +278,23 @@ bool log_disable_stderr(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_disable_stderr(&log->fhandlers[level]);
+            handler_stderr_disable(&log->handlers[level]);
         }
         return true;
     }
     else
     {
-        fh_disable_stderr(&log->fhandlers[level]);
+        handler_stderr_disable(&log->handlers[level]);
         return true;
     }
 }
 
 bool log_stderr_enabled(log_t* log, LG_LEVEL level)
 {
-    return fh_stderr_enabled(&log->fhandlers[level]);
+    return handler_stderr_enabled(&log->handlers[level]);
 }
 
-bool log_enable_file(log_t* log, LG_LEVEL level)
+bool log_file_enable(log_t* log, LG_LEVEL level)
 {
     bool success = false;
     bool failed = false;
@@ -207,17 +303,17 @@ bool log_enable_file(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_enable_file(&log->fhandlers[level]);
+            handler_file_enable(&log->handlers[level]);
         }
     }
     else
     {
-        fh_enable_file(&log->fhandlers[level]);
+        handler_file_enable(&log->handlers[level]);
     }
     return true;
 }
 
-bool log_disable_file(log_t* log, LG_LEVEL level)
+bool log_file_disable(log_t* log, LG_LEVEL level)
 {
     bool success = false;
     bool failed = false;
@@ -226,13 +322,13 @@ bool log_disable_file(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            fh_disable_file(&log->fhandlers[level]);
+            handler_file_disable(&log->handlers[level]);
         }
         return true;
     }
     else
     {
-        fh_disable_file(&log->fhandlers[level]);
+        handler_file_disable(&log->handlers[level]);
         return true;
     }
 
@@ -248,7 +344,7 @@ bool log_file_enabled(log_t* log, LG_LEVEL level)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_file_enabled(&log->fhandlers[level]);
+            success = handler_file_enabled(&log->handlers[level]);
             if (!failed)
             {
                 failed = !success;
@@ -257,13 +353,13 @@ bool log_file_enabled(log_t* log, LG_LEVEL level)
     }
     else
     {
-        return fh_file_enabled(&log->fhandlers[level]);
+        return handler_file_enabled(&log->handlers[level]);
     }
 
     return !failed;
 }
 
-void log_set_error(log_t* log, LG_ERRNO error, const char* message)
+bool log_set_error(log_t* log, LG_ERRNO error, const char* message)
 {
     log->last_error = error;
     strcpy(log->error_msg, message);
@@ -274,7 +370,7 @@ LG_ERRNO log_get_error(log_t* log)
     return log->last_error;
 }
 
-void log_clear_error(log_t* log)
+bool log_clear_error(log_t* log)
 {
     log->last_error = LG_E_NO_ERROR;
 }
@@ -304,7 +400,7 @@ bool log_set_bmode(log_t* log, LG_LEVEL level, int mode)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_bmode(&log->fhandlers[level], mode);
+            success = handler_set_bmode(&log->handlers[level], mode);
             if (!failed)
             {
                 failed = !success;
@@ -313,7 +409,7 @@ bool log_set_bmode(log_t* log, LG_LEVEL level, int mode)
     }
     else
     {
-        return fh_set_bmode(&log->fhandlers[level], mode);
+        return handler_set_bmode(&log->handlers[level], mode);
     }
 
     return !failed;
@@ -321,7 +417,7 @@ bool log_set_bmode(log_t* log, LG_LEVEL level, int mode)
 
 int log_bmode(log_t* log, LG_LEVEL level)
 {
-    return fh_bmode(&log->fhandlers[level]);
+    return handler_bmode(&log->handlers[level]);
 }
 
 bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size)
@@ -333,7 +429,7 @@ bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_bsize(&log->fhandlers[level], buf_size);
+            success = handler_set_bsize(&log->handlers[level], buf_size);
             if (!failed)
             {
                 failed = !success;
@@ -342,7 +438,7 @@ bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size)
     }
     else
     {
-        return success = fh_set_bsize(&log->fhandlers[level], buf_size);
+        return success = handler_set_bsize(&log->handlers[level], buf_size);
     }
 
     return !failed;
@@ -350,7 +446,7 @@ bool log_set_bsize(log_t* log, LG_LEVEL level, size_t buf_size)
 
 size_t log_bsize(log_t* log, LG_LEVEL level)
 {
-    return fh_bsize(&log->fhandlers[level]);
+    return handler_bsize(&log->handlers[level]);
 }
 
 bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode)
@@ -362,7 +458,7 @@ bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_fmode(&log->fhandlers[level], mode);
+            success = handler_set_fmode(&log->handlers[level], mode);
             if (!failed)
             {
                 failed = !success;
@@ -371,7 +467,7 @@ bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode)
     }
     else
     {
-        return fh_set_fmode(&log->fhandlers[level], mode);
+        return handler_set_fmode(&log->handlers[level], mode);
     }
 
     return !failed;
@@ -379,7 +475,7 @@ bool log_set_fmode(log_t* log, LG_LEVEL level, LG_FMODE mode)
 
 LG_FMODE log_fmode(log_t* log, LG_LEVEL level)
 {
-    return fh_fmode(&log->fhandlers[level]);
+    return handler_fmode(&log->handlers[level]);
 }
 
 bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format)
@@ -391,7 +487,7 @@ bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_dname_format(&log->fhandlers[level], format);
+            success = handler_set_dname_format(&log->handlers[level], format);
             if (!failed)
             {
                 failed = !success;
@@ -400,7 +496,7 @@ bool log_set_dname_format(log_t* log, LG_LEVEL level, const char* format)
     }
     else
     {
-        return fh_set_dname_format(&log->fhandlers[level], format);
+        return handler_set_dname_format(&log->handlers[level], format);
     }
 
     return !failed;
@@ -412,12 +508,12 @@ char* log_dname_format(log_t* log, LG_LEVEL level, char* dest)
     {
         return false;
     }
-    return fh_curr_dname(&log->fhandlers[level], dest);
+    return handler_curr_dname(&log->handlers[level], dest);
 }
 
 char* log_dname(log_t* log, LG_LEVEL level, char* dest)
 {
-    return fh_curr_dname(&log->fhandlers[level], dest);
+    return handler_curr_dname(&log->handlers[level], dest);
 }
 
 bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
@@ -429,7 +525,7 @@ bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_fname_format(&log->fhandlers[level], format);
+            success = handler_set_fname_format(&log->handlers[level], format);
             if (!failed)
             {
                 failed = !success;
@@ -438,7 +534,7 @@ bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
     }
     else
     {
-        fh_set_fname_format(&log->fhandlers[level], format);
+        handler_set_fname_format(&log->handlers[level], format);
     }
 
     return !failed;
@@ -446,25 +542,25 @@ bool log_set_fname_format(log_t* log, LG_LEVEL level, const char* format)
 
 char* log_fname_format(log_t* log, LG_LEVEL level, char* dest)
 {
-    return fh_curr_fname(&log->fhandlers[level], dest);
+    return handler_curr_fname(&log->handlers[level], dest);
 }
 
 char* log_fname(log_t* log, LG_LEVEL level, char* dest)
 {
-    return fh_curr_fname(&log->fhandlers[level], dest);
+    return handler_curr_fname(&log->handlers[level], dest);
 }
 
 char* log_fpath_format(log_t* log, LG_LEVEL level, char* dest)
 {
-    fh_dname_format(&log->fhandlers[level], dest);
+    handler_dname_format(&log->handlers[level], dest);
     strcat(dest, "\\");
-    strcat(dest, fh_fname_format(&log->fhandlers[level], dest + strlen(dest)));
+    strcat(dest, handler_fname_format(&log->handlers[level], dest + strlen(dest)));
     return dest;
 }
 
 char* log_fpath(log_t* log, LG_LEVEL level, char* dest)
 {
-    return fh_curr_fpath(&log->fhandlers[level], dest);
+    return handler_curr_fpath(&log->handlers[level], dest);
 }
 
 bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size)
@@ -476,7 +572,7 @@ bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size)
         success = true;
         for (level = 0; level < LG_VALID_LVL_COUNT; ++level)
         {
-            success = fh_set_max_fsize(&log->fhandlers[level], size);
+            success = handler_set_max_fsize(&log->handlers[level], size);
             if (!failed)
             {
                 failed = !success;
@@ -485,7 +581,7 @@ bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size)
     }
     else
     {
-        return fh_set_max_fsize(&log->fhandlers[level], size);
+        return handler_set_max_fsize(&log->handlers[level], size);
     }
 
     return !failed;
@@ -493,12 +589,12 @@ bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size)
 
 size_t log_max_fsize(log_t* log, LG_LEVEL level)
 {
-    return fh_max_fsize(&log->fhandlers[level]);
+    return handler_max_fsize(&log->handlers[level]);
 }
 
 size_t log_curr_fsize(log_t* log, LG_LEVEL level)
 {
-    return fh_current_fsize(&log->fhandlers[level]);
+    return handler_current_fsize(&log->handlers[level]);
 }
 
 bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format)
@@ -544,8 +640,8 @@ bool log_fwrite(log_t* log, LG_LEVEL level, const char* message)
 {
     char formatted_message[LG_MAX_MSG_SIZE];
     formatter_entry(&log->formatters[level], formatted_message, message, level);
-    printf(formatted_message);
-    return fh_fwrite(&log->fhandlers[level], formatted_message);
+    
+    return handler_send(&log->handlers[level], formatted_message);
 }
 
 bool log_trace(log_t* log, const char* message)

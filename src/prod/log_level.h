@@ -17,7 +17,7 @@
 
 typedef enum {
     LG_NO_LEVEL = -2, /* Only intended for internal use. */
-    LG_ALL_LEVELS = -1, /* Only intended for internal use. */
+    LG_ALL_LEVELS = -1,
     LG_TRACE = 0,
     LG_DEBUG,
     LG_INFO,

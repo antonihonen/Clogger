@@ -12,7 +12,7 @@
 #define LG_LOG_H
 
 #include "flags.h"
-#include "file_handler.h"
+#include "handler.h"
 #include "log_level.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -21,7 +21,7 @@
 /* Log. */
 typedef struct
 {
-    fhandler_t  fhandlers[LG_VALID_LVL_COUNT];
+    handler_t   handlers[LG_VALID_LVL_COUNT];
     formatter_t formatters[LG_VALID_LVL_COUNT];
 
     bool        is_enabled[LG_VALID_LVL_COUNT];
@@ -43,40 +43,72 @@ bool log_disable(log_t* log, LG_LEVEL level);
 
 bool log_enabled(log_t* log, LG_LEVEL level);
 
-/* TODO */
-bool log_enable_flock(log_t* log, LG_LEVEL level);
+bool log_set_user_output(log_t* log, LG_LEVEL level, bool(*user_output)(const char*));
+
+bool log_user_output_enable(log_t* log, LG_LEVEL level);
+
+bool log_user_output_disable(log_t* log, LG_LEVEL level);
+
+bool log_user_output_enabled(log_t* log, LG_LEVEL level);
 
 /* TODO */
-bool log_disable_flock(log_t* log, LG_LEVEL level);
+bool log_fclose_enable(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_fclose_disable(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_fclose_enabled(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_strict_time_enable(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_strict_time_disable(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_strict_time_enabled(log_t* log, LG_LEVEL level);
+
+bool log_strict_fsize_enable(log_t* log, LG_LEVEL level);
+
+bool log_strict_fsize_disable(log_t* log, LG_LEVEL level);
+
+bool log_strict_fsize_enabled(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_flock_enable(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_flock_disable(log_t* log, LG_LEVEL level);
 
 /* TODO */
 bool log_flock_enabled(log_t* log, LG_LEVEL level);
 
-bool log_enable_stdout(log_t* log, LG_LEVEL level);
+bool log_stdout_enable(log_t* log, LG_LEVEL level);
 
-bool log_disable_stdout(log_t* log, LG_LEVEL level);
+bool log_stdout_disable(log_t* log, LG_LEVEL level);
 
 bool log_stdout_enabled(log_t* log, LG_LEVEL level);
 
-bool log_enable_stderr(log_t* log, LG_LEVEL level);
+bool log_stderr_enable(log_t* log, LG_LEVEL level);
 
-bool log_disable_stderr(log_t* log, LG_LEVEL level);
+bool log_stderr_disable(log_t* log, LG_LEVEL level);
 
 bool log_stderr_enabled(log_t* log, LG_LEVEL level);
 
-bool log_enable_file(log_t* log, LG_LEVEL level);
+bool log_file_enable(log_t* log, LG_LEVEL level);
 
-bool log_disable_file(log_t* log, LG_LEVEL level);
+bool log_file_disable(log_t* log, LG_LEVEL level);
 
 bool log_file_enabled(log_t* log, LG_LEVEL level);
 
-void log_set_error(log_t* log, LG_ERRNO error, const char* message);
+bool log_set_error(log_t* log, LG_ERRNO error, const char* message);
 
 LG_ERRNO log_get_error(log_t* log);
 
 bool log_has_error(log_t* log);
 
-void log_clear_error(log_t* log);
+bool log_clear_error(log_t* log);
 
 bool log_set_threshold(log_t* log, LG_LEVEL level);
 
@@ -121,6 +153,18 @@ bool log_set_max_fsize(log_t* log, LG_LEVEL level, size_t size);
 size_t log_max_fsize(log_t* log, LG_LEVEL level);
 
 size_t log_curr_fsize(log_t* log, LG_LEVEL level);
+
+/* TODO */
+bool log_set_max_file_iter(log_t* log, size_t iterations);
+
+/* TODO */
+size_t log_get_max_file_iter(log_t* log);
+
+/* TODO */
+bool log_set_max_file_age(log_t* log, size_t age);
+
+/* TODO */
+size_t log_get_max_file_age(log_t* log);
 
 bool log_set_entry_format(log_t* log, LG_LEVEL level, const char* format);
 

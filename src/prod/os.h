@@ -10,6 +10,7 @@
 #define LG_OS_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN32) && !defined(_CYGWIN_)
 #define LG_USE_WINAPI
@@ -54,6 +55,12 @@ bool _remove_dir(const char* abs_path)
     return RemoveDirectoryA(abs_path) == 0;
 #endif
     return false;
+}
+
+/* TODO */
+bool _remove_file(const char* abs_path)
+{
+    return true;
 }
 
 /* Returns true if filepath points to an existing file. */
