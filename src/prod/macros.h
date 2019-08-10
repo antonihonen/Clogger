@@ -12,16 +12,6 @@
 #ifndef LG_MACROS_H
 #define LG_MACROS_H
 
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN32) && !defined(_CYGWIN_)
-#define LG_USE_WINAPI
-#include <windows.h>
-#define LG_PATH_DELIM_CHAR '\\'
-#define LG_PATH_DELIM_STR "\\"
-#else
-#define LG_PATH_DELIM_CHAR '/'
-#define LG_PATH_DELIM_STR "/"
-#endif
-
 #define LG_DEF_MAX_FSIZE 1048576 /* 1 MiB */
 #define LG_DEF_THRESHOLD LG_TRACE
 #define LG_DEF_ENTRY_FORMAT "%(MSG)\n"

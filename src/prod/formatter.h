@@ -49,6 +49,7 @@ typedef struct {
     char      format[LG_MAX_ENTRY_SIZE];
     struct tm time;
     uint16_t  flags;
+    bool      is_dynamic;
 } formatter_t;
 
 formatter_t* formatter_init(formatter_t* buffer, const char* format, uint16_t flags);

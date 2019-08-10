@@ -10,6 +10,7 @@
 #include "flags.h"
 #include "file_handler.h"
 #include "macros.h"
+#include "os.h"
 #include "string_util.h"
 #include <assert.h>
 #include <stdint.h>
@@ -18,8 +19,6 @@
 
 #define LG_MAX_FOPEN_ATTEMPTS 3
 
-static fhandler_t* _fh_alloc(const size_t bufsize);
-
 static bool _fh_open_fstream(fhandler_t* const fh, size_t data_size);
 
 static void _fh_refresh_path(fhandler_t* const fh);
@@ -27,14 +26,6 @@ static void _fh_refresh_path(fhandler_t* const fh);
 static bool _rotate_files(const char* const abs_filepath);
 
 static bool _file_size(FILE* const fstream, fpos_t* const size);
-
-static bool _does_dir_exist(const char* const abs_path);
-
-static bool _create_dir(const char* const abs_path);
-
-static bool _remove_dir(const char* const abs_path);
-
-static bool _does_file_exist(const char* const abs_filepath);
 
 /* Allocates and initializes a new fhandler_t object and returns
 a pointer to it. */
@@ -159,12 +150,12 @@ bool fh_stdout_enabled(fhandler_t* fh)
 
 void fh_enable_stderr(fhandler_t* fh)
 {
-    return fh->is_stderr_enabled = true;
+    fh->is_stderr_enabled = true;
 }
 
 void fh_disable_stderr(fhandler_t* fh)
 {
-    return fh->is_stderr_enabled = false;
+    fh->is_stderr_enabled = false;
 }
 
 bool fh_stderr_enabled(fhandler_t* fh)
@@ -501,48 +492,4 @@ bool _file_size(FILE* fstream, fpos_t* size)
     return true;
 }
 
-/* Returns true if dir_path points to an existing directory. */
-bool _does_dir_exist(const char* abs_path)
-{
-#ifdef LG_USE_WINAPI
-    DWORD ftyp = GetFileAttributesA(abs_path);
-    if (ftyp == INVALID_FILE_ATTRIBUTES)
-    {
-        return false;
-    }
-    else if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
-    {
-        return true;
-    }
-    return false;
-#endif
-}
 
-/* Creates the directory in dir_path and returns true if successful. */
-bool _create_dir(const char* abs_path)
-{
-#ifdef LG_USE_WINAPI
-    /* TODO: Recursive folder creation, i.e. create parent folder(s) */
-    return CreateDirectoryA(abs_path, NULL) != 0;
-#endif
-}
-
-bool _remove_dir(const char* abs_path)
-{
-#ifdef LG_USE_WINAPI
-    return RemoveDirectoryA(abs_path) == 0;
-#endif
-        return false;
-}
-
-/* Returns true if filepath points to an existing file. */
-bool _does_file_exist(const char* abs_path)
-{
-    FILE* f = fopen(abs_path, "r");
-    if (f)
-    {
-        fclose(f);
-        return true;
-    }
-    return false;
-}

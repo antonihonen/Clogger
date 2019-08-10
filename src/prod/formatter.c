@@ -64,30 +64,33 @@ formatter_t* formatter_init(formatter_t* buffer, const char* format, uint16_t fl
     if (!formatter)
     {
         formatter = LG_alloc(sizeof(formatter_t));
-    }
-
-    if (formatter)
-    {
-        formatter->flags = flags;
-        memset(&(formatter->time), 0x00, sizeof(struct tm));
-        if (formatter_set(formatter, format))
+        if (!formatter)
         {
-            return formatter;
+            return NULL;
         }
+        formatter->is_dynamic = true;
+    }
+    else
+    {
+        formatter->is_dynamic = false;
     }
 
-    /* Memory allocation failed or format was invalid. Clean up
-    and return NULL. */
-    if (formatter)
+    formatter->flags = flags;
+    memset(&(formatter->time), 0x00, sizeof(struct tm));
+    if (formatter_set(formatter, format))
     {
-        LG_dealloc(formatter);
+        return formatter;
     }
+
     return NULL;
 }
 
 void formatter_free(formatter_t* formatter)
 {
-    LG_dealloc(formatter);
+    if (formatter->is_dynamic)
+    {
+        LG_dealloc(formatter);
+    }
 }
 
 bool formatter_set(formatter_t* formatter, const char* format)
